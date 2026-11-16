@@ -64,26 +64,21 @@ export default function Home() {
     <div className="home-page">
       {/* HERO SECTION */}
       <section id="hero" className="hero-section">
-        <div className="hero-video-wrapper">
-          <video
-            className="hero-video"
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="/hero-poster.jpg"
-          >
-            <source src={heroVideoSrc} type="video/mp4" />
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
+        <div className="hero-bg-wrapper">
+          <img
+            src="/images/nhehs-hero.jpg"
+            alt="Welcome to Notting Hill & Ealing Junior School"
+            className="hero-bg-image"
+          />
           <div className="hero-overlay"></div>
         </div>
 
         <div className="hero-content">
-          <h1 className="hero-title">Global Education Consultancy</h1>
-          <p className="hero-subtitle">
-            From the first call to your destination—we’re there for every step.
-          </p>
+          <h1 className="hero-title">
+            Welcome to Notting<br />
+            Hill &amp; Ealing Junior<br />
+            School
+          </h1>
         </div>
       </section>
 
