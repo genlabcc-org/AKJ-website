@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,6 +71,15 @@ export default function Navbar() {
         </ul>
       </nav>
 
+      <div className="nav-actions">
+        <Link
+          to={isAuthenticated ? '/admin' : '/admin/login'}
+          className="nav-admin-btn"
+        >
+          {isAuthenticated ? 'Admin Panel' : 'Admin Login'}
+        </Link>
+      </div>
+
       {/* Mobile menu toggle */}
       <button
         className="mobile-toggle"
@@ -89,6 +100,12 @@ export default function Navbar() {
         <Link to="/testimonials">Testimonials</Link>
         <Link to="/blog">Blog</Link>
         <Link to="/contact">Contact</Link>
+        <Link
+          to={isAuthenticated ? '/admin' : '/admin/login'}
+          className="mobile-admin-btn"
+        >
+          {isAuthenticated ? 'Admin Panel' : 'Admin Login'}
+        </Link>
       </div>
     </header>
   );
