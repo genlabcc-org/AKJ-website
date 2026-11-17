@@ -1,65 +1,97 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+} from 'firebase/auth';
+import { auth } from '../firebase';
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = 'akj_admin_auth';
-
-const DEFAULT_ADMIN = {
-  email: 'admin@acadly.com',
-  username: 'admin',
-  password: 'admin123',
-  name: 'Administrator',
-  role: 'Super Admin',
-};
+function getFriendlyFirebaseError(error) {
+  switch (error?.code) {
+    case 'auth/invalid-credential':
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      return 'Invalid admin email or password.';
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    case 'auth/user-disabled':
+      return 'This admin account has been disabled.';
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Please try again later.';
+    case 'auth/network-request-failed':
+      return 'Network error. Please check your internet connection.';
+    default:
+      return error?.message || 'Failed to sign in. Please try again.';
+  }
+}
 
 export function AuthProvider({ children }) {
-  const [adminUser, setAdminUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const [adminUser, setAdminUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      if (adminUser) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(adminUser));
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setAdminUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Administrator',
+          role: 'Admin',
+        });
       } else {
-        localStorage.removeItem(STORAGE_KEY);
+        setAdminUser(null);
       }
-    } catch {
-      // Ignore storage errors
-    }
-  }, [adminUser]);
+      setLoading(false);
+    });
 
-  const login = (identifier, password) => {
-    const cleanId = identifier.trim().toLowerCase();
-    const isValidUser =
-      cleanId === DEFAULT_ADMIN.email.toLowerCase() ||
-      cleanId === DEFAULT_ADMIN.username.toLowerCase();
+    return () => unsubscribe();
+  }, []);
 
-    if (isValidUser && password === DEFAULT_ADMIN.password) {
-      const sessionUser = {
-        email: DEFAULT_ADMIN.email,
-        username: DEFAULT_ADMIN.username,
-        name: DEFAULT_ADMIN.name,
-        role: DEFAULT_ADMIN.role,
-        loggedInAt: new Date().toISOString(),
-      };
-      setAdminUser(sessionUser);
+  const login = async (email, password, rememberDevice = true) => {
+    try {
+      await setPersistence(
+        auth,
+        rememberDevice ? browserLocalPersistence : browserSessionPersistence
+      );
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: getFriendlyFirebaseError(error),
+      };
     }
-
-    return {
-      success: false,
-      error: 'Invalid admin email/username or password.',
-    };
   };
 
-  const logout = () => {
-    setAdminUser(null);
+  const resetPassword = async (email) => {
+    if (!email || !email.trim()) {
+      return {
+        success: false,
+        error: 'Please enter your email address first to reset your password.',
+      };
+    }
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      return {
+        success: true,
+        message: 'Password reset email sent! Please check your inbox.',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: getFriendlyFirebaseError(error),
+      };
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
   };
 
   return (
@@ -67,7 +99,9 @@ export function AuthProvider({ children }) {
       value={{
         adminUser,
         isAuthenticated: Boolean(adminUser),
+        loading,
         login,
+        resetPassword,
         logout,
       }}
     >
@@ -83,4 +117,3 @@ export function useAuth() {
   }
   return context;
 }
-

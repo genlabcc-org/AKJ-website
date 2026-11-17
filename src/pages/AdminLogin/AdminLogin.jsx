@@ -7,7 +7,7 @@ import './AdminLogin.css';
 const RIGHT_SIDE_IMAGE = '/images/about-campus.jpg';
 
 export default function AdminLogin() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, loading, login, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -15,24 +15,30 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
 
   const fromPath = location.state?.from || '/admin';
 
-  if (isAuthenticated) {
+  if (!loading && isAuthenticated) {
     return <Navigate to={fromPath} replace />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setInfoMessage('');
 
     if (!identifier.trim() || !password) {
       setError('Please enter both your email and password.');
       return;
     }
 
-    const result = login(identifier, password);
+    setIsSubmitting(true);
+    const result = await login(identifier, password, rememberDevice);
+    setIsSubmitting(false);
+
     if (result.success) {
       navigate(fromPath, { replace: true });
     } else {
@@ -40,10 +46,15 @@ export default function AdminLogin() {
     }
   };
 
-  const handlePreviewConsole = () => {
-    setIdentifier('admin@acadly.com');
-    setPassword('admin123');
+  const handleForgotPassword = async () => {
     setError('');
+    setInfoMessage('');
+    const result = await resetPassword(identifier);
+    if (result.success) {
+      setInfoMessage(result.message);
+    } else {
+      setError(result.error);
+    }
   };
 
   return (
@@ -87,10 +98,15 @@ export default function AdminLogin() {
               </p>
             </div>
 
-
             {error && (
               <div className="admin-login-error" role="alert">
                 <span>{error}</span>
+              </div>
+            )}
+
+            {infoMessage && (
+              <div className="admin-login-success" role="status">
+                <span>{infoMessage}</span>
               </div>
             )}
 
@@ -100,11 +116,11 @@ export default function AdminLogin() {
                 <label htmlFor="admin-identifier">Email</label>
                 <input
                   id="admin-identifier"
-                  type="text"
+                  type="email"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="Enter your email"
-                  autoComplete="username"
+                  autoComplete="email"
                   required
                 />
               </div>
@@ -161,22 +177,14 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   className="admin-forgot-link"
-                  onClick={handlePreviewConsole}
+                  onClick={handleForgotPassword}
                 >
                   Forget password?
                 </button>
               </div>
 
-              <button type="submit" className="admin-signin-btn">
-                Sign in
-              </button>
-
-              <button
-                type="button"
-                className="admin-preview-console-btn"
-                onClick={handlePreviewConsole}
-              >
-                Need access? preview the console
+              <button type="submit" className="admin-signin-btn" disabled={isSubmitting}>
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </button>
             </form>
 
@@ -184,11 +192,10 @@ export default function AdminLogin() {
             <div className="admin-left-footer">
               <p className="admin-request-text">
                 Don’t have an account?{' '}
-                <button type="button" onClick={handlePreviewConsole} className="admin-request-link">
+                <Link to="/contact" className="admin-request-link">
                   Request admin access
-                </button>
+                </Link>
               </p>
-              
             </div>
           </div>
         </div>

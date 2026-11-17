@@ -75,6 +75,28 @@
   color: #002269;
 }
 
+.nhehs-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 16px;
+  border-radius: 999px;
+  background-color: #002269;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.nhehs-login-btn:hover {
+  background-color: #001647;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 /* MIDDLE SLOT: DIAMOND (14px) */
 .nhehs-mid-slot {
   height: 14px;
@@ -209,6 +231,17 @@
   text-decoration: none;
   padding: 8px 0;
   border-bottom: 1px solid #f0f0f0;
+}
+
+.nhehs-mobile-pane a.nhehs-mobile-login-btn {
+  margin-top: 8px;
+  background-color: #002269;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-weight: 600;
+  border-bottom: none;
 }
 
 /* RESPONSIVE */

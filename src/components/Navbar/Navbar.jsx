@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -157,11 +159,14 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Column 4: Working for us + Views & Voices */}
+          {/* Column 4: Login + Views & Voices */}
           <div className="nhehs-nav-col">
             <div className="nhehs-top-slot">
-              <Link to="/about" className="nhehs-top-link">
-                Working for us
+              <Link
+                to={isAuthenticated ? '/admin' : '/admin/login'}
+                className="nhehs-login-btn"
+              >
+                {isAuthenticated ? 'Admin Panel' : 'Login'}
               </Link>
             </div>
             <div className="nhehs-mid-slot"></div>
@@ -203,8 +208,13 @@ export default function Navbar() {
         <Link to="/blog">Views &amp; Voices</Link>
         <Link to="/about">Support us</Link>
         <Link to="/pricing">Bursaries</Link>
-        <Link to="/about">Working for us</Link>
         <Link to="/contact">Contact Us</Link>
+        <Link
+          to={isAuthenticated ? '/admin' : '/admin/login'}
+          className="nhehs-mobile-login-btn"
+        >
+          {isAuthenticated ? 'Admin Panel' : 'Login'}
+        </Link>
       </div>
     </header>
   );

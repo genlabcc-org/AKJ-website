@@ -15,8 +15,12 @@ import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import './App.css';
 
 function ProtectedAdminRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+
+  if (loading) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location.pathname }} replace />;
@@ -31,7 +35,7 @@ function AppLayout() {
 
   return (
     <div className="app-wrapper">
-      <Navbar />
+      {!isAdminRoute && <Navbar />}
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
