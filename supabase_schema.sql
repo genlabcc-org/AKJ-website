@@ -33,11 +33,13 @@ create table if not exists public.videos (
 alter table public.blogs enable row level security;
 alter table public.videos enable row level security;
 
+drop policy if exists "Allow all operations on blogs" on public.blogs;
 create policy "Allow all operations on blogs"
   on public.blogs for all
   using (true)
   with check (true);
 
+drop policy if exists "Allow all operations on videos" on public.videos;
 create policy "Allow all operations on videos"
   on public.videos for all
   using (true)
@@ -48,18 +50,22 @@ insert into storage.buckets (id, name, public)
 values ('blog-images', 'blog-images', true)
 on conflict (id) do update set public = true;
 
+drop policy if exists "Public read access on blog-images" on storage.objects;
 create policy "Public read access on blog-images"
   on storage.objects for select
   using (bucket_id = 'blog-images');
 
+drop policy if exists "Allow upload to blog-images" on storage.objects;
 create policy "Allow upload to blog-images"
   on storage.objects for insert
   with check (bucket_id = 'blog-images');
 
+drop policy if exists "Allow update on blog-images" on storage.objects;
 create policy "Allow update on blog-images"
   on storage.objects for update
   using (bucket_id = 'blog-images');
 
+drop policy if exists "Allow delete on blog-images" on storage.objects;
 create policy "Allow delete on blog-images"
   on storage.objects for delete
   using (bucket_id = 'blog-images');

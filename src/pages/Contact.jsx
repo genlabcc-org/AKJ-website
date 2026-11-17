@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PageHero from '../components/PageHero';
 import './Contact.css';
 import './Home.css';
 
@@ -30,15 +31,15 @@ export default function Contact() {
 
   return (
     <div className="page-container contact-page">
-      <section className="page-hero">
-        <div className="container">
-          <span className="badge-tag">Get in Touch</span>
-          <h1 className="page-hero-title">Start Your Admissions Journey</h1>
-          <p className="page-hero-subtitle">
-            Schedule a diagnostic consultation with an Acadly senior advisor to discuss boarding school or university placement options.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title={
+          <>
+            Start Your<br />
+            Admissions Journey.
+          </>
+        }
+        subtitle="Schedule a diagnostic consultation with a senior educational advisor"
+      />
 
       <section className="section">
         <div className="container">

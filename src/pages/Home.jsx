@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import LogosTicker from '../components/LogosTicker';
+import PageHero from '../components/PageHero';
+import HeroVideo from '../components/HeroVideo';
 import { supabase } from '../supabase';
 import './Home.css';
 
 export default function Home() {
-  const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [openFaq, setOpenFaq] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
@@ -86,24 +87,18 @@ export default function Home() {
   return (
     <div className="home-page">
       {/* HERO SECTION */}
-      <section id="hero" className="hero-section">
-        <div className="hero-bg-wrapper">
-          <img
-            src="/images/nhehs-hero.jpg"
-            alt="Welcome to Notting Hill & Ealing Junior School"
-            className="hero-bg-image"
-          />
-          <div className="hero-overlay"></div>
-        </div>
+      <PageHero
+        title={
+          <>
+            Global Education.<br />
+            Tailored Admissions.
+          </>
+        }
+        subtitle="From the first call to your destination — university & boarding school consultancy"
+      />
 
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Welcome to Notting<br />
-            Hill &amp; Ealing Junior<br />
-            School
-          </h1>
-        </div>
-      </section>
+      {/* HERO VIDEO */}
+      <HeroVideo src="/service-1.mp4" />
 
       {/* LOGOS TICKER */}
       <LogosTicker />
@@ -376,250 +371,6 @@ export default function Home() {
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS SECTION */}
-      <section id="testimonials" className="section testimonials-section">
-        <div className="container">
-          <div className="section-heading-wrapper" style={{ textAlign: 'center' }}>
-            <span className="badge-tag">Words form our Clients</span>
-            <h2 className="section-title">Don’t Just Take Our Word for It—See What Our Students Say!</h2>
-            <p className="section-desc" style={{ margin: '12px auto 0' }}>Clients Reviews.</p>
-          </div>
-
-          <div className="testimonials-grid">
-            <div className="testimonial-card">
-              <div>
-                <div className="testimonial-stars">
-                  {'★'.repeat(5)}
-                </div>
-                <p className="testimonial-quote">
-                  “Thank you, I got into the university I wanted!”
-                </p>
-              </div>
-              <div className="testimonial-author">
-                <img
-                  src="/images/testimonial-1.jpg"
-                  alt="Haim Georgia"
-                  className="testimonial-avatar"
-                />
-                <div>
-                  <div className="author-name">Haim Georgia</div>
-                  <div className="author-role">Student</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="testimonial-card">
-              <div>
-                <div className="testimonial-stars">
-                  {'★'.repeat(5)}
-                </div>
-                <p className="testimonial-quote">
-                  “The support and information I received helped me pass the entrance exams.”
-                </p>
-              </div>
-              <div className="testimonial-author">
-                <img
-                  src="/images/testimonial-2.jpg"
-                  alt="David Esenbau"
-                  className="testimonial-avatar"
-                />
-                <div>
-                  <div className="author-name">David Esenbau</div>
-                  <div className="author-role">Passionate about technology</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="testimonial-card">
-              <div>
-                <div className="testimonial-stars">
-                  {'★'.repeat(5)}
-                </div>
-                <p className="testimonial-quote">
-                  “They simplified the school enrollment process!”
-                </p>
-              </div>
-              <div className="testimonial-author">
-                <img
-                  src="/images/testimonial-3.jpg"
-                  alt="Elena Smith"
-                  className="testimonial-avatar"
-                />
-                <div>
-                  <div className="author-name">Elena Smith</div>
-                  <div className="author-role">Student Munich</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <Link to="/testimonials" className="btn-secondary">
-              Read full stories
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* PRICING PACKAGES */}
-      <section id="pricing" className="section pricing-section">
-        <div className="container">
-          <div className="pricing-header-center">
-            <span className="badge-tag">Pricing Packages</span>
-            <h2 className="section-title">Explore Pricing for University</h2>
-            
-            <div className="billing-toggle-wrapper">
-              <div className="billing-toggle">
-                <button
-                  type="button"
-                  className={billingPeriod === 'monthly' ? 'active' : ''}
-                  onClick={() => setBillingPeriod('monthly')}
-                >
-                  Monthly
-                </button>
-                <button
-                  type="button"
-                  className={billingPeriod === 'yearly' ? 'active' : ''}
-                  onClick={() => setBillingPeriod('yearly')}
-                >
-                  Yearly <span className="discount-pill">- Save 20%</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="pricing-grid">
-            <div className="pricing-card">
-              <img
-                src="/images/pricing-classic.png"
-                alt="Classic Package Icon"
-                className="pricing-icon"
-              />
-              <h3 className="plan-name">Classic Package</h3>
-              <p className="plan-tagline">Structured guidance for confident families</p>
-              
-              <div className="plan-price-wrapper">
-                <div className="plan-price">
-                  {billingPeriod === 'monthly' ? '199 lei' : '159 lei'}
-                  <span className="plan-period">/{billingPeriod === 'monthly' ? 'month' : 'month (billed yearly)'}</span>
-                </div>
-                <div className="plan-target">Ideal for Families who prefer partial support</div>
-              </div>
-
-              <ul className="plan-features-list">
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Profile Evaluation
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  8-10 School Matches
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Interview Prep (1 session)
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Visa & Relocation Tips
-                </li>
-              </ul>
-
-              <Link to="/pricing" className="pricing-btn outline">
-                Purchase this Plan
-              </Link>
-            </div>
-
-            <div className="pricing-card featured">
-              <div className="featured-badge">Most Popular</div>
-              <img
-                src="/images/pricing-premium.png"
-                alt="Premium Package Icon"
-                className="pricing-icon"
-              />
-              <h3 className="plan-name">Premium Package</h3>
-              <p className="plan-tagline">End-to-end support for top-tier schools</p>
-              
-              <div className="plan-price-wrapper">
-                <div className="plan-price">
-                  {billingPeriod === 'monthly' ? '350 lei' : '280 lei'}
-                  <span className="plan-period">/{billingPeriod === 'monthly' ? 'month' : 'month (billed yearly)'}</span>
-                </div>
-                <div className="plan-target">Ideal for Competitive applicants</div>
-              </div>
-
-              <ul className="plan-features-list">
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Insider School Access
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  2 Mock Interviews
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Exam Strategy (ISEB/UKiset)
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Priority Consultant Access
-                </li>
-              </ul>
-
-              <Link to="/pricing" className="pricing-btn primary">
-                Purchase this Plan
-              </Link>
-            </div>
-
-            <div className="pricing-card">
-              <img
-                src="/images/pricing-elite.png"
-                alt="Elite Package Icon"
-                className="pricing-icon"
-              />
-              <h3 className="plan-name">Elite Package</h3>
-              <p className="plan-tagline">White-glove, VIP admissions experience</p>
-              
-              <div className="plan-price-wrapper">
-                <div className="plan-price">
-                  Consultation
-                  <span className="plan-period"></span>
-                </div>
-                <div className="plan-target">Ideal for Exceptional candidates</div>
-              </div>
-
-              <ul className="plan-features-list">
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Multi-School Roadmap (UK/US)
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Headmaster Meetings
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Full Essay & Portfolio Editing
-                </li>
-                <li className="plan-feature-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  Post-Acceptance Mentorship
-                </li>
-              </ul>
-
-              <Link to="/pricing" className="pricing-btn outline">
-                Book a Consultation
-              </Link>
-            </div>
           </div>
         </div>
       </section>

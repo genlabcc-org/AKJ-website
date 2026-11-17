@@ -1,21 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LogosTicker from '../components/LogosTicker';
+import PageHero from '../components/PageHero';
 import './About.css';
 
 export default function About() {
   return (
     <div className="page-container about-page">
-      {/* Page Hero */}
-      <section className="page-hero">
-        <div className="container">
-          <span className="badge-tag">Get to Know Us</span>
-          <h1 className="page-hero-title">Shaping Global Educational Journeys</h1>
-          <p className="page-hero-subtitle">
-            From premier European academies to Ivy League universities, our tailored advisory empowers students to achieve exceptional academic admissions.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title={
+          <>
+            Shaping Global<br />
+            Educational Journeys.
+          </>
+        }
+        subtitle="From premier European academies to Ivy League universities, tailored advisory for exceptional admissions"
+      />
 
       {/* Main Story */}
       <section className="section">

@@ -1,292 +1,224 @@
-/* Exact NHEHS Navigation Bar Styles - Matching Official Site */
+/* Global Editorial Header Styles */
 
-.nhehs-site-header {
+.site-header {
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
-  background: #ffffff;
+  background-color: #ffffff;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 0 32px;
 }
 
-.nhehs-header-wrap {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 30px 48px 26px 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 56px;
-}
-
-/* LEFT & RIGHT NAV BLOCKS */
-.nhehs-side-nav {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+.site-header-inner {
   width: 100%;
-  max-width: 450px;
-  flex: 1;
-}
-
-.nhehs-side-left {
+  height: 82px;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: clamp(32px, 4vw, 64px);
 }
 
-.nhehs-side-right {
-  justify-content: space-between;
-}
-
-/* 3-SLOT VERTICAL COLUMN */
-.nhehs-nav-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-/* TOP SLOT: UTILITY TEXT (18px) */
-.nhehs-top-slot {
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.nhehs-top-link {
-  font-size: 13.5px;
-  color: #9ea3ad;
-  font-weight: 400;
+.site-brand {
+  font-family: var(--font-family);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--color-dark);
   text-decoration: none;
-  letter-spacing: -0.01em;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  transition: color 0.15s ease;
-}
-
-.nhehs-top-link:hover {
-  color: #002269;
-}
-
-.nhehs-login-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 16px;
-  border-radius: 999px;
-  background-color: #002269;
-  color: #ffffff;
-  font-size: 12.5px;
-  font-weight: 600;
-  text-decoration: none;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  transition: all 0.18s ease;
-}
-
-.nhehs-login-btn:hover {
-  background-color: #001647;
-  color: #ffffff;
-  transform: translateY(-1px);
-}
-
-/* MIDDLE SLOT: DIAMOND (14px) */
-.nhehs-mid-slot {
-  height: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 6px;
-}
-
-.nhehs-diamond {
-  width: 5px;
-  height: 5px;
-  background-color: #002269;
-  transform: rotate(45deg);
-  display: block;
-}
-
-/* BOTTOM SLOT: MAIN NAV TEXT (22px) */
-.nhehs-bot-slot {
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nhehs-nav-link {
-  font-size: 15px;
-  color: #002269;
-  font-weight: 400;
-  text-decoration: none;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  transition: color 0.15s ease;
-}
-
-.nhehs-nav-link:hover,
-.nhehs-nav-link.active {
-  color: #002269;
-  font-weight: 400;
-}
-
-/* CENTER LOGO */
-.nhehs-center-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 16px;
   flex-shrink: 0;
 }
 
-.nhehs-logo-btn {
-  display: block;
-  line-height: 0;
-  transition: opacity 0.2s ease;
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(40px, 5vw, 76px);
+  margin-left: auto;
 }
 
-.nhehs-logo-btn:hover {
-  opacity: 0.92;
+.site-nav-link {
+  position: relative;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-dark);
+  text-decoration: none;
+  padding: 6px 0;
+  white-space: nowrap;
+  transition: color 0.15s ease;
 }
 
-.nhehs-logo-vector {
-  width: 220px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
+.site-nav-link:hover {
+  color: var(--color-accent-orange);
 }
 
-/* MOBILE TOGGLE */
-.nhehs-mobile-burger {
+.site-nav-link.active {
+  color: var(--color-accent-orange);
+}
+
+.site-nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background-color: var(--color-accent-orange);
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.site-admin-link {
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 0.15s ease;
+}
+
+.site-admin-link:hover {
+  color: var(--color-accent-orange);
+}
+
+/* Mobile Toggle */
+.site-mobile-burger {
   display: none;
   flex-direction: column;
   justify-content: space-between;
   width: 24px;
-  height: 18px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  height: 16px;
   padding: 0;
-  z-index: 1001;
 }
 
-.nhehs-mobile-burger span {
+.site-mobile-burger span {
   display: block;
   width: 100%;
   height: 2px;
-  background-color: #002269;
-  border-radius: 1px;
-  transition: all 0.25s ease;
+  background-color: var(--color-dark);
+  transition: transform 0.22s ease, opacity 0.22s ease;
 }
 
-/* MOBILE DRAWER */
-.nhehs-mobile-pane {
+.site-mobile-burger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.site-mobile-burger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.site-mobile-burger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Mobile Drawer */
+.site-mobile-drawer {
   display: none;
   position: fixed;
-  top: 84px;
+  top: 72px;
   left: 0;
   right: 0;
   bottom: 0;
-  background: #ffffff;
-  padding: 24px 28px;
+  background-color: #ffffff;
+  padding: 24px 20px;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-  transform: translateY(-100%);
+  border-top: 1px solid var(--color-border);
+  transform: translateY(-12px);
   opacity: 0;
   pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.22s ease, transform 0.22s ease;
   z-index: 999;
 }
 
-.nhehs-mobile-pane.open {
+.site-mobile-drawer.open {
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
 }
 
-.nhehs-pane-group {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #8c919c;
-  font-weight: 700;
-  margin-top: 10px;
+.site-mobile-link {
+  font-family: var(--font-family);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-dark);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
-.nhehs-mobile-pane a {
-  font-size: 16px;
-  font-weight: 400;
-  color: #002269;
-  text-decoration: none;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+.site-mobile-link.active {
+  color: var(--color-accent-orange);
 }
 
-.nhehs-mobile-pane a.nhehs-mobile-login-btn {
-  margin-top: 8px;
-  background-color: #002269;
+.site-mobile-admin-link {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  background-color: var(--color-dark);
   color: #ffffff;
-  text-align: center;
-  border-radius: 999px;
-  padding: 10px 20px;
-  font-weight: 600;
-  border-bottom: none;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* RESPONSIVE */
-@media (max-width: 1240px) {
-  .nhehs-header-wrap {
-    gap: 32px;
-    padding: 24px 24px 22px 24px;
-  }
-  .nhehs-side-nav {
-    max-width: 390px;
-  }
-  .nhehs-top-link {
-    font-size: 12.5px;
-  }
+/* Floating Right-Edge Contact Button */
+.floating-contact-btn {
+  position: fixed;
+  right: 0;
+  top: 230px;
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-dark);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 950;
+  transition: background-color 0.15s ease;
+}
 
-  .nhehs-nav-link {
-    font-size: 14px;
-  }
-
-  .nhehs-logo-vector {
-    width: 195px;
-  }
+.floating-contact-btn:hover {
+  background-color: var(--color-accent-orange);
 }
 
 @media (max-width: 960px) {
-  .nhehs-header-wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
+  .site-header {
+    padding: 0 20px;
   }
 
-  .nhehs-side-nav {
+  .site-header-inner {
+    height: 72px;
+  }
+
+  .site-nav,
+  .site-admin-link {
     display: none;
   }
 
-  .nhehs-logo-vector {
-    width: 180px;
-  }
-
-  .nhehs-mobile-burger {
+  .site-mobile-burger {
     display: flex;
   }
 
-  .nhehs-mobile-pane {
+  .site-mobile-drawer {
     display: flex;
+  }
+
+  .floating-contact-btn {
+    display: none;
   }
 }

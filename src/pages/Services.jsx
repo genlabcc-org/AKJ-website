@@ -1,20 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../components/PageHero';
 import './Services.css';
 import './Home.css';
 
 export default function Services() {
   return (
     <div className="page-container services-page">
-      <section className="page-hero">
-        <div className="container">
-          <span className="badge-tag">Our Capabilities</span>
-          <h1 className="page-hero-title">Admissions Consulting & Placement</h1>
-          <p className="page-hero-subtitle">
-            Tailored roadmaps crafted by senior educational consultants with proven access to world-renowned boarding schools and universities.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        title={
+          <>
+            Admissions Consulting<br />
+            &amp; Placement.
+          </>
+        }
+        subtitle="Tailored roadmaps crafted by senior educational consultants with proven global access"
+      />
 
       {/* Main Services Showcase */}
       <section className="section">

@@ -765,7 +765,7 @@
 
 .logip-tool-btn.tool-italic {
   font-style: italic;
-  font-family: Georgia, serif;
+  font-family: inherit;
 }
 
 .logip-tool-btn.tool-heading {

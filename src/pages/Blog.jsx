@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageHero from '../components/PageHero';
 import { supabase } from '../supabase';
 import './Blog.css';
 import './Home.css';
@@ -51,25 +52,25 @@ export default function Blog() {
 
   return (
     <div className="page-container blog-page">
-      <section className="page-hero">
-        <div className="container">
-          <span className="badge-tag">Knowledge Hub</span>
-          <h1 className="page-hero-title">Useful Educational Articles</h1>
-          <p className="page-hero-subtitle">
-            Essential guides, strategic insights, and admissions advice from senior university consultants.
-          </p>
-
-          <div className="blog-header-search">
-            <input
-              type="text"
-              placeholder="Search articles by title or topic..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="blog-search-input"
-            />
-          </div>
+      <PageHero
+        title={
+          <>
+            Current,<br />
+            Relevant, Real.
+          </>
+        }
+        subtitle="Education consulting: news, ideas and admissions insights"
+      >
+        <div className="blog-header-search">
+          <input
+            type="text"
+            placeholder="Search articles by title or topic..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="blog-search-input"
+          />
         </div>
-      </section>
+      </PageHero>
 
       <section className="section">
         <div className="container">
