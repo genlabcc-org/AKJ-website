@@ -1006,6 +1006,70 @@
   color: #dc2626;
 }
 
+.logip-table-blogs .logip-table-head,
+.logip-table-blogs .logip-table-row {
+  grid-template-columns: 2.15fr 1.15fr 0.85fr 1.05fr 0.85fr 0.75fr;
+}
+
+.logip-cell-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logip-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.logip-action-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.logip-action-delete:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.logip-delete-message {
+  margin: 10px 0 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.logip-btn-delete {
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: none;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logip-btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+.logip-btn-delete:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 @media (max-width: 860px) {
   .logip-admin-shell {
     grid-template-columns: 1fr;

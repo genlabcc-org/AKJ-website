@@ -42,3 +42,24 @@ create policy "Allow all operations on videos"
   on public.videos for all
   using (true)
   with check (true);
+
+-- Public storage bucket for blog cover/article images
+insert into storage.buckets (id, name, public)
+values ('blog-images', 'blog-images', true)
+on conflict (id) do update set public = true;
+
+create policy "Public read access on blog-images"
+  on storage.objects for select
+  using (bucket_id = 'blog-images');
+
+create policy "Allow upload to blog-images"
+  on storage.objects for insert
+  with check (bucket_id = 'blog-images');
+
+create policy "Allow update on blog-images"
+  on storage.objects for update
+  using (bucket_id = 'blog-images');
+
+create policy "Allow delete on blog-images"
+  on storage.objects for delete
+  using (bucket_id = 'blog-images');

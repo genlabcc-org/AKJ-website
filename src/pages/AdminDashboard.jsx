@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../supabase';
+import { supabase, BLOG_IMAGES_BUCKET } from '../supabase';
 import './AdminDashboard.css';
 
 function formatNowShort() {
@@ -15,13 +15,12 @@ function formatNowShort() {
   });
 }
 
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
+function extractStoragePathFromUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  const marker = `/storage/v1/object/public/${BLOG_IMAGES_BUCKET}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return decodeURIComponent(url.slice(idx + marker.length));
 }
 
 export default function AdminDashboard() {
@@ -40,14 +39,22 @@ export default function AdminDashboard() {
   const [dbLoading, setDbLoading] = useState(false);
   const [dbNotice, setDbNotice] = useState('');
 
-  // Create New Blog full-page state
+  // Create / Edit Blog full-page state
+  const [editingBlogId, setEditingBlogId] = useState(null);
   const [blogTitle, setBlogTitle] = useState('');
   const [blogCategory, setBlogCategory] = useState('');
   const [blogDate, setBlogDate] = useState(() => formatNowShort());
+  const [blogStatus, setBlogStatus] = useState('Published');
   const [blogContent, setBlogContent] = useState('');
   const [blogImages, setBlogImages] = useState([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [blogImageError, setBlogImageError] = useState('');
   const [blogError, setBlogError] = useState('');
   const [isPublishingBlog, setIsPublishingBlog] = useState(false);
+
+  // Delete Blog confirmation modal state
+  const [blogToDelete, setBlogToDelete] = useState(null);
+  const [isDeletingBlog, setIsDeletingBlog] = useState(false);
 
   // Create New Video modal state
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
@@ -145,14 +152,49 @@ export default function AdminDashboard() {
     });
   }, [videos, searchQuery, statusFilter]);
 
-  // Image upload handlers for Create New Blog
+  // Image upload handlers for Create / Edit Blog (Supabase Storage)
   const handleFilesSelected = async (files) => {
     if (!files || !files.length) return;
+    if (!supabase) {
+      setBlogImageError('Supabase is not configured. Cannot upload images.');
+      return;
+    }
+
+    setBlogImageError('');
+    setIsUploadingImages(true);
+
     try {
-      const newUrls = await Promise.all(Array.from(files).map(readFileAsDataUrl));
-      setBlogImages((prev) => [...prev, ...newUrls]);
-    } catch {
-      // Ignore unreadable files
+      const uploadedUrls = [];
+      for (const file of Array.from(files)) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filePath = `blogs/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+
+        const { data, error } = await supabase.storage
+          .from(BLOG_IMAGES_BUCKET)
+          .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+        if (error) {
+          throw error;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from(BLOG_IMAGES_BUCKET)
+          .getPublicUrl(data.path);
+
+        if (publicUrlData?.publicUrl) {
+          uploadedUrls.push(publicUrlData.publicUrl);
+        }
+      }
+
+      setBlogImages((prev) => [...prev, ...uploadedUrls]);
+    } catch (err) {
+      setBlogImageError(
+        err?.message
+          ? `Image upload failed: ${err.message}. Ensure the "${BLOG_IMAGES_BUCKET}" bucket and policies exist (see supabase_schema.sql).`
+          : 'Failed to upload image to Supabase Storage.'
+      );
+    } finally {
+      setIsUploadingImages(false);
     }
   };
 
@@ -180,16 +222,38 @@ export default function AdminDashboard() {
   };
 
   const handleOpenCreateBlog = () => {
+    setEditingBlogId(null);
     setBlogTitle('');
     setBlogCategory('');
     setBlogDate(formatNowShort());
+    setBlogStatus('Published');
     setBlogContent('');
     setBlogImages([]);
+    setBlogImageError('');
     setBlogError('');
     setIsCreatingBlog(true);
   };
 
-  const handlePublishNewBlog = async () => {
+  const handleOpenEditBlog = (item) => {
+    setEditingBlogId(item.id);
+    setBlogTitle(item.title || '');
+    setBlogCategory(item.category || '');
+    setBlogDate(item.publish_date || item.date || formatNowShort());
+    setBlogStatus(item.status || 'Published');
+    setBlogContent(item.content || '');
+    setBlogImages(
+      Array.isArray(item.images) && item.images.length > 0
+        ? item.images
+        : item.thumb
+          ? [item.thumb]
+          : []
+    );
+    setBlogImageError('');
+    setBlogError('');
+    setIsCreatingBlog(true);
+  };
+
+  const handleSaveBlog = async () => {
     if (!blogTitle.trim()) {
       setBlogError('Please enter a blog title.');
       return;
@@ -201,15 +265,19 @@ export default function AdminDashboard() {
     const wordsCount = blogContent.trim().split(/\s+/).filter(Boolean).length;
     const estimatedMins = Math.max(1, Math.ceil(wordsCount / 200));
 
+    const existingBlog = editingBlogId !== null
+      ? blogs.find((b) => b.id === editingBlogId)
+      : null;
+
     const basePayload = {
       title: finalTitle,
       thumb: finalThumb,
-      author: displayName,
-      avatar: null,
-      is_admin_icon: true,
+      author: existingBlog?.author || displayName,
+      avatar: existingBlog?.avatar ?? null,
+      is_admin_icon: existingBlog?.is_admin_icon ?? true,
       read_time: `${estimatedMins} min read`,
       publish_date: blogDate.trim() || formatNowShort(),
-      status: 'Published',
+      status: blogStatus,
     };
 
     const extendedPayload = {
@@ -221,7 +289,34 @@ export default function AdminDashboard() {
 
     setIsPublishingBlog(true);
 
-    if (supabase) {
+    if (editingBlogId !== null) {
+      if (supabase) {
+        let { data, error } = await supabase
+          .from('blogs')
+          .update(extendedPayload)
+          .eq('id', editingBlogId)
+          .select()
+          .single();
+
+        if (error) {
+          const retry = await supabase
+            .from('blogs')
+            .update(basePayload)
+            .eq('id', editingBlogId)
+            .select()
+            .single();
+          data = retry.data;
+          error = retry.error;
+        }
+
+        const updatedItem = !error && data ? data : { ...existingBlog, ...extendedPayload, id: editingBlogId };
+        setBlogs((prev) => prev.map((b) => (b.id === editingBlogId ? updatedItem : b)));
+      } else {
+        setBlogs((prev) =>
+          prev.map((b) => (b.id === editingBlogId ? { ...b, ...extendedPayload } : b))
+        );
+      }
+    } else if (supabase) {
       let { data, error } = await supabase
         .from('blogs')
         .insert([extendedPayload])
@@ -244,7 +339,31 @@ export default function AdminDashboard() {
     }
 
     setIsPublishingBlog(false);
+    setEditingBlogId(null);
     setIsCreatingBlog(false);
+  };
+
+  const handleConfirmDeleteBlog = async () => {
+    if (!blogToDelete) return;
+    setIsDeletingBlog(true);
+
+    if (supabase) {
+      const candidateUrls = [
+        blogToDelete.thumb,
+        ...(Array.isArray(blogToDelete.images) ? blogToDelete.images : []),
+      ];
+      const storagePaths = [...new Set(candidateUrls.map(extractStoragePathFromUrl).filter(Boolean))];
+
+      if (storagePaths.length > 0) {
+        await supabase.storage.from(BLOG_IMAGES_BUCKET).remove(storagePaths);
+      }
+
+      await supabase.from('blogs').delete().eq('id', blogToDelete.id);
+    }
+
+    setBlogs((prev) => prev.filter((b) => b.id !== blogToDelete.id));
+    setIsDeletingBlog(false);
+    setBlogToDelete(null);
   };
 
   const handleAddVideo = async (e) => {
@@ -427,7 +546,10 @@ export default function AdminDashboard() {
             <button
               type="button"
               className="logip-back-to-blogs"
-              onClick={() => setIsCreatingBlog(false)}
+              onClick={() => {
+                setEditingBlogId(null);
+                setIsCreatingBlog(false);
+              }}
             >
               <span>&larr;</span>
               <span>Back to Blogs</span>
@@ -435,9 +557,13 @@ export default function AdminDashboard() {
 
             <div className="logip-create-header">
               <div>
-                <h1 className="logip-create-title">Create New Blog</h1>
+                <h1 className="logip-create-title">
+                  {editingBlogId !== null ? 'Edit Blog' : 'Create New Blog'}
+                </h1>
                 <p className="logip-create-subtitle">
-                  Write and publish a new article for your blog feed.
+                  {editingBlogId !== null
+                    ? 'Update your blog article details and publish status.'
+                    : 'Write and publish a new article for your blog feed.'}
                 </p>
               </div>
 
@@ -445,17 +571,26 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   className="logip-cancel-pill"
-                  onClick={() => setIsCreatingBlog(false)}
+                  onClick={() => {
+                    setEditingBlogId(null);
+                    setIsCreatingBlog(false);
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className="logip-publish-pill"
-                  onClick={handlePublishNewBlog}
-                  disabled={isPublishingBlog}
+                  onClick={handleSaveBlog}
+                  disabled={isPublishingBlog || isUploadingImages}
                 >
-                  {isPublishingBlog ? 'Publishing...' : 'Publish Blog'}
+                  {isPublishingBlog
+                    ? editingBlogId !== null
+                      ? 'Saving...'
+                      : 'Publishing...'
+                    : editingBlogId !== null
+                      ? 'Save Changes'
+                      : 'Publish Blog'}
                 </button>
               </div>
             </div>
@@ -590,6 +725,20 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="logip-field-group">
+                  <label htmlFor="blog-status-select">Status</label>
+                  <select
+                    id="blog-status-select"
+                    className="logip-pill-input"
+                    value={blogStatus}
+                    onChange={(e) => setBlogStatus(e.target.value)}
+                  >
+                    <option value="Published">Published</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </div>
+
+                <div className="logip-field-group">
                   <label>Blog Images</label>
                   <input
                     ref={fileInputRef}
@@ -597,19 +746,27 @@ export default function AdminDashboard() {
                     accept="image/*"
                     multiple
                     style={{ display: 'none' }}
-                    onChange={(e) => handleFilesSelected(e.target.files)}
+                    onChange={(e) => {
+                      handleFilesSelected(e.target.files);
+                      e.target.value = '';
+                    }}
                   />
                   <div
                     className="logip-upload-dropzone"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => !isUploadingImages && fileInputRef.current?.click()}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.preventDefault();
-                      handleFilesSelected(e.dataTransfer.files);
+                      if (!isUploadingImages) {
+                        handleFilesSelected(e.dataTransfer.files);
+                      }
                     }}
                   >
-                    Click or drag to upload multiple images
+                    {isUploadingImages
+                      ? 'Uploading images to Supabase Storage...'
+                      : 'Click or drag to upload multiple images'}
                   </div>
+                  {blogImageError && <p className="logip-field-error">{blogImageError}</p>}
 
                   <div className="logip-image-thumbs-row">
                     {blogImages.slice(0, 3).map((imgSrc, idx) => (
@@ -841,13 +998,14 @@ export default function AdminDashboard() {
               </h2>
 
               {activeTab === 'blogs' ? (
-                <div className="logip-table">
+                <div className="logip-table logip-table-blogs">
                   <div className="logip-table-head">
                     <span>Content</span>
                     <span>Author</span>
                     <span>Read Time</span>
                     <span>Publish Date</span>
                     <span>Status</span>
+                    <span>Actions</span>
                   </div>
 
                   <div className="logip-table-body">
@@ -901,6 +1059,35 @@ export default function AdminDashboard() {
                                 title="Click to change status in Supabase"
                               >
                                 {item.status}
+                              </button>
+                            </div>
+                            <div className="logip-cell-actions">
+                              <button
+                                type="button"
+                                className="logip-action-btn"
+                                onClick={() => handleOpenEditBlog(item)}
+                                title="Edit blog"
+                                aria-label={`Edit ${item.title}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M12 20h9" />
+                                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                className="logip-action-btn logip-action-delete"
+                                onClick={() => setBlogToDelete(item)}
+                                title="Delete blog"
+                                aria-label={`Delete ${item.title}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                </svg>
                               </button>
                             </div>
                           </div>
@@ -1050,6 +1237,35 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* DELETE BLOG CONFIRMATION MODAL */}
+      {blogToDelete && (
+        <div className="logip-modal-backdrop" onClick={() => !isDeletingBlog && setBlogToDelete(null)}>
+          <div className="logip-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Blog</h3>
+            <p className="logip-delete-message">
+              Are you sure you want to delete <strong>{blogToDelete.title}</strong>? This action cannot be undone.
+            </p>
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setBlogToDelete(null)}
+                className="logip-btn-cancel"
+                disabled={isDeletingBlog}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteBlog}
+                className="logip-btn-delete"
+                disabled={isDeletingBlog}
+              >
+                {isDeletingBlog ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}
