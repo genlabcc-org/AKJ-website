@@ -7,6 +7,7 @@
   right: 0;
   width: 100%;
   background-color: #ffffff;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
   z-index: 1000;
   padding: 0 32px;
 }
@@ -180,7 +181,7 @@
 .floating-contact-btn {
   position: fixed;
   right: 0;
-  top: 230px;
+  top: 38%;
   width: 44px;
   height: 44px;
   background-color: var(--color-dark);
@@ -188,6 +189,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   z-index: 950;
   transition: background-color 0.15s ease;
 }

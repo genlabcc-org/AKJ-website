@@ -1,0 +1,143 @@
+/* Editorial Agency Intro Section (Home Page after HeroVideo) */
+
+.agency-intro-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 96px 72px 104px;
+}
+
+.agency-intro-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e6e6e6;
+  margin-bottom: 48px;
+}
+
+.agency-intro-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.agency-intro-eyebrow {
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0px;
+}
+
+.agency-intro-title {
+  color: #000000;
+  background-color: rgba(0, 0, 0, 0);
+  font-family: var(--font-family);
+  font-size: 40px;
+  line-height: 50px;
+  letter-spacing: normal;
+  word-spacing: 0px;
+  margin: 20px 0px 22px;
+  padding: 0px;
+  font-weight: 400;
+  font-style: normal;
+  font-variant: normal;
+  font-kerning: auto;
+  font-optical-sizing: auto;
+  font-stretch: 100%;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: start;
+  text-indent: 0px;
+}
+
+.agency-intro-lead {
+  font-family: var(--font-family-light);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 33px;
+  color: #000000;
+  margin: 0px;
+  max-width: 420px;
+}
+
+.agency-intro-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0px;
+}
+
+.agency-intro-body,
+.agency-intro-point {
+  color: #000000;
+  background-color: rgba(0, 0, 0, 0);
+  font-family: var(--font-family-light);
+  font-size: 19px;
+  line-height: 28px;
+  letter-spacing: normal;
+  word-spacing: 0px;
+  margin: 0px 0px 16px;
+  padding: 0px;
+  font-weight: 400;
+  font-style: normal;
+  font-variant: normal;
+  font-kerning: auto;
+  font-optical-sizing: auto;
+  font-stretch: 100%;
+  text-transform: none;
+  text-decoration: none;
+  text-align: start;
+  text-indent: 0px;
+}
+
+.agency-intro-point strong {
+  font-family: var(--font-family);
+  font-weight: 400;
+  color: #000000;
+  margin-right: 4px;
+}
+
+.agency-intro-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.agency-intro-btn:hover {
+  background-color: var(--color-accent-orange);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .agency-intro-section {
+    padding: 56px 24px 64px;
+  }
+
+  .agency-intro-divider {
+    margin-bottom: 36px;
+  }
+
+  .agency-intro-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .agency-intro-lead {
+    max-width: none;
+  }
+}
