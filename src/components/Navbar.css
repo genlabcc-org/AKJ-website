@@ -7,14 +7,15 @@
   right: 0;
   width: 100%;
   background-color: #ffffff;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  border: none;
+  box-shadow: none;
   z-index: 1000;
   padding: 0 32px;
 }
 
 .site-header-inner {
   width: 100%;
-  height: 82px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -127,7 +128,7 @@
 .site-mobile-drawer {
   display: none;
   position: fixed;
-  top: 72px;
+  top: 60px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -204,7 +205,7 @@
   }
 
   .site-header-inner {
-    height: 72px;
+    height: 60px;
   }
 
   .site-nav,
