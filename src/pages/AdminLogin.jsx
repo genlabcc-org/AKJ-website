@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import './AdminLogin.css';
 
 // Change this path anytime to use a different image on the right side

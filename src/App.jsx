@@ -1,17 +1,17 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Navbar from './components/Navbar/Navbar';
-import Footer from './components/Footer/Footer';
-import Home from './pages/Home/Home';
-import About from './pages/About/About';
-import Services from './pages/Services/Services';
-import Pricing from './pages/Pricing/Pricing';
-import Testimonials from './pages/Testimonials/Testimonials';
-import Blog from './pages/Blog/Blog';
-import Contact from './pages/Contact/Contact';
-import AdminLogin from './pages/AdminLogin/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import About from './pages/About';
+import Services from './pages/Services';
+import Pricing from './pages/Pricing';
+import Testimonials from './pages/Testimonials';
+import Blog from './pages/Blog';
+import Contact from './pages/Contact';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 
 function ProtectedAdminRoute({ children }) {

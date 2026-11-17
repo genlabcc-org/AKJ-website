@@ -1,6 +1,6 @@
 import React from 'react';
 import './Testimonials.css';
-import '../Home/Home.css';
+import './Home.css';
 
 export default function Testimonials() {
   const reviews = [

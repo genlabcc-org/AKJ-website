@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Pricing.css';
-import '../Home/Home.css';
+import './Home.css';
 
 export default function Pricing() {
   const [billingPeriod, setBillingPeriod] = useState('monthly');

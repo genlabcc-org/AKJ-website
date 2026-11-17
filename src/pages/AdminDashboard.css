@@ -970,6 +970,42 @@
   color: #111827;
 }
 
+.logip-thumb-placeholder {
+  width: 48px;
+  height: 32px;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logip-live-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logip-empty-row {
+  padding: 32px 16px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.logip-field-error {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #dc2626;
+}
+
 @media (max-width: 860px) {
   .logip-admin-shell {
     grid-template-columns: 1fr;

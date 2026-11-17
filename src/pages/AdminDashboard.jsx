@@ -1,133 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../supabase';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../supabase';
 import './AdminDashboard.css';
-
-const INITIAL_BLOGS = [
-  {
-    id: 1,
-    title: 'Building a Personal Brand',
-    thumb: '/images/blog-1.jpg',
-    author: 'Margaret',
-    avatar: '/images/testimonial-1.jpg',
-    is_admin_icon: false,
-    read_time: '5 min read',
-    publish_date: '16 May, 10:42 AM',
-    status: 'Published',
-  },
-  {
-    id: 2,
-    title: 'Introduction to AI Ethics',
-    thumb: '/images/blog-2.jpg',
-    author: 'John Doe',
-    avatar: '/images/testimonial-2.jpg',
-    is_admin_icon: false,
-    read_time: '8 min read',
-    publish_date: '16 May, 10:15 AM',
-    status: 'Published',
-  },
-  {
-    id: 3,
-    title: 'Intro to Data Analysis',
-    thumb: '/images/blog-3.jpg',
-    author: 'Admin',
-    avatar: null,
-    is_admin_icon: true,
-    read_time: '8 min read',
-    publish_date: '14 May, 09:30 AM',
-    status: 'Draft',
-  },
-  {
-    id: 4,
-    title: 'Designing for Accessibility',
-    thumb: '/images/blog-4.jpg',
-    author: 'Alice Smith',
-    avatar: '/images/testimonial-3.jpg',
-    is_admin_icon: false,
-    read_time: '6 min read',
-    publish_date: '12 May, 11:58 PM',
-    status: 'Scheduled',
-  },
-  {
-    id: 5,
-    title: 'Modern UI Design Tips',
-    thumb: '/images/about-campus.jpg',
-    author: 'Bob Johnson',
-    avatar: '/images/testimonial-4.jpg',
-    is_admin_icon: false,
-    read_time: '4 min read',
-    publish_date: '10 May, 08:14 PM',
-    status: 'Published',
-  },
-];
-
-const INITIAL_VIDEOS = [
-  {
-    id: 1,
-    title: 'Mastering FastAPI',
-    thumb: '/images/blog-2.jpg',
-    host: 'John Doe',
-    avatar: '/images/testimonial-2.jpg',
-    is_admin_icon: false,
-    duration: '45 mins',
-    session_date: '16 May, 10:15 AM',
-    status: 'Published',
-  },
-  {
-    id: 2,
-    title: 'Live Q&A: AI Trends',
-    thumb: '/images/blog-3.jpg',
-    host: 'Alice Smith',
-    avatar: '/images/testimonial-3.jpg',
-    is_admin_icon: false,
-    duration: '60 mins',
-    session_date: '12 May, 11:58 PM',
-    status: 'Scheduled',
-  },
-  {
-    id: 3,
-    title: 'Python for Beginners',
-    thumb: '/images/blog-4.jpg',
-    host: 'Admin',
-    avatar: null,
-    is_admin_icon: true,
-    duration: '90 mins',
-    session_date: '10 May, 03:00 PM',
-    status: 'Published',
-  },
-  {
-    id: 4,
-    title: 'Building Agentic AI',
-    thumb: '/images/blog-1.jpg',
-    host: 'Margaret',
-    avatar: '/images/testimonial-1.jpg',
-    is_admin_icon: false,
-    duration: '30 mins',
-    session_date: '08 May, 01:20 PM',
-    status: 'Draft',
-  },
-  {
-    id: 5,
-    title: 'Industry Tech Talk',
-    thumb: '/images/about-interview.png',
-    host: 'Bob Johnson',
-    avatar: '/images/testimonial-4.jpg',
-    is_admin_icon: false,
-    duration: '50 mins',
-    session_date: '05 May, 06:45 PM',
-    status: 'Published',
-  },
-];
-
-const DEFAULT_BLOG_IMAGES = [
-  '/images/blog-1.jpg',
-  '/images/blog-2.jpg',
-  '/images/blog-3.jpg',
-];
-
-const DEFAULT_ARTICLE_CONTENT =
-  'Choosing the perfect university is a life-changing decision that goes far beyond global rankings and prestige. Our expert advisors and realing prestiges. expert advisors evaluate learning style, anvmystyle, faculty mentorship, and career placement.';
 
 function formatNowShort() {
   const now = new Date();
@@ -137,6 +12,15 @@ function formatNowShort() {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
+  });
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
   });
 }
 
@@ -151,17 +35,18 @@ export default function AdminDashboard() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');
-  const [blogs, setBlogs] = useState(INITIAL_BLOGS);
-  const [videos, setVideos] = useState(INITIAL_VIDEOS);
+  const [blogs, setBlogs] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [dbLoading, setDbLoading] = useState(false);
   const [dbNotice, setDbNotice] = useState('');
 
   // Create New Blog full-page state
   const [blogTitle, setBlogTitle] = useState('');
   const [blogCategory, setBlogCategory] = useState('');
-  const [blogDate, setBlogDate] = useState('16 May, 2023');
-  const [blogContent, setBlogContent] = useState(DEFAULT_ARTICLE_CONTENT);
-  const [blogImages, setBlogImages] = useState(DEFAULT_BLOG_IMAGES);
+  const [blogDate, setBlogDate] = useState(() => formatNowShort());
+  const [blogContent, setBlogContent] = useState('');
+  const [blogImages, setBlogImages] = useState([]);
+  const [blogError, setBlogError] = useState('');
   const [isPublishingBlog, setIsPublishingBlog] = useState(false);
 
   // Create New Video modal state
@@ -174,7 +59,7 @@ export default function AdminDashboard() {
 
   const displayName = useMemo(() => {
     if (!adminUser?.name || adminUser.name === 'Administrator') {
-      return 'Margaret';
+      return 'Admin';
     }
     const raw = adminUser.name;
     return raw.charAt(0).toUpperCase() + raw.slice(1);
@@ -193,12 +78,8 @@ export default function AdminDashboard() {
 
       if (blogsError) {
         setDbNotice('Supabase connected — run supabase_schema.sql in Supabase SQL Editor to create tables.');
-      } else if (blogsData && blogsData.length > 0) {
-        setBlogs(blogsData);
-      } else if (blogsData && blogsData.length === 0) {
-        const seedPayload = INITIAL_BLOGS.map(({ id: _id, ...rest }) => rest);
-        const { data: seededBlogs } = await supabase.from('blogs').insert(seedPayload).select();
-        if (seededBlogs?.length) setBlogs(seededBlogs);
+      } else {
+        setBlogs(blogsData || []);
       }
 
       const { data: videosData, error: videosError } = await supabase
@@ -207,23 +88,25 @@ export default function AdminDashboard() {
         .order('id', { ascending: false });
 
       if (!videosError) {
-        if (videosData && videosData.length > 0) {
-          setVideos(videosData);
-        } else if (videosData && videosData.length === 0) {
-          const seedVideosPayload = INITIAL_VIDEOS.map(({ id: _id, ...rest }) => rest);
-          const { data: seededVideos } = await supabase.from('videos').insert(seedVideosPayload).select();
-          if (seededVideos?.length) setVideos(seededVideos);
-        }
+        setVideos(videosData || []);
       }
     } catch {
-      // Keep fallback rows
+      setDbNotice('Unable to load data from Supabase.');
     } finally {
       setDbLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSupabaseData();
+    let active = true;
+    const load = async () => {
+      if (!active) return;
+      await fetchSupabaseData();
+    };
+    load();
+    return () => {
+      active = false;
+    };
   }, [fetchSupabaseData]);
 
   const handleLogout = async () => {
@@ -263,10 +146,14 @@ export default function AdminDashboard() {
   }, [videos, searchQuery, statusFilter]);
 
   // Image upload handlers for Create New Blog
-  const handleFilesSelected = (files) => {
+  const handleFilesSelected = async (files) => {
     if (!files || !files.length) return;
-    const newUrls = Array.from(files).map((file) => URL.createObjectURL(file));
-    setBlogImages((prev) => [...prev, ...newUrls]);
+    try {
+      const newUrls = await Promise.all(Array.from(files).map(readFileAsDataUrl));
+      setBlogImages((prev) => [...prev, ...newUrls]);
+    } catch {
+      // Ignore unreadable files
+    }
   };
 
   const handleRemoveBlogImage = (indexToRemove) => {
@@ -295,24 +182,31 @@ export default function AdminDashboard() {
   const handleOpenCreateBlog = () => {
     setBlogTitle('');
     setBlogCategory('');
-    setBlogDate('16 May, 2023');
-    setBlogContent(DEFAULT_ARTICLE_CONTENT);
-    setBlogImages(DEFAULT_BLOG_IMAGES);
+    setBlogDate(formatNowShort());
+    setBlogContent('');
+    setBlogImages([]);
+    setBlogError('');
     setIsCreatingBlog(true);
   };
 
   const handlePublishNewBlog = async () => {
-    const finalTitle = blogTitle.trim() || 'Finding the Right University: A Strategic Approach';
-    const finalThumb = blogImages[0] || '/images/blog-1.jpg';
+    if (!blogTitle.trim()) {
+      setBlogError('Please enter a blog title.');
+      return;
+    }
+
+    setBlogError('');
+    const finalTitle = blogTitle.trim();
+    const finalThumb = blogImages[0] || null;
     const wordsCount = blogContent.trim().split(/\s+/).filter(Boolean).length;
-    const estimatedMins = Math.max(3, Math.ceil(wordsCount / 40));
+    const estimatedMins = Math.max(1, Math.ceil(wordsCount / 200));
 
     const basePayload = {
       title: finalTitle,
       thumb: finalThumb,
       author: displayName,
-      avatar: '/images/testimonial-1.jpg',
-      is_admin_icon: false,
+      avatar: null,
+      is_admin_icon: true,
       read_time: `${estimatedMins} min read`,
       publish_date: blogDate.trim() || formatNowShort(),
       status: 'Published',
@@ -320,8 +214,9 @@ export default function AdminDashboard() {
 
     const extendedPayload = {
       ...basePayload,
-      category: blogCategory.trim() || 'University Guide',
+      category: blogCategory.trim() || null,
       content: blogContent,
+      images: blogImages,
     };
 
     setIsPublishingBlog(true);
@@ -333,7 +228,6 @@ export default function AdminDashboard() {
         .select()
         .single();
 
-      // Fallback if category/content columns aren't added yet in existing table
       if (error) {
         const retry = await supabase.from('blogs').insert([basePayload]).select().single();
         data = retry.data;
@@ -362,10 +256,10 @@ export default function AdminDashboard() {
 
     const newVideoPayload = {
       title: newVideoTitle.trim(),
-      thumb: '/images/blog-2.jpg',
+      thumb: null,
       host: newVideoHost.trim() || displayName,
-      avatar: '/images/testimonial-2.jpg',
-      is_admin_icon: false,
+      avatar: null,
+      is_admin_icon: true,
       duration: newVideoDuration.trim() || '45 mins',
       session_date: nowStr,
       status: newVideoStatus,
@@ -427,15 +321,23 @@ export default function AdminDashboard() {
     }
   };
 
-  const previewTitle = blogTitle.trim() || 'Finding the Right University: A Strategic Approach';
-  const previewCategory = blogCategory.trim() || 'University Guide';
-  const previewDate = blogDate.trim() || '16 May, 2023';
-  const previewImage = blogImages[0] || '/images/blog-1.jpg';
+  const publishedBlogsCount = blogs.filter((b) => b.status === 'Published').length;
+  const draftBlogsCount = blogs.filter((b) => b.status !== 'Published').length;
+  const publishedBlogsRate = blogs.length
+    ? `${Math.round((publishedBlogsCount / blogs.length) * 100)}% rate`
+    : '0% rate';
+
+  const publishedVideosCount = videos.filter((v) => v.status === 'Published').length;
+  const scheduledVideosCount = videos.filter((v) => v.status === 'Scheduled').length;
+
+  const previewTitle = blogTitle.trim() || 'Untitled Blog';
+  const previewCategory = blogCategory.trim() || 'General';
+  const previewDate = blogDate.trim() || formatNowShort();
+  const previewImage = blogImages[0] || '';
   const previewExcerpt =
     blogContent.trim().length > 92
       ? `${blogContent.trim().slice(0, 92)}...`
-      : blogContent.trim() ||
-        'Choosing the perfect university is a life-changing decision that goes far...';
+      : blogContent.trim() || 'Article preview will appear here as you write...';
 
   return (
     <div className="logip-admin-viewport">
@@ -568,9 +470,13 @@ export default function AdminDashboard() {
                     type="text"
                     className="logip-pill-input"
                     value={blogTitle}
-                    onChange={(e) => setBlogTitle(e.target.value)}
-                    placeholder="e.g., Finding the Right University: A Strategic Approach"
+                    onChange={(e) => {
+                      setBlogTitle(e.target.value);
+                      if (blogError) setBlogError('');
+                    }}
+                    placeholder="Enter blog title..."
                   />
+                  {blogError && <p className="logip-field-error">{blogError}</p>}
                 </div>
 
                 <div className="logip-field-group">
@@ -581,7 +487,7 @@ export default function AdminDashboard() {
                     className="logip-pill-input"
                     value={blogCategory}
                     onChange={(e) => setBlogCategory(e.target.value)}
-                    placeholder="e.g., University Guide"
+                    placeholder="Enter category or tag..."
                   />
                 </div>
 
@@ -733,7 +639,11 @@ export default function AdminDashboard() {
                   <label>Live Card Preview</label>
                   <div className="logip-live-card">
                     <div className="logip-live-card-img-wrap">
-                      <img src={previewImage} alt={previewTitle} className="logip-live-card-img" />
+                      {previewImage ? (
+                        <img src={previewImage} alt={previewTitle} className="logip-live-card-img" />
+                      ) : (
+                        <div className="logip-live-card-placeholder">No cover image selected</div>
+                      )}
                     </div>
                     <div className="logip-live-card-body">
                       <div className="logip-live-card-meta">
@@ -765,7 +675,7 @@ export default function AdminDashboard() {
               </div>
 
               <div className="logip-date-box">
-                <span className="logip-date-text">16 May, 2023</span>
+                <span className="logip-date-text">{formatNowShort()}</span>
                 <span className="logip-calendar-btn" aria-hidden="true">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -791,8 +701,8 @@ export default function AdminDashboard() {
                   </div>
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Total Blogs</span>
-                    <strong className="logip-stat-value">48</strong>
-                    <span className="logip-stat-trend text-green">+6 this month</span>
+                    <strong className="logip-stat-value">{blogs.length}</strong>
+                    <span className="logip-stat-trend text-green">Stored in database</span>
                   </div>
                 </div>
 
@@ -805,8 +715,8 @@ export default function AdminDashboard() {
                   </div>
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Published</span>
-                    <strong className="logip-stat-value">42</strong>
-                    <span className="logip-stat-trend text-green">87.5% rate</span>
+                    <strong className="logip-stat-value">{publishedBlogsCount}</strong>
+                    <span className="logip-stat-trend text-green">{publishedBlogsRate}</span>
                   </div>
                 </div>
 
@@ -818,9 +728,9 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                   <div className="logip-stat-info">
-                    <span className="logip-stat-label">Total Reads</span>
-                    <strong className="logip-stat-value">12.6k</strong>
-                    <span className="logip-stat-trend text-green">+18% vs last week</span>
+                    <span className="logip-stat-label">Drafts / Scheduled</span>
+                    <strong className="logip-stat-value">{draftBlogsCount}</strong>
+                    <span className="logip-stat-trend text-green">Awaiting publish</span>
                   </div>
                 </div>
               </div>
@@ -835,8 +745,8 @@ export default function AdminDashboard() {
                   </div>
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Total Videos</span>
-                    <strong className="logip-stat-value">32</strong>
-                    <span className="logip-stat-pill pill-green">+4 this week</span>
+                    <strong className="logip-stat-value">{videos.length}</strong>
+                    <span className="logip-stat-pill pill-green">Stored in database</span>
                   </div>
                 </div>
 
@@ -851,9 +761,9 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                   <div className="logip-stat-info">
-                    <span className="logip-stat-label">Live / Scheduled</span>
-                    <strong className="logip-stat-value">5</strong>
-                    <span className="logip-stat-pill pill-blue">2 upcoming today</span>
+                    <span className="logip-stat-label">Scheduled</span>
+                    <strong className="logip-stat-value">{scheduledVideosCount}</strong>
+                    <span className="logip-stat-pill pill-blue">Upcoming</span>
                   </div>
                 </div>
 
@@ -865,9 +775,9 @@ export default function AdminDashboard() {
                     </svg>
                   </div>
                   <div className="logip-stat-info">
-                    <span className="logip-stat-label">Total Views</span>
-                    <strong className="logip-stat-value">18.4k</strong>
-                    <span className="logip-stat-pill pill-green">+14% vs last week</span>
+                    <span className="logip-stat-label">Published</span>
+                    <strong className="logip-stat-value">{publishedVideosCount}</strong>
+                    <span className="logip-stat-pill pill-green">Live sessions</span>
                   </div>
                 </div>
               </div>
@@ -941,46 +851,62 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="logip-table-body">
-                    {filteredBlogs.map((item) => {
-                      const isAdminIcon = item.is_admin_icon ?? item.isAdminIcon;
-                      const readTime = item.read_time || item.readTime;
-                      const publishDate = item.publish_date || item.date;
-                      return (
-                        <div className="logip-table-row" key={item.id}>
-                          <div className="logip-cell-main">
-                            <img src={item.thumb || '/images/blog-1.jpg'} alt={item.title} className="logip-thumb" />
-                            <span className="logip-item-title">{item.title}</span>
-                          </div>
+                    {filteredBlogs.length === 0 ? (
+                      <div className="logip-empty-row">
+                        {dbLoading ? 'Loading blogs...' : 'No blogs yet. Click "+ New Blog" to create one.'}
+                      </div>
+                    ) : (
+                      filteredBlogs.map((item) => {
+                        const isAdminIcon = item.is_admin_icon ?? item.isAdminIcon ?? !item.avatar;
+                        const readTime = item.read_time || item.readTime || '—';
+                        const publishDate = item.publish_date || item.date;
+                        return (
+                          <div className="logip-table-row" key={item.id}>
+                            <div className="logip-cell-main">
+                              {item.thumb ? (
+                                <img src={item.thumb} alt={item.title} className="logip-thumb" />
+                              ) : (
+                                <div className="logip-thumb-placeholder" aria-hidden="true">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                  </svg>
+                                </div>
+                              )}
+                              <span className="logip-item-title">{item.title}</span>
+                            </div>
 
-                          <div className="logip-cell-person">
-                            {isAdminIcon ? (
-                              <span className="logip-admin-avatar">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                  <circle cx="12" cy="7" r="4" />
-                                </svg>
-                              </span>
-                            ) : (
-                              <img src={item.avatar || '/images/testimonial-1.jpg'} alt={item.author} className="logip-avatar" />
-                            )}
-                            <span>{item.author}</span>
-                          </div>
+                            <div className="logip-cell-person">
+                              {isAdminIcon || !item.avatar ? (
+                                <span className="logip-admin-avatar">
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                  </svg>
+                                </span>
+                              ) : (
+                                <img src={item.avatar} alt={item.author} className="logip-avatar" />
+                              )}
+                              <span>{item.author}</span>
+                            </div>
 
-                          <div className="logip-cell-text">{readTime}</div>
-                          <div className="logip-cell-date">{publishDate}</div>
-                          <div>
-                            <button
-                              type="button"
-                              onClick={() => handleCycleStatus(item, 'blogs')}
-                              className={`logip-status-badge ${getStatusClass(item.status)}`}
-                              title="Click to change status in Supabase"
-                            >
-                              {item.status}
-                            </button>
+                            <div className="logip-cell-text">{readTime}</div>
+                            <div className="logip-cell-date">{publishDate}</div>
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => handleCycleStatus(item, 'blogs')}
+                                className={`logip-status-badge ${getStatusClass(item.status)}`}
+                                title="Click to change status in Supabase"
+                              >
+                                {item.status}
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               ) : (
@@ -994,45 +920,60 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="logip-table-body">
-                    {filteredVideos.map((item) => {
-                      const isAdminIcon = item.is_admin_icon ?? item.isAdminIcon;
-                      const sessionDate = item.session_date || item.date;
-                      return (
-                        <div className="logip-table-row" key={item.id}>
-                          <div className="logip-cell-main">
-                            <img src={item.thumb || '/images/blog-2.jpg'} alt={item.title} className="logip-thumb" />
-                            <span className="logip-item-title">{item.title}</span>
-                          </div>
+                    {filteredVideos.length === 0 ? (
+                      <div className="logip-empty-row">
+                        {dbLoading ? 'Loading videos...' : 'No video sessions yet. Click "+ New Video" to add one.'}
+                      </div>
+                    ) : (
+                      filteredVideos.map((item) => {
+                        const isAdminIcon = item.is_admin_icon ?? item.isAdminIcon ?? !item.avatar;
+                        const sessionDate = item.session_date || item.date;
+                        return (
+                          <div className="logip-table-row" key={item.id}>
+                            <div className="logip-cell-main">
+                              {item.thumb ? (
+                                <img src={item.thumb} alt={item.title} className="logip-thumb" />
+                              ) : (
+                                <div className="logip-thumb-placeholder" aria-hidden="true">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                    <rect x="2" y="6" width="14" height="12" rx="2" />
+                                    <path d="M16 10l5-3v10l-5-3" />
+                                  </svg>
+                                </div>
+                              )}
+                              <span className="logip-item-title">{item.title}</span>
+                            </div>
 
-                          <div className="logip-cell-person">
-                            {isAdminIcon ? (
-                              <span className="logip-admin-avatar">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                  <circle cx="12" cy="7" r="4" />
-                                </svg>
-                              </span>
-                            ) : (
-                              <img src={item.avatar || '/images/testimonial-2.jpg'} alt={item.host} className="logip-avatar" />
-                            )}
-                            <span>{item.host}</span>
-                          </div>
+                            <div className="logip-cell-person">
+                              {isAdminIcon || !item.avatar ? (
+                                <span className="logip-admin-avatar">
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                  </svg>
+                                </span>
+                              ) : (
+                                <img src={item.avatar} alt={item.host} className="logip-avatar" />
+                              )}
+                              <span>{item.host}</span>
+                            </div>
 
-                          <div className="logip-cell-text">{item.duration}</div>
-                          <div className="logip-cell-date">{sessionDate}</div>
-                          <div>
-                            <button
-                              type="button"
-                              onClick={() => handleCycleStatus(item, 'videos')}
-                              className={`logip-status-badge ${getStatusClass(item.status)}`}
-                              title="Click to change status in Supabase"
-                            >
-                              {item.status}
-                            </button>
+                            <div className="logip-cell-text">{item.duration || '—'}</div>
+                            <div className="logip-cell-date">{sessionDate}</div>
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => handleCycleStatus(item, 'videos')}
+                                className={`logip-status-badge ${getStatusClass(item.status)}`}
+                                title="Click to change status in Supabase"
+                              >
+                                {item.status}
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               )}
@@ -1040,7 +981,9 @@ export default function AdminDashboard() {
               {/* PAGINATION FOOTER */}
               <div className="logip-pagination">
                 <span className="logip-page-count">
-                  {activeTab === 'blogs' ? 'Showing 1-5 of 80' : 'Showing 1-5 of 32'}
+                  {activeTab === 'blogs'
+                    ? `Showing ${filteredBlogs.length} of ${blogs.length}`
+                    : `Showing ${filteredVideos.length} of ${videos.length}`}
                 </span>
                 <div className="logip-page-btns">
                   <button type="button" className="logip-page-btn" aria-label="Previous page">

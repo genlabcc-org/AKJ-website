@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LogosTicker from '../../components/LogosTicker/LogosTicker';
+import LogosTicker from '../components/LogosTicker';
 import './About.css';
 
 export default function About() {

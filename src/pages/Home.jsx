@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import LogosTicker from '../../components/LogosTicker/LogosTicker';
+import LogosTicker from '../components/LogosTicker';
+import { supabase } from '../supabase';
 import './Home.css';
 
 export default function Home() {
@@ -8,8 +9,30 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+  const [recentBlogs, setRecentBlogs] = useState([]);
 
-  const heroVideoSrc = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+  useEffect(() => {
+    if (!supabase) return;
+    let active = true;
+
+    const loadRecentBlogs = async () => {
+      const { data, error } = await supabase
+        .from('blogs')
+        .select('*')
+        .eq('status', 'Published')
+        .order('id', { ascending: false })
+        .limit(3);
+
+      if (active && !error && data) {
+        setRecentBlogs(data);
+      }
+    };
+
+    loadRecentBlogs();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
@@ -655,82 +678,40 @@ export default function Home() {
             <h2 className="section-title">Real World Reviews</h2>
           </div>
 
-          <div className="blog-grid">
-            <article className="blog-card">
-              <div className="blog-img-wrapper">
-                <img
-                  src="/images/blog-1.jpg"
-                  alt="Finding the Right University"
-                  className="blog-img"
-                />
-              </div>
-              <div className="blog-body">
-                <div className="blog-meta">
-                  <span className="blog-tag">University Guide</span>
-                  <span>Oct 11, 2024</span>
-                </div>
-                <h3 className="blog-title">
-                  Finding the Right University: A Strategic Approach
-                </h3>
-                <p className="blog-excerpt">
-                  Choosing the perfect university is a life-changing decision that goes far beyond global rankings and prestige. Our expert advisors take a holistic approach, evaluating each student’s academic profile, learning style, career aspirations, and personal preferences...
-                </p>
-                <Link to="/blog" className="blog-link">
-                  Read article →
-                </Link>
-              </div>
-            </article>
-
-            <article className="blog-card">
-              <div className="blog-img-wrapper">
-                <img
-                  src="/images/blog-2.jpg"
-                  alt="Precision University Matching"
-                  className="blog-img"
-                />
-              </div>
-              <div className="blog-body">
-                <div className="blog-meta">
-                  <span className="blog-tag">Admissions Strategy</span>
-                  <span>Oct 11, 2024</span>
-                </div>
-                <h3 className="blog-title">
-                  Precision University Matching: Find Your Perfect Academic Fit
-                </h3>
-                <p className="blog-excerpt">
-                  How strategic data, faculty insights, and campus culture analysis help transform overwhelming international options into a clear, bespoke pathway for academic excellence and future career mobility.
-                </p>
-                <Link to="/blog" className="blog-link">
-                  Read article →
-                </Link>
-              </div>
-            </article>
-
-            <article className="blog-card">
-              <div className="blog-img-wrapper">
-                <img
-                  src="/images/blog-3.jpg"
-                  alt="The Boarding School Advantage"
-                  className="blog-img"
-                />
-              </div>
-              <div className="blog-body">
-                <div className="blog-meta">
-                  <span className="blog-tag">Boarding Schools</span>
-                  <span>Oct 10, 2024</span>
-                </div>
-                <h3 className="blog-title">
-                  The Boarding School Advantage: Why It Matters
-                </h3>
-                <p className="blog-excerpt">
-                  Unlocking academic rigor, holistic leadership development, and global peer networks through premier UK and European boarding institutions that prepare students for world-class universities.
-                </p>
-                <Link to="/blog" className="blog-link">
-                  Read article →
-                </Link>
-              </div>
-            </article>
-          </div>
+          {recentBlogs.length === 0 ? (
+            <p style={{ textAlign: 'center', color: 'var(--color-muted)', marginBottom: '32px' }}>
+              No articles published yet.
+            </p>
+          ) : (
+            <div className="blog-grid">
+              {recentBlogs.map((art) => (
+                <article key={art.id} className="blog-card">
+                  {art.thumb && (
+                    <div className="blog-img-wrapper">
+                      <img src={art.thumb} alt={art.title} className="blog-img" />
+                    </div>
+                  )}
+                  <div className="blog-body">
+                    <div className="blog-meta">
+                      {art.category && <span className="blog-tag">{art.category}</span>}
+                      <span>{art.publish_date}</span>
+                    </div>
+                    <h3 className="blog-title">{art.title}</h3>
+                    {art.content && (
+                      <p className="blog-excerpt">
+                        {art.content.length > 160
+                          ? `${art.content.slice(0, 160)}...`
+                          : art.content}
+                      </p>
+                    )}
+                    <Link to="/blog" className="blog-link">
+                      Read article →
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
 
           <div style={{ textAlign: 'center' }}>
             <Link to="/blog" className="btn-secondary">
