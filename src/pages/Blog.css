@@ -78,15 +78,7 @@
   padding: 0 0 22px 18px;
 }
 
-.bbb-filter-list {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 38px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+
 
 .bbb-filter-btn {
   background: none;

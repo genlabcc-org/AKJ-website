@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LogosTicker from '../components/LogosTicker';
 import PageHero from '../components/PageHero';
 import './About.css';
 
@@ -90,9 +89,6 @@ export default function About() {
           </div>
         </div>
       </section>
-
-      {/* Partner Logos */}
-      <LogosTicker />
     </div>
   );
 }
