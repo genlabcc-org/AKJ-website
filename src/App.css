@@ -23,6 +23,21 @@
   }
 }
 
+.app-wrapper.admin-route {
+  background-color: #ffffff;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.app-wrapper.admin-route .main-content {
+  margin-bottom: 0;
+  box-shadow: none;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
 .page-container {
   min-height: 100vh;
   background-color: #ffffff;

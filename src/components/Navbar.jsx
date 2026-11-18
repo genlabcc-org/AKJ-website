@@ -88,26 +88,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      <Link
-        to="/contact"
-        className="floating-contact-btn"
-        aria-label="Contact us"
-        title="Contact us"
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="2" y="4" width="20" height="16" rx="1" />
-          <path d="m22 7-10 7L2 7" />
-        </svg>
-      </Link>
+      
     </>
   );
 }

@@ -6,7 +6,6 @@ import AgencyIntro from '../components/AgencyIntro';
 import CaseStudies from '../components/CaseStudies';
 import NewsFlash from '../components/NewsFlash';
 import TalkFeedback from '../components/TalkFeedback';
-import { supabase } from '../supabase';
 import { supabase, normalizeBlogRow } from '../supabase';
 import './Home.css';
 

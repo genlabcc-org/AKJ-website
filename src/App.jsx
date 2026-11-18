@@ -32,7 +32,7 @@ function AppLayout() {
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <div className="app-wrapper">
+    <div className={`app-wrapper ${isAdminRoute ? 'admin-route' : ''}`}>
       {!isAdminRoute && <Navbar />}
       <main className="main-content">
         <Routes>
