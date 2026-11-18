@@ -25,8 +25,12 @@ export default function Navbar() {
     <>
       <header className="site-header">
         <div className="site-header-inner">
-          <Link to="/" className="site-brand" aria-label="Acadly Home">
-            Acadly
+          <Link to="/" className="site-brand" aria-label="AKJ Home">
+            <img
+              src="/images/akj-logo.svg"
+              alt="AKJ Logo"
+              className="site-logo-img"
+            />
           </Link>
 
           <nav className="site-nav" aria-label="Primary navigation">

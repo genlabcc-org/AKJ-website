@@ -121,7 +121,7 @@ export default function Contact() {
                       onChange={(e) => setFormData({ ...formData, agreed: e.target.checked })}
                     />
                     <label htmlFor="agreement">
-                      I agree to the processing of my contact information in accordance with Acadly's Privacy Policy.
+                      I agree to the processing of my contact information in accordance with bb&amp;b's Privacy Policy.
                     </label>
                   </div>
 

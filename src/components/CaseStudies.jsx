@@ -1,8 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './CaseStudies.css';
 
 export default function CaseStudies() {
+  // Smooth subtle parallax float on the overlapping cards during scroll
+  useEffect(() => {
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.innerWidth >= 1024) {
+            const cards = document.querySelectorAll('.case-study-card');
+            const windowHeight = window.innerHeight;
+            cards.forEach((card) => {
+              const rect = card.getBoundingClientRect();
+              const mid = rect.top + rect.height / 2;
+              const offset = (mid - windowHeight / 2) / windowHeight;
+              // Smooth gentle parallax offset (-35px to +35px)
+              const translateY = Math.max(-45, Math.min(45, offset * 50));
+              card.style.transform = `translate3d(0, ${translateY}px, 0)`;
+            });
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <section className="case-studies-section" aria-label="Our Projects and Tangible Case Studies">
       {/* SECTION DIVIDER */}

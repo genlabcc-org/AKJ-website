@@ -15,8 +15,8 @@ export default function AgencyIntro() {
           </p>
           <h2 className="agency-intro-title">A Unique Consultancy</h2>
           <p className="agency-intro-lead">
-            Acadly is an international education and admissions consultancy
-            specialising in leading universities and premier boarding schools.
+            bb&amp;b is an international B2B marketing and communications consultancy
+            specialising in industrial and technology sectors.
           </p>
         </div>
 

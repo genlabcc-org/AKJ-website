@@ -23,14 +23,23 @@
 }
 
 .site-brand {
-  font-family: var(--font-family);
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: var(--color-dark);
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
   flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.site-brand:hover {
+  opacity: 0.88;
+  transform: scale(1.03);
+}
+
+.site-logo-img {
+  height: 46px;
+  width: 46px;
+  object-fit: contain;
+  display: block;
 }
 
 .site-nav {

@@ -24,7 +24,7 @@ export default function About() {
               <span className="badge-tag">Our Story & Mission</span>
               <h2 className="section-title">Personalized Consulting with Global Reach</h2>
               <p style={{ marginTop: '20px', fontSize: '16px', lineHeight: 1.7, color: '#444' }}>
-                Founded with a mission to demystify complex international admissions, Acadly connects ambitious students with prestigious institutions across the UK, Europe, and North America. Based in Germany with offices in London, we blend localized knowledge with global placement expertise.
+                Founded with a mission to simplify complex industrial and B2B communication, bb&amp;b connects leading technological and industrial companies across Europe and worldwide. Based in Paris, we blend technical expertise with strategic methodology.
               </p>
               <p style={{ marginTop: '16px', fontSize: '16px', lineHeight: 1.7, color: '#444' }}>
                 We believe that every candidate possesses a distinctive narrative. Rather than relying on generic application templates, we craft bespoke roadmaps tailored to individual academic profiles, extracurricular achievements, and career aspirations.
