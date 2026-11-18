@@ -57,8 +57,8 @@ export default function Home() {
       {/* CASE STUDIES (TANGIBLE CASE STUDIES) */}
       <CaseStudies />
 
-      {/* NEWSFLASH (OUR NEWS) */}
-      <NewsFlash />
+      {/* BLOG (LATEST 3 FROM ADMIN BLOGS) */}
+      <NewsFlash blogs={recentBlogs} />
 
       {/* LET'S TALK / CUSTOMER FEEDBACK */}
       <TalkFeedback />

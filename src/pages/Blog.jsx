@@ -1,19 +1,89 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase, normalizeBlogRow } from '../supabase';
 import './Blog.css';
 
 const FILTER_TABS = ['SEE ALL', 'NEWS', 'IDEARS', 'WHITE PAPERS', 'PRODUCTIONS'];
 
+function cleanMarkdownPreview(text) {
+  if (!text) return '';
+  return text
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .trim();
+}
+
 function getExcerpt(art) {
   if (art.excerpt) return art.excerpt;
   if (!art.content) return '';
-  return art.content.length > 152 ? `${art.content.slice(0, 152)} ...` : art.content;
+  const cleaned = cleanMarkdownPreview(art.content);
+  return cleaned.length > 152 ? `${cleaned.slice(0, 152)} ...` : cleaned;
 }
 
 function getShortBannerTitle(title) {
   if (!title) return '';
   const words = title.split(/\s+/);
   return words.slice(0, 4).join(' ');
+}
+
+function renderFormattedInline(text) {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={idx}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+}
+
+function renderArticleBlocks(content) {
+  if (!content) {
+    return <p className="bbb-full-paragraph">No article content available.</p>;
+  }
+
+  const lines = content.split('\n');
+  const blocks = [];
+  let keyCounter = 0;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const rawLine = lines[i].trim();
+    if (!rawLine) continue;
+
+    if (rawLine.startsWith('### ')) {
+      blocks.push(
+        <h3 key={`b-${keyCounter++}`} className="bbb-full-h3">
+          {renderFormattedInline(rawLine.slice(4))}
+        </h3>
+      );
+    } else if (rawLine.startsWith('## ')) {
+      blocks.push(
+        <h2 key={`b-${keyCounter++}`} className="bbb-full-h2">
+          {renderFormattedInline(rawLine.slice(3))}
+        </h2>
+      );
+    } else if (rawLine.startsWith('# ')) {
+      blocks.push(
+        <h2 key={`b-${keyCounter++}`} className="bbb-full-h2">
+          {renderFormattedInline(rawLine.slice(2))}
+        </h2>
+      );
+    } else if (rawLine.startsWith('• ') || rawLine.startsWith('- ')) {
+      blocks.push(
+        <li key={`b-${keyCounter++}`} className="bbb-full-list-item">
+          {renderFormattedInline(rawLine.slice(2))}
+        </li>
+      );
+    } else {
+      blocks.push(
+        <p key={`b-${keyCounter++}`} className="bbb-full-paragraph">
+          {renderFormattedInline(rawLine)}
+        </p>
+      );
+    }
+  }
+
+  return blocks;
 }
 
 function DiagonalArrow({ className = '' }) {
@@ -39,6 +109,9 @@ function DiagonalArrow({ className = '' }) {
 }
 
 export default function Blog() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [activeFilter, setActiveFilter] = useState('SEE ALL');
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(Boolean(supabase));
@@ -74,6 +147,29 @@ export default function Blog() {
     };
   }, []);
 
+  // Sync URL param `/blog/:id` with active article
+  const activeArticle = useMemo(() => {
+    if (selectedArticle && (!id || String(selectedArticle.id) === String(id))) {
+      return selectedArticle;
+    }
+    if (id && articles.length > 0) {
+      return articles.find((a) => String(a.id) === String(id)) || null;
+    }
+    return null;
+  }, [id, articles, selectedArticle]);
+
+  const handleOpenArticle = (art) => {
+    setSelectedArticle(art);
+    navigate(`/blog/${art.id}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToList = () => {
+    setSelectedArticle(null);
+    navigate('/blog');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const filteredArticles = useMemo(() => {
     if (activeFilter === 'SEE ALL') return articles;
     const target = activeFilter.toLowerCase();
@@ -83,11 +179,91 @@ export default function Blog() {
     });
   }, [articles, activeFilter]);
 
+  // FULL-SCREEN ARTICLE PAGE
+  if (activeArticle) {
+    const galleryImages =
+      Array.isArray(activeArticle.images) && activeArticle.images.length > 1
+        ? activeArticle.images.slice(1)
+        : [];
+
+    return (
+      <div className="bbb-blog-page bbb-full-article-page">
+        <a href="/contact" className="bbb-floating-mail" aria-label="Contact us">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <rect x="3" y="5" width="18" height="14" rx="1" />
+            <polyline points="3 6 12 13 21 6" />
+          </svg>
+        </a>
+
+        <div className="bbb-blog-container bbb-full-article-container">
+          <div className="bbb-full-back-bar">
+            <button
+              type="button"
+              className="bbb-full-back-btn"
+              onClick={handleBackToList}
+            >
+              <span>&larr;</span>
+              <span>Back to Blog</span>
+            </button>
+          </div>
+
+          <article className="bbb-full-article">
+            <header className="bbb-full-header">
+              <div className="bbb-full-meta">
+                {activeArticle.category && (
+                  <span className="bbb-full-tag">{activeArticle.category}</span>
+                )}
+                {activeArticle.publish_date && (
+                  <span>{activeArticle.publish_date}</span>
+                )}
+                {activeArticle.read_time && (
+                  <span>{activeArticle.read_time}</span>
+                )}
+              </div>
+
+              <h1 className="bbb-full-title">{activeArticle.title}</h1>
+
+              {activeArticle.author && (
+                <p className="bbb-full-author">By {activeArticle.author}</p>
+              )}
+            </header>
+
+            {activeArticle.thumb && (
+              <div className="bbb-full-hero-media">
+                <img
+                  src={activeArticle.thumb}
+                  alt={activeArticle.title}
+                  className="bbb-full-hero-img"
+                />
+              </div>
+            )}
+
+            <div className="bbb-full-body">
+              {renderArticleBlocks(activeArticle.content)}
+            </div>
+
+            {galleryImages.length > 0 && (
+              <div className="bbb-full-gallery">
+                {galleryImages.map((imgUrl, idx) => (
+                  <img
+                    key={`${imgUrl}-${idx}`}
+                    src={imgUrl}
+                    alt={`${activeArticle.title} - ${idx + 2}`}
+                    className="bbb-full-gallery-img"
+                  />
+                ))}
+              </div>
+            )}
+          </article>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bbb-blog-page">
       {/* Fixed right-edge contact icon matching reference */}
-     
-
+      
       <div className="bbb-blog-container">
         {/* TOP EDITORIAL HERO */}
         <section className="bbb-hero-section">
@@ -129,7 +305,7 @@ export default function Blog() {
                     <div className="bbb-article-left">
                       <h2
                         className="bbb-article-title"
-                        onClick={() => setSelectedArticle(art)}
+                        onClick={() => handleOpenArticle(art)}
                       >
                         {art.title}
                       </h2>
@@ -137,7 +313,7 @@ export default function Blog() {
                       <button
                         type="button"
                         className="bbb-learn-more-btn"
-                        onClick={() => setSelectedArticle(art)}
+                        onClick={() => handleOpenArticle(art)}
                       >
                         <DiagonalArrow className="bbb-learn-arrow" />
                         <span>Learn more</span>
@@ -146,7 +322,7 @@ export default function Blog() {
 
                     <div
                       className="bbb-article-right"
-                      onClick={() => setSelectedArticle(art)}
+                      onClick={() => handleOpenArticle(art)}
                     >
                       <div className="bbb-thumb-card">
                         {art.thumb && (
@@ -170,50 +346,6 @@ export default function Blog() {
           )}
         </section>
       </div>
-
-      {/* ARTICLE READER MODAL */}
-      {selectedArticle && (
-        <div
-          className="bbb-modal-backdrop"
-          onClick={() => setSelectedArticle(null)}
-        >
-          <article className="bbb-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="bbb-modal-close"
-              onClick={() => setSelectedArticle(null)}
-              aria-label="Close article"
-            >
-              &times;
-            </button>
-            {selectedArticle.thumb && (
-              <img
-                src={selectedArticle.thumb}
-                alt={selectedArticle.title}
-                className="bbb-modal-img"
-              />
-            )}
-            <div className="bbb-modal-meta">
-              {selectedArticle.category && (
-                <span className="bbb-modal-tag">{selectedArticle.category}</span>
-              )}
-              {selectedArticle.publish_date && (
-                <span>{selectedArticle.publish_date}</span>
-              )}
-              {selectedArticle.read_time && (
-                <span>{selectedArticle.read_time}</span>
-              )}
-            </div>
-            <h2 className="bbb-modal-title">{selectedArticle.title}</h2>
-            {selectedArticle.author && (
-              <p className="bbb-modal-author">By {selectedArticle.author}</p>
-            )}
-            <div className="bbb-modal-content">
-              {selectedArticle.content || 'No article content available.'}
-            </div>
-          </article>
-        </div>
-      )}
     </div>
   );
 }

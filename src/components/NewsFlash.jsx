@@ -1,101 +1,139 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase, normalizeBlogRow } from '../supabase';
 import './NewsFlash.css';
 
-export default function NewsFlash() {
-  const newsItems = [
-    {
-      id: 'choix-agence',
-      title: 'INDUSTRIAL AND TECHNOLOGY COMPANIES: HOW TO CHOOSE A B2B MARKETING AND COMMUNICATIONS AGENCY?',
-      desc: 'For an industrial or technology company, choosing a B2B marketing and communications agency means assessing six key capabilities: understanding technical issues, mastering strategic methodology, crafting impactful storytelling, executing cross-channel campaigns, measuring ROI, and international reach.',
-      image: '/images/12_CHOIX_AGENCE.jpg',
-      alt: 'Finding the right agency - Marketing and B2B communication',
-      link: '/blog'
-    },
-    {
-      id: 'new-website',
-      title: 'WELCOME TO THE NEW BB&B WEBSITE',
-      desc: 'Same address, new look. Fresher, lighter, more vibrant: our new website is now live. We wanted it to reflect what bb&b stands for: clear, precise and forward-thinking B2B communication.',
-      image: '/images/11_new-site-web-2026_POST_1-scaled.jpg',
-      alt: 'Contemporary web design - Welcome to the new bb&b website',
-      link: '/blog'
-    },
-    {
-      id: 'be-consistent',
-      title: 'BE CONSISTENT — OR BE NOTHING.',
-      desc: 'Consistency is one of the toughest and most important things to achieve in communication. Why? Because anyone can claim anything, at any time, across all touchpoints. Building a coherent and trustworthy industrial brand requires rigorous alignment.',
-      image: '/images/10_Be_consistent_POST-scaled.jpg',
-      alt: 'B2B communication - What really matters',
-      link: '/blog'
+function getExcerpt(item) {
+  if (item.desc) return item.desc;
+  if (!item.content) return '';
+  return item.content.length > 220
+    ? `${item.content.slice(0, 220)}...`
+    : item.content;
+}
+
+export default function NewsFlash({ blogs }) {
+  const [fetchedBlogs, setFetchedBlogs] = useState([]);
+  const [loading, setLoading] = useState(Boolean(supabase && !blogs));
+
+  useEffect(() => {
+    if (blogs || !supabase) {
+      setLoading(false);
+      return;
     }
-  ];
+
+    let active = true;
+
+    const loadTopBlogs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blogs')
+          .select('*')
+          .eq('status', 'Published')
+          .order('id', { ascending: false })
+          .limit(3);
+
+        if (active && !error && data) {
+          setFetchedBlogs(data.map(normalizeBlogRow));
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    loadTopBlogs();
+    return () => {
+      active = false;
+    };
+  }, [blogs]);
+
+  const displayBlogs = (blogs || fetchedBlogs).slice(0, 3);
 
   return (
-    <section className="newsflash-section" aria-label="Our News and Newsflash">
+    <section className="newsflash-section" aria-label="Our Blogs">
       {/* TOP DIVIDER */}
       <div className="newsflash-divider"></div>
 
       {/* HEADER */}
       <div className="newsflash-header">
-        <p className="newsflash-eyebrow">OUR NEWS</p>
-        <h2 className="newsflash-heading">NEWSFLASH</h2>
+        <p className="newsflash-eyebrow">OUR BLOG</p>
+        <h2 className="newsflash-heading">BLOG</h2>
         <p className="newsflash-lead">
-          News from our customers, latest solutions deployed by the agency and jobs to be filled ... Find everything here in our latest news.
+          Latest articles, insights and solutions published by our team ... Find everything here in our latest blogs.
         </p>
       </div>
 
       {/* DIVIDER UNDER INTRO */}
       <div className="newsflash-sub-divider"></div>
 
-      {/* NEWS LIST */}
+      {/* BLOG LIST (MAX 3 ITEMS FROM ADMIN BLOGS) */}
       <div className="newsflash-list">
-        {newsItems.map((item) => (
-          <article key={item.id} className="newsflash-item">
-            {/* LEFT: TEXT CONTENT */}
-            <div className="newsflash-item-content">
-              <h3 className="newsflash-item-title">{item.title}</h3>
-              <p className="newsflash-item-desc">{item.desc}</p>
-              <Link
-                to={item.link}
-                className="newsflash-item-link"
-                aria-label={`Read more about: ${item.title}`}
-              >
-                <svg
-                  className="newsflash-arrow"
-                  width="13"
-                  height="13"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
-                  />
-                </svg>
-                <span>Learn more</span>
-              </Link>
-            </div>
+        {loading ? (
+          <p className="newsflash-item-desc" style={{ padding: '40px 0' }}>
+            Loading blogs...
+          </p>
+        ) : displayBlogs.length === 0 ? (
+          <p className="newsflash-item-desc" style={{ padding: '40px 0' }}>
+            No blogs published yet.
+          </p>
+        ) : (
+          displayBlogs.map((item) => {
+            const imageSrc =
+              item.thumb ||
+              (Array.isArray(item.images) && item.images[0]) ||
+              '';
+            const excerpt = getExcerpt(item);
 
-            {/* RIGHT: IMAGE */}
-            <div className="newsflash-item-media">
-              <div className="newsflash-img-wrap">
-                <img
-                  src={item.image}
-                  alt={item.alt}
-                  className="newsflash-img"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-          </article>
-        ))}
+            return (
+              <article key={item.id} className="newsflash-item">
+                {/* LEFT: TEXT CONTENT */}
+                <div className="newsflash-item-content">
+                  <h3 className="newsflash-item-title">{item.title}</h3>
+                  {excerpt && <p className="newsflash-item-desc">{excerpt}</p>}
+                  <Link
+                    to={`/blog/${item.id}`}
+                    className="newsflash-item-link"
+                    aria-label={`Read more about: ${item.title}`}
+                  >
+                    <svg
+                      className="newsflash-arrow"
+                      width="13"
+                      height="13"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
+                      />
+                    </svg>
+                    <span>Learn more</span>
+                  </Link>
+                </div>
+
+                {/* RIGHT: IMAGE */}
+                <div className="newsflash-item-media">
+                  <div className="newsflash-img-wrap">
+                    {imageSrc && (
+                      <img
+                        src={imageSrc}
+                        alt={item.title}
+                        className="newsflash-img"
+                        loading="lazy"
+                      />
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })
+        )}
       </div>
 
-      {/* MORE NEWS CTA BUTTON */}
+      {/* MORE BLOG CTA BUTTON */}
       <div className="newsflash-cta-wrap">
-        <Link to="/blog" className="newsflash-more-btn" aria-label="Explore more news">
+        <Link to="/blog" className="newsflash-more-btn" aria-label="Explore more blogs">
           <svg
             className="newsflash-more-arrow"
             width="12"
@@ -110,7 +148,7 @@ export default function NewsFlash() {
               d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
             />
           </svg>
-          <span>More news</span>
+          <span>More blog</span>
         </Link>
       </div>
     </section>
