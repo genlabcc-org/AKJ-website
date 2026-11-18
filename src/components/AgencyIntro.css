@@ -123,6 +123,134 @@
   transform: translateY(-1px);
 }
 
+/* Full-Width Banner Image after A Unique Consultancy */
+.agency-intro-banner {
+  width: 100%;
+  margin-top: 72px;
+  overflow: hidden;
+  height: 440px;
+  background-color: #000000;
+}
+
+@media (min-width: 1024px) {
+  .agency-intro-banner {
+    height: 520px;
+    margin-top: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .agency-intro-banner {
+    height: 300px;
+    margin-top: 40px;
+  }
+}
+
+.agency-intro-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agency-intro-banner:hover .agency-intro-banner-img {
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   WHAT SETS US APART SECTION
+   ========================================================================== */
+
+.agency-apart-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e6e6e6;
+  margin: 96px 0 48px;
+}
+
+.agency-apart-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.agency-apart-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.agency-apart-eyebrow {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0;
+}
+
+.agency-apart-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.agency-apart-title {
+  font-family: var(--font-family);
+  font-size: clamp(2.2rem, 3.6vw, 2.75rem);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0 0 24px 0;
+}
+
+.agency-apart-lead {
+  font-family: var(--font-family-light);
+  font-size: 19px;
+  line-height: 28px;
+  color: #111111;
+  font-weight: 400;
+  margin: 0 0 36px 0;
+  max-width: 680px;
+}
+
+.agency-apart-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.agency-apart-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.agency-apart-btn:hover {
+  background-color: var(--color-accent-orange);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.agency-apart-btn:hover svg {
+  transform: rotate(-45deg);
+}
+
 @media (max-width: 900px) {
   .agency-intro-section {
     padding: 56px 24px 64px;
@@ -139,5 +267,151 @@
 
   .agency-intro-lead {
     max-width: none;
+  }
+
+  .agency-apart-divider {
+    margin: 56px 0 32px;
+  }
+
+  .agency-apart-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .agency-apart-title {
+    font-size: 32px;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+
+  .agency-apart-lead {
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 28px;
+  }
+}
+
+/* ==========================================================================
+   3 PILLARS / EDITORIAL CARDS (STRUCTURING, CREATE, EXECUTE)
+   ========================================================================== */
+
+.agency-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin-top: 80px;
+  width: 100%;
+}
+
+.agency-pillar-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+}
+
+.agency-pillar-img-wrap {
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 24px;
+  background-color: #f4f4f4;
+}
+
+.agency-pillar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agency-pillar-card:hover .agency-pillar-img {
+  transform: scale(1.04);
+}
+
+.agency-pillar-title {
+  font-family: var(--font-family);
+  font-size: clamp(26px, 2.3vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0 0 16px 0;
+  line-height: 1.15;
+}
+
+.agency-pillar-desc {
+  font-family: var(--font-family-light);
+  font-size: 17px;
+  line-height: 26px;
+  color: #111111;
+  font-weight: 400;
+  margin: 0 0 24px 0;
+  flex-grow: 1;
+}
+
+.agency-pillar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  margin-top: auto;
+}
+
+.agency-pillar-arrow {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.agency-pillar-card:hover .agency-pillar-link,
+.agency-pillar-link:hover {
+  color: var(--color-accent-orange, #fa4500);
+}
+
+.agency-pillar-card:hover .agency-pillar-arrow,
+.agency-pillar-link:hover .agency-pillar-arrow {
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 1024px) {
+  .agency-pillars-grid {
+    gap: 32px;
+    margin-top: 64px;
+  }
+
+  .agency-pillar-img-wrap {
+    height: 340px;
+  }
+}
+
+@media (max-width: 900px) {
+  .agency-pillars-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    margin-top: 48px;
+  }
+
+  .agency-pillar-img-wrap {
+    height: 320px;
+  }
+
+  .agency-pillar-title {
+    font-size: 28px;
+  }
+
+  .agency-pillar-desc {
+    font-size: 16px;
+    line-height: 24px;
   }
 }

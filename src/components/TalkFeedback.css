@@ -1,0 +1,166 @@
+/* ==========================================================================
+   LET'S TALK / CUSTOMER FEEDBACK SECTION
+   Based on bb-b.net design language
+   ========================================================================== */
+
+.talk-feedback-section {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 48px 120px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+.talk-feedback-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e6e6e6;
+  margin-bottom: 72px;
+}
+
+.talk-feedback-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 96px;
+  align-items: start;
+  width: 100%;
+}
+
+/* ==========================================================================
+   LEFT COLUMN: LET'S TALK
+   ========================================================================== */
+
+.talk-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.talk-feedback-heading {
+  font-family: var(--font-family);
+  font-size: clamp(32px, 3.2vw, 42px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0 0 24px 0;
+  line-height: 1.15;
+}
+
+.talk-feedback-lead {
+  font-family: var(--font-family-light);
+  font-size: clamp(18px, 1.6vw, 21px);
+  line-height: 1.6;
+  color: #111111;
+  font-weight: 400;
+  margin: 0 0 36px 0;
+  max-width: 520px;
+}
+
+.talk-feedback-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 28px;
+  border-radius: 9999px;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.talk-feedback-arrow {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.talk-feedback-btn:hover {
+  background-color: var(--color-accent-orange, #fa4500);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.talk-feedback-btn:hover .talk-feedback-arrow {
+  transform: rotate(-45deg);
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: CUSTOMER FEEDBACK
+   ========================================================================== */
+
+.feedback-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.feedback-quote {
+  font-family: var(--font-family-light);
+  font-style: italic;
+  font-size: clamp(20px, 1.8vw, 24px);
+  line-height: 1.55;
+  color: #111111;
+  font-weight: 400;
+  margin: 0 0 24px 0;
+  padding: 0;
+  border: none;
+  quotes: none;
+  transition: opacity 0.4s ease;
+}
+
+.feedback-author {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .talk-feedback-section {
+    padding: 30px 32px 90px;
+  }
+
+  .talk-feedback-grid {
+    gap: 56px;
+  }
+}
+
+@media (max-width: 860px) {
+  .talk-feedback-section {
+    padding: 20px 20px 64px;
+  }
+
+  .talk-feedback-divider {
+    margin-bottom: 48px;
+  }
+
+  .talk-feedback-grid {
+    grid-template-columns: 1fr;
+    gap: 52px;
+  }
+
+  .talk-feedback-lead {
+    font-size: 17px;
+    line-height: 26px;
+    margin-bottom: 28px;
+  }
+
+  .feedback-quote {
+    font-size: 19px;
+    line-height: 28px;
+    margin-bottom: 18px;
+  }
+}

@@ -64,6 +64,156 @@ export default function AgencyIntro() {
           </Link>
         </div>
       </div>
+
+      {/* FULL-WIDTH BANNER IMAGE (Acoustic Foam Architecture) */}
+      <div className="agency-intro-banner">
+        <img
+          src="/images/agence-image-1.png"
+          alt="Acoustic anechoic pyramid structure - Design & Architecture"
+          className="agency-intro-banner-img"
+          loading="lazy"
+        />
+      </div>
+
+      {/* WHAT SETS US APART SECTION */}
+      <div className="agency-apart-divider"></div>
+
+      <div className="agency-apart-grid">
+        <div className="agency-apart-left">
+          <h2 className="agency-apart-eyebrow">WHAT SETS US APART</h2>
+        </div>
+
+        <div className="agency-apart-right">
+          <h3 className="agency-apart-title">CLARITY, STRUCTURE, IMPACT</h3>
+          <p className="agency-apart-lead">
+            Stronger communication begins with deeper understanding. In
+            industrial, technological and international environments, this relies
+            on a rigorous analysis of the challenges, offerings and competitive
+            landscape. It requires method, discernment and creativity. This is
+            precisely what bb&amp;b delivers.
+          </p>
+
+          <Link to="/about" className="agency-apart-btn" aria-label="Learn more about what sets us apart">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              fill="none"
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+            >
+              <path
+                stroke="currentColor"
+                strokeWidth="1.5"
+                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
+              />
+            </svg>
+            <span>Learn more</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* 3 PILLARS / EDITORIAL CARDS */}
+      <div className="agency-pillars-grid">
+        {/* Card 1: STRUCTURING */}
+        <div className="agency-pillar-card">
+          <div className="agency-pillar-img-wrap">
+            <img
+              src="/images/CONSEILLER_1.jpg"
+              alt="Structuring"
+              className="agency-pillar-img"
+              loading="lazy"
+            />
+          </div>
+          <h3 className="agency-pillar-title">STRUCTURING</h3>
+          <p className="agency-pillar-desc">
+            We clarify the issues, identify value drivers, define relevant strategies and organise ideas to build a solid foundation on which to base your communication.
+          </p>
+          <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Structuring">
+            <svg
+              className="agency-pillar-arrow"
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                stroke="currentColor"
+                strokeWidth="1.5"
+                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
+              />
+            </svg>
+            <span>Learn more</span>
+          </Link>
+        </div>
+
+        {/* Card 2: CREATE */}
+        <div className="agency-pillar-card">
+          <div className="agency-pillar-img-wrap">
+            <img
+              src="/images/CREER_2.jpg"
+              alt="Create"
+              className="agency-pillar-img"
+              loading="lazy"
+            />
+          </div>
+          <h3 className="agency-pillar-title">CREATE</h3>
+          <p className="agency-pillar-desc">
+            We develop meaningful concepts, accurate messages and creative expressions that reinforce your brand’s credibility and uniqueness.
+          </p>
+          <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Create">
+            <svg
+              className="agency-pillar-arrow"
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                stroke="currentColor"
+                strokeWidth="1.5"
+                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
+              />
+            </svg>
+            <span>Learn more</span>
+          </Link>
+        </div>
+
+        {/* Card 3: EXECUTE */}
+        <div className="agency-pillar-card">
+          <div className="agency-pillar-img-wrap">
+            <img
+              src="/images/REALISER_1.jpg"
+              alt="Execute"
+              className="agency-pillar-img"
+              loading="lazy"
+            />
+          </div>
+          <h3 className="agency-pillar-title">EXECUTE</h3>
+          <p className="agency-pillar-desc">
+            We implement our initiatives with rigour and precision to ensure visibility, impact and measurable results – across all your markets.
+          </p>
+          <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Execute">
+            <svg
+              className="agency-pillar-arrow"
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                stroke="currentColor"
+                strokeWidth="1.5"
+                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
+              />
+            </svg>
+            <span>Learn more</span>
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }

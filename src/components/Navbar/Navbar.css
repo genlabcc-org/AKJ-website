@@ -1,0 +1,261 @@
+/* Exact NHEHS Navigation Bar Styles - Matching Official Site */
+
+.nhehs-site-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: #ffffff;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.nhehs-header-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 48px 26px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+}
+
+/* LEFT & RIGHT NAV BLOCKS */
+.nhehs-side-nav {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 450px;
+  flex: 1;
+}
+
+.nhehs-side-left {
+  justify-content: space-between;
+}
+
+.nhehs-side-right {
+  justify-content: space-between;
+}
+
+/* 3-SLOT VERTICAL COLUMN */
+.nhehs-nav-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* TOP SLOT: UTILITY TEXT (18px) */
+.nhehs-top-slot {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.nhehs-top-link {
+  font-size: 13.5px;
+  color: #9ea3ad;
+  font-weight: 400;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.nhehs-top-link:hover {
+  color: #002269;
+}
+
+/* MIDDLE SLOT: DIAMOND (14px) */
+.nhehs-mid-slot {
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.nhehs-diamond {
+  width: 5px;
+  height: 5px;
+  background-color: #002269;
+  transform: rotate(45deg);
+  display: block;
+}
+
+/* BOTTOM SLOT: MAIN NAV TEXT (22px) */
+.nhehs-bot-slot {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nhehs-nav-link {
+  font-size: 15px;
+  color: #002269;
+  font-weight: 400;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.nhehs-nav-link:hover,
+.nhehs-nav-link.active {
+  color: #002269;
+  font-weight: 400;
+}
+
+/* CENTER LOGO */
+.nhehs-center-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+
+.nhehs-logo-btn {
+  display: block;
+  line-height: 0;
+  transition: opacity 0.2s ease;
+}
+
+.nhehs-logo-btn:hover {
+  opacity: 0.92;
+}
+
+.nhehs-logo-vector {
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* MOBILE TOGGLE */
+.nhehs-mobile-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.nhehs-mobile-burger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: #002269;
+  border-radius: 1px;
+  transition: all 0.25s ease;
+}
+
+/* MOBILE DRAWER */
+.nhehs-mobile-pane {
+  display: none;
+  position: fixed;
+  top: 84px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  padding: 24px 28px;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 999;
+}
+
+.nhehs-mobile-pane.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nhehs-pane-group {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8c919c;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.nhehs-mobile-pane a {
+  font-size: 16px;
+  font-weight: 400;
+  color: #002269;
+  text-decoration: none;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1240px) {
+  .nhehs-header-wrap {
+    gap: 32px;
+    padding: 24px 24px 22px 24px;
+  }
+
+  .nhehs-side-nav {
+    max-width: 390px;
+  }
+
+  .nhehs-top-link {
+    font-size: 12.5px;
+  }
+
+  .nhehs-nav-link {
+    font-size: 14px;
+  }
+
+  .nhehs-logo-vector {
+    width: 195px;
+  }
+}
+
+@media (max-width: 960px) {
+  .nhehs-header-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+  }
+
+  .nhehs-side-nav {
+    display: none;
+  }
+
+  .nhehs-logo-vector {
+    width: 180px;
+  }
+
+  .nhehs-mobile-burger {
+    display: flex;
+  }
+
+  .nhehs-mobile-pane {
+    display: flex;
+  }
+}
