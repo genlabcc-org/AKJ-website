@@ -46,7 +46,7 @@ export default function TalkFeedback() {
       <div className="talk-feedback-grid">
         {/* LEFT COLUMN: LET'S TALK */}
         <div className="talk-col">
-          <h2 className="talk-feedback-heading">LET'S TALK</h2>
+          <h2 className="talk-feedback-heading">Apply / Book a Visit</h2>
           <p className="talk-feedback-lead">
             Do you have a project, a question, or would you like to find out more about us? We’d be happy to answer any questions you may have!
           </p>
@@ -71,7 +71,7 @@ export default function TalkFeedback() {
 
         {/* RIGHT COLUMN: CUSTOMER FEEDBACK */}
         <div className="feedback-col">
-          <h2 className="talk-feedback-heading">CUSTOMER FEEDBACK</h2>
+          <h2 className="talk-feedback-heading">Latest achievements </h2>
           <div className="feedback-quote-container">
             <blockquote key={current.id} className="feedback-quote">
               {current.quote}

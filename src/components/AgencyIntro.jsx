@@ -67,10 +67,9 @@ export default function AgencyIntro() {
           <p className="agency-intro-eyebrow">
             Universities, Boarding Schools &amp; Global Admissions
           </p>
-          <h2 className="agency-intro-title">A Unique Consultancy</h2>
+          <h2 className="agency-intro-title">How we learn</h2>
           <p className="agency-intro-lead">
-            bb&amp;b is an international B2B marketing and communications consultancy
-            specialising in industrial and technology sectors.
+            At AKJ, children do the thinking, the talking and the doing. Our facilitators plan every lesson around them and guide them towards real understanding, not memorising and repeating.
           </p>
         </div>
 
@@ -138,7 +137,7 @@ export default function AgencyIntro() {
         </div>
 
         <div className="agency-apart-right">
-          <h3 className="agency-apart-title">CLARITY, STRUCTURE, IMPACT</h3>
+          <h3 className="agency-apart-title">Learner qualities</h3>
           <p className="agency-apart-lead">
             Stronger communication begins with deeper understanding. In
             industrial, technological and international environments, this relies

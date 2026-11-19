@@ -90,8 +90,7 @@ export default function NewsFlash({ blogs }) {
 
       {/* HEADER */}
       <div className="newsflash-header">
-        <p className="newsflash-eyebrow">OUR BLOG</p>
-        <h2 className="newsflash-heading">BLOG</h2>
+        <h2 className="newsflash-heading">Latest blog posts </h2>
         <p className="newsflash-lead">
           Latest articles, insights and solutions published by our team ... Find everything here in our latest blogs.
         </p>

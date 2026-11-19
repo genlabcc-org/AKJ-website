@@ -67,8 +67,7 @@ export default function CaseStudies() {
       {/* SECTION HEADER */}
       <div className="case-studies-header">
         <div className="case-studies-title-wrap">
-          <h2 className="case-studies-eyebrow">OUR PROJECTS</h2>
-          <h3 className="case-studies-heading">TANGIBLE CASE STUDIES</h3>
+          <h2 className="case-studies-heading">Life at AKJ</h2>
         </div>
         <p className="case-studies-lead">
           Our b2b know-how encompasses a variety of industries and applications. Discover our work through the following examples.
