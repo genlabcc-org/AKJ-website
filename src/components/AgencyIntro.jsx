@@ -90,26 +90,20 @@ export default function AgencyIntro() {
         {/* RIGHT COLUMN */}
         <div className="agency-intro-right">
           <p className="agency-intro-body">
-            We combine academic insight, strategic profiling, international
-            perspective and mentorship to develop applications that make a
-            difference. From evaluation to ideation, from shortlisting to
-            interview prep, from essays to placement, we have the expertise to
-            take every student’s future forward.
+            <strong>One Seamless Cambridge Journey: </strong> 
+            From Early Years (EY1) to Grade 10 (IGCSE), students follow one unified Cambridge pathway where every stage builds naturally on the last—so moving up never feels like starting over.
           </p>
 
           <p className="agency-intro-point">
-            <strong>Our mission:</strong> to elevate each student’s academic
-            profile for top institutions in the UK, Europe, and worldwide.
+            <strong>Student-Led Active Learning: </strong> At AKJ, children take the lead by doing the thinking, the talking, and the doing in every classroom.
           </p>
 
           <p className="agency-intro-point">
-            <strong>What sets us apart:</strong> an understanding of global
-            admissions standards, trusted institutional links, an international
-            outlook – and the dedication to turn potential into offers.
+            <strong>Facilitator-Guided Discovery: </strong> Our facilitators design every lesson around the learner, guiding students rather than lecturing.
           </p>
 
           <p className="agency-intro-point">
-            <strong>Our expertise:</strong> profiling, positioning, placement.
+            <strong>Deep Understanding Over Rote: </strong> We focus on building genuine comprehension and critical thinking, moving away from memorizing and repeating.
           </p>
 
           <Link to="/about" className="agency-intro-btn">

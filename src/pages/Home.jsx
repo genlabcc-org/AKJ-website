@@ -42,10 +42,10 @@ export default function Home() {
         title={
           <>
             Cambridge Journey.<br />
-            (EY1 to Grade 10).
+            <span className="site-hero-subline">Building Minds Beyond Borders.</span>
           </>
         }
-        subtitle="From the first call to your destination — university & boarding school consultancy"
+        subtitle="A Cambridge School in Thuckalay . EY1 to Grade 10"
       />
 
       {/* HERO VIDEO */}
