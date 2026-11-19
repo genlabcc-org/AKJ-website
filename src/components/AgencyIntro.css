@@ -123,33 +123,55 @@
   transform: translateY(-1px);
 }
 
-/* Full-Width Banner Image after A Unique Consultancy */
-.agency-intro-banner {
+/* Dual Banner Images after A Unique Consultancy */
+.agency-intro-dual-banners {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
   width: 100%;
   margin-top: 72px;
   overflow: hidden;
-  height: 440px;
-  background-color: #000000;
 }
 
 @media (min-width: 1024px) {
-  .agency-intro-banner {
-    height: 520px;
+  .agency-intro-dual-banners {
+    gap: 0;
     margin-top: 80px;
   }
 }
 
 @media (max-width: 768px) {
-  .agency-intro-banner {
-    height: 300px;
+  .agency-intro-dual-banners {
+    grid-template-columns: 1fr;
+    gap: 0;
     margin-top: 40px;
   }
 }
 
-.agency-intro-banner-img {
+.agency-intro-dual-banner {
   width: 100%;
-  height: 132%;
-  top: -16%;
+  height: 440px;
+  overflow: hidden;
+  position: relative;
+  background-color: #f4f4f4;
+}
+
+@media (min-width: 1024px) {
+  .agency-intro-dual-banner {
+    height: 520px;
+  }
+}
+
+@media (max-width: 768px) {
+  .agency-intro-dual-banner {
+    height: 320px;
+  }
+}
+
+.agency-intro-dual-img {
+  width: 100%;
+  height: 128%;
+  top: -14%;
   position: relative;
   object-fit: cover;
   object-position: center;
@@ -157,7 +179,7 @@
   will-change: transform;
 }
 
-.agency-intro-banner:hover .agency-intro-banner-img {
+.agency-intro-dual-banner:hover .agency-intro-dual-img {
   transform: none;
 }
 

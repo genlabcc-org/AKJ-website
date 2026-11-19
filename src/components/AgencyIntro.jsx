@@ -11,27 +11,30 @@ export default function AgencyIntro() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 1. Faster responsive banner parallax scrub
-      const bannerImg = document.querySelector('.agency-intro-banner-img');
-      const bannerWrap = document.querySelector('.agency-intro-banner');
-      if (bannerImg && bannerWrap) {
-        gsap.fromTo(
-          bannerImg,
-          { yPercent: -16 },
-          {
-            yPercent: 16,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: bannerWrap,
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: 0.65,
-            },
-          }
-        );
-      }
+      // 1. Dual banner parallax scrub with GSAP
+      const dualBanners = gsap.utils.toArray('.agency-intro-dual-banner');
+      dualBanners.forEach((wrap) => {
+        const img = wrap.querySelector('.agency-intro-dual-img');
+        if (img) {
+          gsap.fromTo(
+            img,
+            { yPercent: -14 },
+            {
+              yPercent: 14,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: wrap,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.65,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+      });
 
-      // 2. Faster responsive parallax on the 3 Pillars images
+      // 2. Responsive parallax on the 3 Pillars images
       const pillarCards = gsap.utils.toArray('.agency-pillar-card');
       pillarCards.forEach((card) => {
         const img = card.querySelector('.agency-pillar-img');
@@ -47,14 +50,25 @@ export default function AgencyIntro() {
                 start: 'top bottom',
                 end: 'bottom top',
                 scrub: 0.65,
+                invalidateOnRefresh: true,
               },
             }
           );
         }
       });
+
+      ScrollTrigger.refresh();
     }, sectionRef);
 
-    return () => ctx.revert();
+    // Refresh after layout settles
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -118,14 +132,22 @@ export default function AgencyIntro() {
         </div>
       </div>
 
-      {/* FULL-WIDTH BANNER IMAGE (Acoustic Foam Architecture) */}
-      <div className="agency-intro-banner">
-        <img
-          src="/images/agence-image-1.png"
-          alt="Acoustic anechoic pyramid structure - Design & Architecture"
-          className="agency-intro-banner-img"
-          loading="lazy"
-        />
+      {/* DUAL BANNER IMAGES */}
+      <div className="agency-intro-dual-banners">
+        <div className="agency-intro-dual-banner">
+          <img
+            src="/images/akj-student-reading.jpg"
+            alt="AKJ student reading"
+            className="agency-intro-dual-img"
+          />
+        </div>
+        <div className="agency-intro-dual-banner">
+          <img
+            src="/images/akj-bookshelf.jpg"
+            alt="AKJ learning library"
+            className="agency-intro-dual-img"
+          />
+        </div>
       </div>
 
       {/* WHAT SETS US APART SECTION */}
@@ -172,7 +194,7 @@ export default function AgencyIntro() {
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
-              src="/images/CONSEILLER_1.jpg"
+              src="/images/s5.jpeg"
               alt="Structuring"
               className="agency-pillar-img"
               loading="lazy"
@@ -205,7 +227,7 @@ export default function AgencyIntro() {
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
-              src="/images/CREER_2.jpg"
+              src="/images/s6.jpeg"
               alt="Create"
               className="agency-pillar-img"
               loading="lazy"
@@ -238,7 +260,7 @@ export default function AgencyIntro() {
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
-              src="/images/REALISER_1.jpg"
+              src="/images/s7.jpeg"
               alt="Execute"
               className="agency-pillar-img"
               loading="lazy"

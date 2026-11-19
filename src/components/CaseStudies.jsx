@@ -81,7 +81,7 @@ export default function CaseStudies() {
           <div className="case-study-img-wrap">
             <div className="case-study-img-inner">
               <img
-                src="/images/ZG_HEADER.jpg"
+                src="/images/s1.jpeg"
                 alt="Zonegreen railway depot protection systems"
                 className="case-study-img"
                 loading="lazy"
@@ -124,7 +124,7 @@ export default function CaseStudies() {
           <div className="case-study-img-wrap">
             <div className="case-study-img-inner">
               <img
-                src="/images/bbb_Binder_magnetic.jpg"
+                src="/images/s2.jpeg"
                 alt="Binder Magnetic polyurethane timing belts and mechanical components"
                 className="case-study-img"
                 loading="lazy"
@@ -167,7 +167,7 @@ export default function CaseStudies() {
           <div className="case-study-img-wrap">
             <div className="case-study-img-inner">
               <img
-                src="/images/bbb_frenehard_pliage.jpg"
+                src="/images/s3.jpeg"
                 alt="Frénéhard Pliage digital sheet metal folding offering"
                 className="case-study-img"
                 loading="lazy"
@@ -210,7 +210,7 @@ export default function CaseStudies() {
           <div className="case-study-img-wrap">
             <div className="case-study-img-inner">
               <img
-                src="/images/bbb_BrightLoop_5.jpg"
+                src="/images/s4.jpeg"
                 alt="BrightLoop universal high-performance power converters"
                 className="case-study-img"
                 loading="lazy"
