@@ -41,8 +41,8 @@ export default function Home() {
       <PageHero
         title={
           <>
-            Global Education.<br />
-            Tailored Admissions.
+            Cambridge Eduction Journey.<br />
+            (EY1 to Grade 10).
           </>
         }
         subtitle="From the first call to your destination — university & boarding school consultancy"

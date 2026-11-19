@@ -38,7 +38,7 @@ export default function Contact() {
             Admissions Journey.
           </>
         }
-        subtitle="Schedule a diagnostic consultation with a senior educational advisor"
+        subtitle="AKJ Internation School"
       />
 
       <section className="section">

@@ -15,11 +15,12 @@
 
 .site-header-inner {
   width: 100%;
-  height: 64px;
+  min-height: 74px;
+  padding: 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(32px, 4vw, 64px);
+  gap: clamp(20px, 3vw, 48px);
 }
 
 .site-brand {
@@ -44,20 +45,36 @@
 
 .site-nav {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.site-nav-row {
+  display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: clamp(40px, 5vw, 76px);
-  margin-left: auto;
+  gap: clamp(14px, 1.8vw, 32px);
+}
+
+.site-nav-row-1 {
+  /* Line 1: Home to Learners Achievement Corner */
+}
+
+.site-nav-row-2 {
+  /* Line 2: Blog to Portal Login */
 }
 
 .site-nav-link {
   position: relative;
   font-family: var(--font-family);
-  font-size: 14px;
+  font-size: clamp(12.5px, 0.95vw, 14px);
   font-weight: 400;
   color: var(--color-dark);
   text-decoration: none;
-  padding: 6px 0;
+  padding: 4px 0;
   white-space: nowrap;
   transition: color 0.15s ease;
 }
@@ -78,6 +95,120 @@
   bottom: 0;
   height: 1.5px;
   background-color: var(--color-accent-orange);
+}
+
+/* Portal Dropdown Styles */
+.site-portal-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-portal-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  padding: 4px 0;
+  transition: color 0.15s ease;
+}
+
+.site-portal-trigger:hover,
+.site-portal-dropdown.open .site-portal-trigger {
+  color: var(--color-accent-orange);
+}
+
+.site-portal-chevron {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.site-portal-dropdown.open .site-portal-chevron,
+.site-portal-dropdown:hover .site-portal-chevron {
+  transform: rotate(180deg);
+}
+
+.site-portal-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 195px;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 8px 0;
+  margin-top: 8px;
+  z-index: 1050;
+  display: none;
+  flex-direction: column;
+}
+
+/* Invisible bridge so mouse hover doesn't break across margin-top */
+.site-portal-menu::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
+.site-portal-dropdown.open .site-portal-menu,
+.site-portal-dropdown:hover .site-portal-menu {
+  display: flex;
+}
+
+.site-portal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  font-family: var(--font-family);
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--color-dark);
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+}
+
+.site-portal-item:hover {
+  background-color: #f7f7f7;
+  color: var(--color-accent-orange);
+  padding-left: 22px;
+}
+
+.site-portal-badge {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  background-color: #eaf8ee;
+  color: #1b873f;
+  border-radius: 4px;
+}
+
+.site-portal-logout-btn {
+  border-top: 1px solid var(--color-border);
+  margin-top: 4px;
+  padding-top: 10px;
+  color: #c53030;
+}
+
+.site-portal-logout-btn:hover {
+  color: #e53e3e;
+  background-color: #fff5f5;
+  padding-left: 22px;
 }
 
 .site-header-actions {
@@ -173,6 +304,63 @@
   color: var(--color-accent-orange);
 }
 
+/* Mobile Portal Section */
+.site-mobile-portal-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-mobile-portal-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  text-align: left;
+  padding: 12px 0;
+}
+
+.site-mobile-portal-sublinks {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0 6px 14px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid var(--color-border);
+  gap: 2px;
+}
+
+.site-mobile-portal-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-dark);
+  padding: 10px 12px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.site-mobile-portal-sublink:hover {
+  color: var(--color-accent-orange);
+}
+
+.site-mobile-portal-logout {
+  color: #c53030;
+  border-top: 1px solid #ededed;
+  margin-top: 4px;
+  padding-top: 10px;
+}
+
 .site-mobile-admin-link {
   margin-top: 16px;
   display: inline-flex;
@@ -215,6 +403,8 @@
 
   .site-header-inner {
     height: 60px;
+    min-height: unset;
+    padding: 0;
   }
 
   .site-nav,
