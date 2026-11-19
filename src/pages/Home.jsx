@@ -41,7 +41,7 @@ export default function Home() {
       <PageHero
         title={
           <>
-            Cambridge Eduction Journey.<br />
+            Cambridge Journey.<br />
             (EY1 to Grade 10).
           </>
         }

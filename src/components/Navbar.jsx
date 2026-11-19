@@ -107,7 +107,7 @@ export default function Navbar() {
               >
                 <button
                   type="button"
-                  className={`site-nav-link site-portal-trigger ${isPortalActive ? 'active' : ''}`}
+                  className={`site-portal-btn ${isPortalActive ? 'active' : ''}`}
                   onClick={() => setPortalDropdownOpen((prev) => !prev)}
                   aria-expanded={portalDropdownOpen}
                   aria-haspopup="true"
@@ -124,7 +124,7 @@ export default function Navbar() {
                     <path
                       d="M1 1L5 5L9 1"
                       stroke="currentColor"
-                      strokeWidth="1.5"
+                      strokeWidth="1.6"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
