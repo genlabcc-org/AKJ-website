@@ -1,41 +1,66 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './CaseStudies.css';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function CaseStudies() {
-  // Smooth subtle parallax float on the overlapping cards during scroll
+  const sectionRef = useRef(null);
+
+  // GSAP Smooth Parallax on Images and Floating Overlapping Cards
   useEffect(() => {
-    let ticking = false;
+    const ctx = gsap.context(() => {
+      const items = gsap.utils.toArray('.case-study-item');
 
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (window.innerWidth >= 1024) {
-            const cards = document.querySelectorAll('.case-study-card');
-            const windowHeight = window.innerHeight;
-            cards.forEach((card) => {
-              const rect = card.getBoundingClientRect();
-              const mid = rect.top + rect.height / 2;
-              const offset = (mid - windowHeight / 2) / windowHeight;
-              // Smooth gentle parallax offset (-35px to +35px)
-              const translateY = Math.max(-45, Math.min(45, offset * 50));
-              card.style.transform = `translate3d(0, ${translateY}px, 0)`;
-            });
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
+      items.forEach((item) => {
+        const img = item.querySelector('.case-study-img');
+        const card = item.querySelector('.case-study-card');
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+        // Faster, responsive image parallax scrub
+        if (img) {
+          gsap.fromTo(
+            img,
+            { yPercent: -14 },
+            {
+              yPercent: 14,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: item,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.65,
+              },
+            }
+          );
+        }
 
-    return () => window.removeEventListener('scroll', onScroll);
+        // Faster floating card parallax on desktop
+        if (card && window.innerWidth >= 1024) {
+          gsap.fromTo(
+            card,
+            { y: -45 },
+            {
+              y: 45,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: item,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.75,
+              },
+            }
+          );
+        }
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section className="case-studies-section" aria-label="Our Projects and Tangible Case Studies">
+    <section ref={sectionRef} className="case-studies-section" aria-label="Our Projects and Tangible Case Studies">
       {/* SECTION DIVIDER */}
       <div className="case-studies-divider"></div>
 

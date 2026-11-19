@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { supabase, normalizeBlogRow } from '../supabase';
 import './NewsFlash.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 function getExcerpt(item) {
   if (item.desc) return item.desc;
@@ -14,6 +18,7 @@ function getExcerpt(item) {
 export default function NewsFlash({ blogs }) {
   const [fetchedBlogs, setFetchedBlogs] = useState([]);
   const [loading, setLoading] = useState(Boolean(supabase && !blogs));
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     if (blogs || !supabase) {
@@ -48,8 +53,38 @@ export default function NewsFlash({ blogs }) {
 
   const displayBlogs = (blogs || fetchedBlogs).slice(0, 3);
 
+  // GSAP Smooth Parallax on Blog Images
+  useEffect(() => {
+    if (loading || displayBlogs.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      const items = gsap.utils.toArray('.newsflash-item');
+      items.forEach((item) => {
+        const img = item.querySelector('.newsflash-img');
+        if (img) {
+          gsap.fromTo(
+            img,
+            { yPercent: -12 },
+            {
+              yPercent: 12,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: item,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.65,
+              },
+            }
+          );
+        }
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [loading, displayBlogs.length]);
+
   return (
-    <section className="newsflash-section" aria-label="Our Blogs">
+    <section ref={sectionRef} className="newsflash-section" aria-label="Our Blogs">
       {/* TOP DIVIDER */}
       <div className="newsflash-divider"></div>
 

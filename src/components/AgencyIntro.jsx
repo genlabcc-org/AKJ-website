@@ -1,10 +1,64 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './AgencyIntro.css';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function AgencyIntro() {
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // 1. Faster responsive banner parallax scrub
+      const bannerImg = document.querySelector('.agency-intro-banner-img');
+      const bannerWrap = document.querySelector('.agency-intro-banner');
+      if (bannerImg && bannerWrap) {
+        gsap.fromTo(
+          bannerImg,
+          { yPercent: -16 },
+          {
+            yPercent: 16,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: bannerWrap,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 0.65,
+            },
+          }
+        );
+      }
+
+      // 2. Faster responsive parallax on the 3 Pillars images
+      const pillarCards = gsap.utils.toArray('.agency-pillar-card');
+      pillarCards.forEach((card) => {
+        const img = card.querySelector('.agency-pillar-img');
+        if (img) {
+          gsap.fromTo(
+            img,
+            { yPercent: -12 },
+            {
+              yPercent: 12,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: card,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 0.65,
+              },
+            }
+          );
+        }
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="agency-intro-section">
+    <section ref={sectionRef} className="agency-intro-section">
       <div className="agency-intro-divider"></div>
 
       <div className="agency-intro-grid">

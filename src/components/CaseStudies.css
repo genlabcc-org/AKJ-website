@@ -108,10 +108,13 @@
 
 .case-study-img {
   width: 100%;
-  height: 100%;
+  height: 128%;
+  top: -14%;
+  position: relative;
   object-fit: cover;
   object-position: center;
   display: block;
+  will-change: transform;
 }
 
 .case-study-item:hover .case-study-img {
