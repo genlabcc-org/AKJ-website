@@ -90,7 +90,7 @@ export default function CaseStudies() {
           </div>
 
           <div className="case-study-card">
-            <span className="case-study-tag">INTEGRATED MARKETING CAMPAIGN</span>
+            <span className="case-study-tag">CLUB EVERY FRIDAY, EVENTS ALL YEAR</span>
             <h4 className="case-study-title">ZONEGREEN</h4>
             <p className="case-study-desc">
               Zonegreen develops and produces protection systems for railway depots. bb&amp;b has conceived an integrated marketing campaign to launch the brand in France.
@@ -133,7 +133,7 @@ export default function CaseStudies() {
           </div>
 
           <div className="case-study-card">
-            <span className="case-study-tag">WEB DEVELOPMENT &amp; DIGITAL MARKETING</span>
+            <span className="case-study-tag">CHLIDREN LEARNS TO LEAD</span>
             <h4 className="case-study-title">BINDER MAGNETIC</h4>
             <p className="case-study-desc">
               Binder Magnetic is a leading French supplier and manufacturer of polyurethane timing belts. The company also provides a wealth of mechanical components such as electromagnets, brakes and electrical actuators for the industry.
@@ -219,8 +219,8 @@ export default function CaseStudies() {
           </div>
 
           <div className="case-study-card">
-            <span className="case-study-tag">BRANDING</span>
-            <h4 className="case-study-title">BRIGHTLOOP BRAND</h4>
+            <span className="case-study-tag">CREATIVITY</span>
+            <h4 className="case-study-title">CREATE AND WORK TOGETHER</h4>
             <p className="case-study-desc">
               BrightLoop develops and produces universal high-performance power converters for the energy transition. bb&amp;b has completely overhauled the technologically leading brand.
             </p>

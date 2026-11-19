@@ -194,9 +194,9 @@ export default function AgencyIntro() {
               loading="lazy"
             />
           </div>
-          <h3 className="agency-pillar-title">STRUCTURING</h3>
+          <h3 className="agency-pillar-title">CONFIDENT</h3>
           <p className="agency-pillar-desc">
-            We clarify the issues, identify value drivers, define relevant strategies and organise ideas to build a solid foundation on which to base your communication.
+            Students develop the self-assurance to speak up, share ideas, and tackle new challenges without fear of making mistakes.
           </p>
           <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Structuring">
             <svg
@@ -227,9 +227,9 @@ export default function AgencyIntro() {
               loading="lazy"
             />
           </div>
-          <h3 className="agency-pillar-title">CREATE</h3>
+          <h3 className="agency-pillar-title">REFLECTIVE</h3>
           <p className="agency-pillar-desc">
-            We develop meaningful concepts, accurate messages and creative expressions that reinforce your brand’s credibility and uniqueness.
+            Learners actively evaluate their own thinking, understand how they learn best, and turn everyday feedback into continuous growth.
           </p>
           <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Create">
             <svg
@@ -260,9 +260,9 @@ export default function AgencyIntro() {
               loading="lazy"
             />
           </div>
-          <h3 className="agency-pillar-title">EXECUTE</h3>
+          <h3 className="agency-pillar-title">INNOVATIVE</h3>
           <p className="agency-pillar-desc">
-            We implement our initiatives with rigour and precision to ensure visibility, impact and measurable results – across all your markets.
+            Children are encouraged to ask questions, think outside the box, and apply what they know to solve real-world problems creatively.
           </p>
           <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Execute">
             <svg
