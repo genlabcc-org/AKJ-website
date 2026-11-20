@@ -10,8 +10,8 @@ import Faq from './pages/Faq';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import Team from './pages/Team';
-import Pathway from './pages/Pathway';
 import LearnersAchievement from './pages/LearnersAchievement';
+import Pathway from './pages/Pathway';
 import Admission from './pages/Admission';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
@@ -43,12 +43,17 @@ function AppLayout() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/acedemics" element={<About />} />
-          <Route path="/academics" element={<About />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/services" element={<Services />} />
           <Route path="/acedemics" element={<Pathway />} />
           <Route path="/academics" element={<Pathway />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/learners" element={<LearnersAchievement />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<Blog />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/admission" element={<Admission />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/team" element={<Team />} />
           <Route path="/learners" element={<LearnersAchievement />} />
           <Route path="/blog" element={<Blog />} />

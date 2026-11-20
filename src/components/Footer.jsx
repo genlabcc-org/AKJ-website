@@ -95,7 +95,9 @@ export default function Footer() {
                   <li><Link to="/about">About</Link></li>
                   <li><Link to="/acedemics">Academics</Link></li>
                   <li><Link to="/team">Team</Link></li>
-                  <li><Link to="/learners">Achievements</Link></li>
+                  <li><Link to="/learners">Learners' Corner</Link></li>
+                  <li><Link to="/services">Competences</Link></li>
+                  <li><Link to="/services">References</Link></li>
                   <li><Link to="/blog">Blog</Link></li>
                   <li><Link to="/admission">Admission</Link></li>
                   <li><Link to="/contact">Contact</Link></li>
