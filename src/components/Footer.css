@@ -1,6 +1,6 @@
 /* ==========================================================================
    AKJ INTERNATIONAL SCHOOL FOOTER STYLES
-   Curtain reveal layout with Cambridge educational maroon banner and white card
+   Curtain reveal layout with white educational doodle banner and solid white card
    Authorized Palette: #1E459F (Blue), #CF2A2A (Crimson), #FABD32 (Gold), #E1DCCA (Stone), White
    ========================================================================== */
 
@@ -37,7 +37,7 @@
 .akj-footer-section {
   position: relative;
   width: 100%;
-  background-color: #ffffff;
+  background-color: #f6f2f0;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -53,7 +53,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. Background Banner: Maroon Educational Doodle Banner (/images/Footer_akj.jpg)
+   3. Background Banner: White Educational Doodle Banner (/images/Footer_white_banner.jpg)
    -------------------------------------------------------------------------- */
 .akj-footer-bg {
   position: absolute;
@@ -64,6 +64,7 @@
   z-index: 1;
   overflow: hidden;
   pointer-events: none;
+  background-color: #f6f2f0;
 }
 
 .akj-footer-bg-img {
@@ -75,9 +76,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. Overlapping Solid White Card
-   Reduced top maroon banner height slightly for a balanced, compact look.
-   Desktop: reveals the maroon doodle banner on the top and left side.
+   4. Overlapping Solid White Card (White Template — NOT Blue)
+   Desktop: reveals the white doodle banner on the top and left side.
    -------------------------------------------------------------------------- */
 .akj-footer-card {
   position: relative;
@@ -85,7 +85,8 @@
   background-color: #ffffff;
   color: #1f2937;
   box-sizing: border-box;
-  margin-top: 72px; /* Compact top reveal on mobile */
+  margin-top: 72px;
+  /* Compact top reveal on mobile */
   margin-left: 0;
   width: 100%;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);

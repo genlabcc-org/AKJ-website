@@ -10,6 +10,7 @@ import Faq from './pages/Faq';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import Team from './pages/Team';
+import LearnersAchievement from './pages/LearnersAchievement';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
@@ -43,6 +44,7 @@ function AppLayout() {
           <Route path="/faq" element={<Faq />} />
           <Route path="/services" element={<Services />} />
           <Route path="/team" element={<Team />} />
+          <Route path="/learners" element={<LearnersAchievement />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />

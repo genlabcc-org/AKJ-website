@@ -1,0 +1,389 @@
+/* --------------------------------------------------------------------------
+   LEARNERS' ACHIEVEMENT CORNER — SÖHNE / BB&B EDITORIAL ARCHITECTURE
+   (Modeled with identical styling to Team & About pages: borderless cards & clean typography)
+   -------------------------------------------------------------------------- */
+
+.bbb-learners-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #000000;
+  padding-top: 100px;
+  padding-bottom: 80px;
+}
+
+.bbb-learners-container {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .bbb-learners-page {
+    padding-top: 80px;
+    padding-bottom: 60px;
+  }
+  .bbb-learners-container {
+    padding: 0 20px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1. EDITORIAL SPLIT SECTION (MATCHING ABOUT & TEAM)
+   -------------------------------------------------------------------------- */
+.bbb-learners-split-section {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  padding: 48px 0 72px;
+  border-top: 1px solid #e6e6e6;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .bbb-learners-split-section {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 36px 0 48px;
+  }
+}
+
+.bbb-learners-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.bbb-learners-kicker {
+  display: inline-block;
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0;
+}
+
+.bbb-learners-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bbb-learners-heading {
+  color: #000000;
+  font-family: var(--font-family);
+  font-size: 44px;
+  line-height: 50px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  margin: 0 0 28px 0;
+  max-width: 620px;
+}
+
+@media (max-width: 768px) {
+  .bbb-learners-heading {
+    font-size: 30px;
+    line-height: 36px;
+    margin-bottom: 20px;
+  }
+}
+
+.bbb-learners-lead {
+  font-family: var(--font-family-light);
+  font-size: 16px;
+  line-height: 25px;
+  color: #222222;
+  margin: 0 0 28px 0;
+  max-width: 580px;
+}
+
+.bbb-learners-framework-card {
+  width: 100%;
+  max-width: 580px;
+  background-color: #fafafa;
+  border-left: 2px solid #edba3a;
+  border-radius: 2px;
+  padding: 18px 24px 18px 20px;
+}
+
+.bbb-framework-tag {
+  display: inline-block;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #edba3a;
+  margin-bottom: 6px;
+}
+
+.bbb-framework-text {
+  font-family: var(--font-family-light);
+  font-size: 14px;
+  line-height: 21px;
+  color: #333333;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2. BROWSE FILTER PILLS (MATCHING TEAM FILTER)
+   -------------------------------------------------------------------------- */
+.bbb-learners-filter-section {
+  border-top: 1px solid #e6e6e6;
+  padding: 36px 0 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bbb-learners-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bbb-learners-filter-label {
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.bbb-learners-total-count {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #000000;
+}
+
+.bbb-learners-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bbb-learners-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  background-color: #f7f7f7;
+  color: #333333;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  font-family: var(--font-family);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bbb-learners-filter-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.bbb-learners-filter-btn.active {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.bbb-learners-grade-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.bbb-learners-grade-label {
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #999999;
+}
+
+.bbb-learners-grade-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bbb-learners-grade-btn {
+  padding: 6px 14px;
+  background-color: transparent;
+  color: #555555;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bbb-learners-grade-btn:hover,
+.bbb-learners-grade-btn.active {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* --------------------------------------------------------------------------
+   3. ROSTER GROUPS & BORDERLESS CARDS (IDENTICAL TO TEAM PAGE)
+   -------------------------------------------------------------------------- */
+.bbb-learners-roster {
+  display: flex;
+  flex-direction: column;
+}
+
+.bbb-learners-group-section {
+  border-top: 1px solid #e6e6e6;
+  padding: 56px 0 64px;
+}
+
+.bbb-learners-group-row {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 72px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .bbb-learners-group-row {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.bbb-learners-group-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: sticky;
+  top: 96px;
+}
+
+.bbb-learners-group-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bbb-learners-group-title {
+  display: inline-block;
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0;
+}
+
+.bbb-learners-group-count {
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.bbb-learners-group-desc {
+  font-family: var(--font-family-light);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: #666666;
+  margin: 8px 0 0;
+}
+
+.bbb-learners-group-right {
+  width: 100%;
+}
+
+.bbb-learners-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* BORDERLESS CARD (IDENTICAL TO TEAM MEMBER CARDS) */
+.bbb-learner-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 24px 22px;
+  background-color: #fafafa;
+  border: none;
+  border-radius: 4px;
+  min-height: 160px;
+  box-sizing: border-box;
+}
+
+.bbb-learner-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.bbb-learner-stage-pill {
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #000000;
+  background-color: #f0f0f0;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.bbb-learner-grades-tag {
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #888888;
+}
+
+.bbb-learner-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bbb-learner-card-title {
+  font-family: var(--font-family);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 23px;
+  color: #000000;
+  margin: 0;
+}
+
+.bbb-learner-card-desc {
+  font-family: var(--font-family-light);
+  font-size: 14px;
+  line-height: 21px;
+  color: #555555;
+  margin: 0;
+}
