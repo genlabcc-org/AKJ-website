@@ -10,6 +10,7 @@ import Faq from './pages/Faq';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import Team from './pages/Team';
+import Pathway from './pages/Pathway';
 import LearnersAchievement from './pages/LearnersAchievement';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
@@ -43,6 +44,8 @@ function AppLayout() {
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/acedemics" element={<Pathway />} />
+          <Route path="/academics" element={<Pathway />} />
           <Route path="/team" element={<Team />} />
           <Route path="/learners" element={<LearnersAchievement />} />
           <Route path="/blog" element={<Blog />} />
