@@ -59,7 +59,7 @@ export default function Footer() {
         {/* FULL BACKGROUND IMAGE: PERFORATED INDUSTRIAL VENTILATION GRILLE */}
         <div className="bbb-footer-bg">
           <img
-            src="/images/FOOTER_2.avif"
+            src="/images/Footer_akj.jpg"
             alt="Perforated industrial grille pattern"
             className="bbb-footer-bg-img"
           />
@@ -79,7 +79,7 @@ export default function Footer() {
                   />
                 </Link>
               </div>
-              <div className="bbb-footer-copy">© 2026 AKJ</div>
+              <div className="bbb-footer-copy">© 2026 AKJ International School</div>
             </div>
 
             {/* RIGHT NAVIGATION COLUMNS */}
@@ -89,13 +89,12 @@ export default function Footer() {
                 <h4 className="bbb-footer-title">SITEMAP</h4>
                 <ul className="bbb-footer-list">
                   <li><Link to="/">Home</Link></li>
-                  <li><Link to="/about">Agency</Link></li>
-                  <li><Link to="/team">Team</Link></li>
-                  <li><Link to="/services">Competences</Link></li>
+                  <li><Link to="/about">About</Link></li>
+                  <li><Link to="/services">Academics</Link></li>
                   <li><Link to="/services">References</Link></li>
                   <li><Link to="/blog">Blog</Link></li>
-                  <li><Link to="/about">bb&amp;b glossary</Link></li>
-                  <li><Link to="/about">Legal Notice</Link></li>
+                  <li><Link to="/about">Admission</Link></li>
+                  {/* <li><Link to="/about">Legal Notice</Link></li> */}
                 </ul>
               </div>
 
@@ -109,23 +108,23 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="bbb-footer-text-link"
                   >
-                    22, rue Soleillet<br />
-                    75020 Paris<br />
-                    France
+                    Tirunelveli Highway, opposite Iyangar Bakery,<br />
+                    Thiruvananthapuram,<br />
+                    Kumaracoil, Tamil Nadu 629175
                   </a>
                 </p>
 
                 <h4 className="bbb-footer-title bbb-footer-sub">PHONE</h4>
                 <p className="bbb-footer-desc">
                   <a href="tel:+33140337941" className="bbb-footer-text-link">
-                    +33 1 40 33 79 41
+                    +91 8072590214
                   </a>
                 </p>
 
                 <h4 className="bbb-footer-title bbb-footer-sub">EMAIL</h4>
                 <p className="bbb-footer-desc">
-                  <a href="mailto:contact@bb-b.fr" className="bbb-footer-text-link">
-                    contact@bb-b.fr
+                  <a href="mailto:akjinternationalschool@gmail.com" className="bbb-footer-text-link">
+                    akjinternationalschool@gmail.com
                   </a>
                 </p>
               </div>

@@ -49,7 +49,7 @@ export default function Home() {
       />
 
       {/* HERO VIDEO */}
-      <HeroVideo src="/Akj_intro.mp4" />
+      <HeroVideo src="/Akj_intro_ai.mp4" />
 
       {/* AGENCY INTRO */}
       <AgencyIntro />

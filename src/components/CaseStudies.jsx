@@ -70,7 +70,7 @@ export default function CaseStudies() {
           <h2 className="case-studies-heading">Life at AKJ</h2>
         </div>
         <p className="case-studies-lead">
-          Our b2b know-how encompasses a variety of industries and applications. Discover our work through the following examples.
+          Clubs every Friday, events all year, and a school that feels like family, Children learn to lead, perform, create and work together beyond the classroom
         </p>
       </div>
 
@@ -91,9 +91,9 @@ export default function CaseStudies() {
 
           <div className="case-study-card">
             <span className="case-study-tag">CLUB EVERY FRIDAY, EVENTS ALL YEAR</span>
-            <h4 className="case-study-title">ZONEGREEN</h4>
+            <h4 className="case-study-title">Learning Beyond the Classroom</h4>
             <p className="case-study-desc">
-              Zonegreen develops and produces protection systems for railway depots. bb&amp;b has conceived an integrated marketing campaign to launch the brand in France.
+              Weekly Friday clubs and year-round events at AKJ International School inspire creativity, teamwork, and real-world confidence.
             </p>
             <Link
               to="/services"
@@ -134,9 +134,9 @@ export default function CaseStudies() {
 
           <div className="case-study-card">
             <span className="case-study-tag">CHLIDREN LEARNS TO LEAD</span>
-            <h4 className="case-study-title">BINDER MAGNETIC</h4>
+            <h4 className="case-study-title">Building Tomorrow’s Voices Today</h4>
             <p className="case-study-desc">
-              Binder Magnetic is a leading French supplier and manufacturer of polyurethane timing belts. The company also provides a wealth of mechanical components such as electromagnets, brakes and electrical actuators for the industry.
+              At AKJ International School, students take initiative, make responsible choices, and grow into confident, compassionate leaders.
             </p>
             <Link
               to="/services"
@@ -176,10 +176,10 @@ export default function CaseStudies() {
           </div>
 
           <div className="case-study-card">
-            <span className="case-study-tag">WEB DEVELOPMENT &amp; DIGITAL MARKETING</span>
-            <h4 className="case-study-title">FRÉNÉHARD PLIAGE</h4>
+            <span className="case-study-tag">Facilitators Who Inspire</span>
+            <h4 className="case-study-title">Passionate Mentors, Personalized Guidance</h4>
             <p className="case-study-desc">
-              Frénéhard accelerates its digitalisation and launches a new activity: Frénéhard Pliage. It aims at meeting the needs of the building envelope and exterior fittings market with an entirely digital offering.
+              At AKJ International School, our dedicated facilitators go beyond textbooks—guiding, mentoring, and empowering every child to think independently and reach their fullest potential.
             </p>
             <Link
               to="/services"
@@ -222,7 +222,7 @@ export default function CaseStudies() {
             <span className="case-study-tag">CREATIVITY</span>
             <h4 className="case-study-title">CREATE AND WORK TOGETHER</h4>
             <p className="case-study-desc">
-              BrightLoop develops and produces universal high-performance power converters for the energy transition. bb&amp;b has completely overhauled the technologically leading brand.
+              At AKJ International School, students collaborate on hands-on projects, share bold ideas, and discover the true value of teamwork and creative problem-solving.
             </p>
             <Link
               to="/services"
