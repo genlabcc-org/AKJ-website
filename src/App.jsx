@@ -8,6 +8,7 @@ import About from './pages/About';
 import Services from './pages/Services';
 import Blog from './pages/Blog';
 import Contact from './pages/Contact';
+import Team from './pages/Team';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
@@ -39,6 +40,7 @@ function AppLayout() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/team" element={<Team />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />

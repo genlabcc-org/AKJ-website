@@ -90,6 +90,7 @@ export default function Footer() {
                 <ul className="bbb-footer-list">
                   <li><Link to="/">Home</Link></li>
                   <li><Link to="/about">Agency</Link></li>
+                  <li><Link to="/team">Team</Link></li>
                   <li><Link to="/services">Competences</Link></li>
                   <li><Link to="/services">References</Link></li>
                   <li><Link to="/blog">Blog</Link></li>
