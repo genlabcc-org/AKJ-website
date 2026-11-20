@@ -124,7 +124,7 @@ export default function Footer() {
                       <circle cx="12" cy="10" r="3" />
                     </svg>
                     <a
-                      href="https://maps.google.com/?q=Tirunelveli+Highway+Kumaracoil+Tamil+Nadu+629175"
+                      href="https://www.google.com/maps/place/AKJ+International+School/@8.2332383,77.3384014,871m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3b04f9e24bc806ed:0x20591399153dd220!8m2!3d8.2332383!4d77.3409817!16s%2Fg%2F11zcjfkhv1"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="akj-footer-contact-link"

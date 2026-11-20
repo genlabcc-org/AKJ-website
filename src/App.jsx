@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import Team from './pages/Team';
 import Pathway from './pages/Pathway';
 import LearnersAchievement from './pages/LearnersAchievement';
+import Admission from './pages/Admission';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
@@ -42,6 +43,8 @@ function AppLayout() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/acedemics" element={<About />} />
+          <Route path="/academics" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/services" element={<Services />} />
           <Route path="/acedemics" element={<Pathway />} />
@@ -51,6 +54,7 @@ function AppLayout() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/admission" element={<Admission />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"

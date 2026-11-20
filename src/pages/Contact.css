@@ -1,93 +1,358 @@
-.contact-grid-page {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: start;
+/* ==========================================================================
+   AKJ INTERNATIONAL SCHOOL - EDITORIAL CONTACT FORM (BB&B STYLING)
+   Exact match to the editorial reference layout:
+   - Pure white page background
+   - "OUR FORM" uppercase kicker & bold "WRITE US" title
+   - Flat warm-stone background input blocks (#ECE8E1) with zero borders
+   - Asymmetric 2-column layout (Message occupies left column)
+   - Square checkbox consent notice
+   - Cambridge blue & crimson accents (#1E459F / #CF2A2A)
+   ========================================================================== */
+
+.bbb-contact-page {
+  background-color: #ffffff;
+  min-height: 100vh;
+  width: 100%;
+  color: #000000;
 }
 
-@media (max-width: 860px) {
-  .contact-grid-page {
+/* --------------------------------------------------------------------------
+   1. OUR FORM / WRITE US SECTION
+   -------------------------------------------------------------------------- */
+.bbb-form-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 60px 0 70px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.bbb-form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+  box-sizing: border-box;
+}
+
+.bbb-form-header {
+  margin-bottom: 38px;
+}
+
+.bbb-form-kicker {
+  display: block;
+  font-family: var(--font-family, sans-serif);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000000;
+  margin-bottom: 14px;
+}
+
+.bbb-form-title {
+  font-family: var(--font-family, sans-serif);
+  font-size: clamp(34px, 4.8vw, 50px);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: #000000;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2. FORM GRID & INPUT FIELDS (Warm Stone #ECE8E1, Zero Border, Sharp Edges)
+   -------------------------------------------------------------------------- */
+.bbb-form {
+  width: 100%;
+}
+
+.bbb-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .bbb-form-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    row-gap: 14px;
   }
 }
 
-.contact-form-card {
-  background: var(--color-light-gray);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: 40px;
-  box-shadow: var(--shadow-sm);
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-dark);
-  margin-bottom: 8px;
-}
-
-.form-input,
-.form-textarea {
+.bbb-field-col {
   width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: #ffffff;
-  font-size: 15px;
-  font-family: inherit;
-  color: var(--color-dark);
+}
+
+/* Asymmetric Row 3: Message is on Left Column; Right column is empty on desktop */
+.bbb-empty-col {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .bbb-empty-col {
+    display: none;
+  }
+}
+
+.bbb-input {
+  width: 100%;
+  height: 52px;
+  background-color: #ECE8E1;
+  border: none;
+  border-radius: 0;
+  padding: 0 20px;
+  font-family: var(--font-family, sans-serif);
+  font-size: 14px;
+  color: #000000;
+  box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.form-input:focus,
-.form-textarea:focus {
-  border-color: var(--color-dark);
+.bbb-input::placeholder {
+  color: #2b2b2b;
+  opacity: 1;
+  font-family: var(--font-family, sans-serif);
+  font-size: 14px;
 }
 
-.form-textarea {
+.bbb-input:focus {
+  background-color: #E6E1D8;
+  box-shadow: inset 0 0 0 2px #1E459F;
+}
+
+.bbb-textarea {
+  height: auto;
+  min-height: 140px;
+  padding: 16px 20px;
   resize: vertical;
-  min-height: 120px;
+  line-height: 1.5;
 }
 
-.form-check {
+.bbb-select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 14px;
+  padding-right: 44px;
+}
+
+.bbb-select option {
+  background-color: #ffffff;
+  color: #000000;
+  padding: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   3. CONSENT CHECKBOX & SUBMIT BUTTON
+   -------------------------------------------------------------------------- */
+.bbb-consent-row {
   display: flex;
   align-items: flex-start;
+  gap: 12px;
+  margin-top: 24px;
+  max-width: 580px;
+  box-sizing: border-box;
+}
+
+.bbb-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #777777;
+  border-radius: 0;
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #1E459F;
+}
+
+.bbb-consent-label {
+  font-family: var(--font-family, sans-serif);
+  font-size: 12px;
+  line-height: 1.55;
+  color: #222222;
+  cursor: pointer;
+}
+
+.bbb-submit-row {
+  margin-top: 28px;
+}
+
+.bbb-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 24px;
+  background-color: #1E459F;
+  color: #ffffff !important;
+  font-family: var(--font-family, sans-serif);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 13px 30px;
+  border: 1px solid #1E459F;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
-.form-check input {
-  margin-top: 3px;
+.bbb-submit-btn:hover:not(:disabled) {
+  background-color: #CF2A2A;
+  border-color: #CF2A2A;
+  transform: translateY(-1px);
 }
 
-.contact-info-card {
-  background: #ffffff;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: 40px;
+.bbb-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.bbb-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Success Confirmation Box */
+.bbb-form-success {
+  background-color: #ECE8E1;
+  padding: 40px clamp(24px, 4vw, 48px);
+  border-left: 4px solid #1E459F;
+  max-width: 680px;
+}
+
+.bbb-success-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1E459F;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.bbb-success-heading {
+  font-size: 24px;
+  font-weight: 800;
+  color: #000000;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+}
+
+.bbb-success-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333333;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. CAMPUS LOCATION & GOOGLE MAP SECTION
+   -------------------------------------------------------------------------- */
+.bbb-campus-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 60px 0 90px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.bbb-campus-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 48px;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 860px) {
+  .bbb-campus-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+.bbb-campus-details {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 22px;
 }
 
-.office-item h4 {
-  font-size: 18px;
+.bbb-campus-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bbb-campus-label {
+  font-family: var(--font-family, sans-serif);
+  font-size: 11.5px;
   font-weight: 700;
-  color: var(--color-dark);
-  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #777777;
 }
 
-.office-item p {
-  font-size: 15px;
-  color: var(--color-muted);
-  line-height: 1.6;
+.bbb-campus-link {
+  font-family: var(--font-family, sans-serif);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #000000;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.bbb-campus-link:hover {
+  color: #1E459F;
+  text-decoration: underline;
+}
+
+.bbb-campus-text {
+  font-family: var(--font-family, sans-serif);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #000000;
+}
+
+.bbb-directions-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  background-color: transparent;
+  color: #1E459F;
+  border: 1.5px solid #1E459F;
+  padding: 10px 20px;
+  font-family: var(--font-family, sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  width: fit-content;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.bbb-directions-btn:hover {
+  background-color: #1E459F;
+  color: #ffffff;
+}
+
+.bbb-campus-map-box {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.bbb-map-iframe {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  border: none;
 }
