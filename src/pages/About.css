@@ -1,104 +1,269 @@
-.about-detailed-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
-  padding: 80px 0;
-}
+/* Exact bb&b Söhne Typography & Computed Styles (matching AgencyIntro.css) */
 
-@media (max-width: 860px) {
-  .about-detailed-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-}
-
-.about-images-wrapper {
+.bbb-about-page {
   position: relative;
-}
-
-.about-main-img {
   width: 100%;
-  border-radius: var(--radius-lg);
-  object-fit: cover;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--color-border);
+  background-color: #ffffff;
+  color: #000000;
+  min-height: 100vh;
+  padding: 48px 72px 120px;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.about-secondary-img-wrapper {
-  position: absolute;
-  bottom: -30px;
-  right: -20px;
-  width: 55%;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  border: 4px solid #ffffff;
-}
-
-@media (max-width: 600px) {
-  .about-secondary-img-wrapper {
-    position: static;
-    width: 100%;
-    margin-top: 16px;
-    border: none;
-  }
-}
-
-.about-secondary-img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.pillar-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-  margin-top: 40px;
-}
-
-@media (max-width: 860px) {
-  .pillar-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.pillar-card {
-  background: var(--color-light-gray);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 36px 28px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.pillar-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-}
-
-.pillar-icon {
-  width: 48px;
-  height: 48px;
-  background: #1c1c1c;
+.bbb-about-floating-mail {
+  position: fixed;
+  right: 0;
+  top: 215px;
+  width: 40px;
+  height: 40px;
+  background-color: #000000;
   color: #ffffff;
-  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  margin-bottom: 20px;
+  z-index: 90;
+  transition: background-color 0.2s ease;
 }
 
-.pillar-card h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin-bottom: 10px;
+.bbb-about-floating-mail:hover {
+  background-color: var(--color-accent-orange, #ff5a26);
+  color: #ffffff;
 }
 
-.pillar-card p {
+.bbb-about-container {
+  width: 100%;
+  margin: 0;
+}
+
+/* 2-COLUMN SPLIT SECTIONS ("OUR CREDO / EXCELLENCE" & "OUR HISTORY / WHY BB&B?") */
+.bbb-about-split-section {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  padding: 48px 0 96px;
+  border-top: 1px solid #e6e6e6;
+  align-items: start;
+}
+
+.bbb-about-kicker {
+  display: inline-block;
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 0;
+}
+
+.bbb-about-heading {
+  color: #000000;
+  background-color: rgba(0, 0, 0, 0);
+  font-family: var(--font-family);
+  font-size: 40px;
+  line-height: 50px;
+  letter-spacing: normal;
+  word-spacing: 0px;
+  margin: -6px 0px 26px;
+  padding: 0px;
+  font-weight: 400;
+  font-style: normal;
+  font-variant: normal;
+  font-kerning: auto;
+  font-optical-sizing: auto;
+  font-stretch: 100%;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: start;
+  text-indent: 0px;
+}
+
+.bbb-about-text {
+  color: #000000;
+  background-color: rgba(0, 0, 0, 0);
+  font-family: var(--font-family-light);
+  font-size: 19px;
+  line-height: 28px;
+  letter-spacing: normal;
+  word-spacing: 0px;
+  margin: 0px 0px 24px;
+  padding: 0px;
+  font-weight: 400;
+  font-style: normal;
+  font-variant: normal;
+  font-kerning: auto;
+  font-optical-sizing: auto;
+  font-stretch: 100%;
+  text-transform: none;
+  text-decoration: none;
+  text-align: start;
+  text-indent: 0px;
+}
+
+.bbb-about-text strong {
+  font-family: var(--font-family);
+  font-weight: 400;
+  color: #000000;
+}
+
+.bbb-about-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-family);
   font-size: 14px;
-  color: var(--color-muted);
-  line-height: 1.6;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.bbb-about-pill-btn:hover {
+  background-color: var(--color-accent-orange, #ff5a26);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* 4-COLUMN STAGES SHOWCASE ("OUR CUSTOMERS / THEY TRUST US") */
+.bbb-about-stages-section {
+  border-top: 1px solid #e6e6e6;
+  padding: 48px 0 40px;
+}
+
+.bbb-about-stages-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin-bottom: 56px;
+}
+
+.bbb-about-stages-header .bbb-about-heading {
+  margin-bottom: 0;
+}
+
+.bbb-about-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.bbb-about-col-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bbb-about-logo-lockup {
+  height: 82px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.bbb-lockup-eyebrow {
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8c8c8c;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.bbb-lockup-number {
+  font-family: var(--font-family-bold);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #000000;
+  line-height: 1;
+}
+
+.bbb-about-col-title {
+  font-family: var(--font-family);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: normal;
+  color: #000000;
+  margin: 0 0 18px;
+}
+
+.bbb-about-col-desc {
+  font-family: var(--font-family-light);
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 400;
+  color: #000000;
+  margin: 0;
+}
+
+/* BOTTOM CENTER ARROWS */
+.bbb-about-slider-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  margin-top: 56px;
+}
+
+.bbb-about-arrow-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  color: #4b5563;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.bbb-about-arrow-btn:hover {
+  color: #000000;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .bbb-about-columns-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px;
+  }
+}
+
+@media (max-width: 900px) {
+  .bbb-about-page {
+    padding: 32px 24px 80px;
+  }
+
+  .bbb-about-split-section,
+  .bbb-about-stages-header {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 40px 0 56px;
+  }
+
+  .bbb-about-stages-header {
+    padding: 0;
+    margin-bottom: 36px;
+  }
+
+  .bbb-about-columns-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }

@@ -179,91 +179,11 @@ export default function Blog() {
     });
   }, [articles, activeFilter]);
 
-  // FULL-SCREEN ARTICLE PAGE
-  if (activeArticle) {
-    const galleryImages =
-      Array.isArray(activeArticle.images) && activeArticle.images.length > 1
-        ? activeArticle.images.slice(1)
-        : [];
-
-    return (
-      <div className="bbb-blog-page bbb-full-article-page">
-        <a href="/contact" className="bbb-floating-mail" aria-label="Contact us">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <rect x="3" y="5" width="18" height="14" rx="1" />
-            <polyline points="3 6 12 13 21 6" />
-          </svg>
-        </a>
-
-        <div className="bbb-blog-container bbb-full-article-container">
-          <div className="bbb-full-back-bar">
-            <button
-              type="button"
-              className="bbb-full-back-btn"
-              onClick={handleBackToList}
-            >
-              <span>&larr;</span>
-              <span>Back to Blog</span>
-            </button>
-          </div>
-
-          <article className="bbb-full-article">
-            <header className="bbb-full-header">
-              <div className="bbb-full-meta">
-                {activeArticle.category && (
-                  <span className="bbb-full-tag">{activeArticle.category}</span>
-                )}
-                {activeArticle.publish_date && (
-                  <span>{activeArticle.publish_date}</span>
-                )}
-                {activeArticle.read_time && (
-                  <span>{activeArticle.read_time}</span>
-                )}
-              </div>
-
-              <h1 className="bbb-full-title">{activeArticle.title}</h1>
-
-              {activeArticle.author && (
-                <p className="bbb-full-author">By {activeArticle.author}</p>
-              )}
-            </header>
-
-            {activeArticle.thumb && (
-              <div className="bbb-full-hero-media">
-                <img
-                  src={activeArticle.thumb}
-                  alt={activeArticle.title}
-                  className="bbb-full-hero-img"
-                />
-              </div>
-            )}
-
-            <div className="bbb-full-body">
-              {renderArticleBlocks(activeArticle.content)}
-            </div>
-
-            {galleryImages.length > 0 && (
-              <div className="bbb-full-gallery">
-                {galleryImages.map((imgUrl, idx) => (
-                  <img
-                    key={`${imgUrl}-${idx}`}
-                    src={imgUrl}
-                    alt={`${activeArticle.title} - ${idx + 2}`}
-                    className="bbb-full-gallery-img"
-                  />
-                ))}
-              </div>
-            )}
-          </article>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bbb-blog-page">
       {/* Fixed right-edge contact icon matching reference */}
-      
+     
+
       <div className="bbb-blog-container">
         {/* TOP EDITORIAL HERO */}
         <section className="bbb-hero-section">
@@ -346,6 +266,50 @@ export default function Blog() {
           )}
         </section>
       </div>
+
+      {/* ARTICLE READER MODAL */}
+      {selectedArticle && (
+        <div
+          className="bbb-modal-backdrop"
+          onClick={() => setSelectedArticle(null)}
+        >
+          <article className="bbb-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="bbb-modal-close"
+              onClick={() => setSelectedArticle(null)}
+              aria-label="Close article"
+            >
+              &times;
+            </button>
+            {selectedArticle.thumb && (
+              <img
+                src={selectedArticle.thumb}
+                alt={selectedArticle.title}
+                className="bbb-modal-img"
+              />
+            )}
+            <div className="bbb-modal-meta">
+              {selectedArticle.category && (
+                <span className="bbb-modal-tag">{selectedArticle.category}</span>
+              )}
+              {selectedArticle.publish_date && (
+                <span>{selectedArticle.publish_date}</span>
+              )}
+              {selectedArticle.read_time && (
+                <span>{selectedArticle.read_time}</span>
+              )}
+            </div>
+            <h2 className="bbb-modal-title">{selectedArticle.title}</h2>
+            {selectedArticle.author && (
+              <p className="bbb-modal-author">By {selectedArticle.author}</p>
+            )}
+            <div className="bbb-modal-content">
+              {selectedArticle.content || 'No article content available.'}
+            </div>
+          </article>
+        </div>
+      )}
     </div>
   );
 }

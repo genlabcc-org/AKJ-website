@@ -79,7 +79,7 @@ export default function AgencyIntro() {
         {/* LEFT COLUMN */}
         <div className="agency-intro-left">
           <p className="agency-intro-eyebrow">
-            Universities, Boarding Schools &amp; Global Admissions
+            About / The Cambridge Way
           </p>
           <h2 className="agency-intro-title">How we learn</h2>
           <p className="agency-intro-lead">
@@ -90,20 +90,23 @@ export default function AgencyIntro() {
         {/* RIGHT COLUMN */}
         <div className="agency-intro-right">
           <p className="agency-intro-body">
-            <strong>One Seamless Cambridge Journey: </strong> 
+            <strong>One Seamless Cambridge Journey: </strong>
             From Early Years (EY1) to Grade 10 (IGCSE), students follow one unified Cambridge pathway where every stage builds naturally on the last—so moving up never feels like starting over.
           </p>
 
           <p className="agency-intro-point">
-            <strong>Student-Led Active Learning: </strong> At AKJ, children take the lead by doing the thinking, the talking, and the doing in every classroom.
+            <strong>Student-Led Active Learning: </strong>
+            At AKJ, children take the lead by doing the thinking, the talking, and the doing in every classroom.
           </p>
 
           <p className="agency-intro-point">
-            <strong>Facilitator-Guided Discovery: </strong> Our facilitators design every lesson around the learner, guiding students rather than lecturing.
+            <strong>Facilitator-Guided Discovery: </strong>
+            Our facilitators design every lesson around the learner, guiding students rather than lecturing.
           </p>
 
           <p className="agency-intro-point">
-            <strong>Deep Understanding Over Rote: </strong> We focus on building genuine comprehension and critical thinking, moving away from memorizing and repeating.
+            <strong>Deep Understanding Over Rote: </strong>
+            We focus on building genuine comprehension and critical thinking, moving away from memorizing and repeating.
           </p>
 
           <Link to="/about" className="agency-intro-btn">
@@ -149,20 +152,22 @@ export default function AgencyIntro() {
 
       <div className="agency-apart-grid">
         <div className="agency-apart-left">
-          <h2 className="agency-apart-eyebrow">WHAT SETS US APART</h2>
+          <h2 className="agency-apart-eyebrow">CENTRE NO. IA998</h2>
         </div>
 
         <div className="agency-apart-right">
           <h3 className="agency-apart-title">Learner qualities</h3>
           <p className="agency-apart-lead">
-            Stronger communication begins with deeper understanding. In
-            industrial, technological and international environments, this relies
-            on a rigorous analysis of the challenges, offerings and competitive
-            landscape. It requires method, discernment and creativity. This is
-            precisely what bb&amp;b delivers.
+            AKJ International School is officially registered with Cambridge
+            International Education as a Cambridge school (Centre No. IA998) for
+            Early Years and Primary. That means our facilitators teach from
+            Cambridge&apos;s own curriculum frameworks, use Cambridge resources
+            and training, and are held to the same standards as Cambridge
+            schools around the world. Here in Thuckalay, your child gets an
+            education that&apos;s recognised far beyond it.
           </p>
 
-          <Link to="/about" className="agency-apart-btn" aria-label="Learn more about what sets us apart">
+          <Link to="/about" className="agency-apart-btn" aria-label="Learn more about The Cambridge Pathway">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="12"
@@ -182,14 +187,14 @@ export default function AgencyIntro() {
         </div>
       </div>
 
-      {/* 3 PILLARS / EDITORIAL CARDS */}
+      {/* 3 PILLARS / LEARNER QUALITIES */}
       <div className="agency-pillars-grid">
-        {/* Card 1: STRUCTURING */}
+        {/* Card 1: CONFIDENT */}
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
               src="/images/s5.jpeg"
-              alt="Structuring"
+              alt="Confident"
               className="agency-pillar-img"
               loading="lazy"
             />
@@ -198,7 +203,7 @@ export default function AgencyIntro() {
           <p className="agency-pillar-desc">
             Students develop the self-assurance to speak up, share ideas, and tackle new challenges without fear of making mistakes.
           </p>
-          <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Structuring">
+          <Link to="/about" className="agency-pillar-link" aria-label="Learn more about Confident">
             <svg
               className="agency-pillar-arrow"
               width="12"
@@ -217,12 +222,12 @@ export default function AgencyIntro() {
           </Link>
         </div>
 
-        {/* Card 2: CREATE */}
+        {/* Card 2: REFLECTIVE */}
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
               src="/images/s6.jpeg"
-              alt="Create"
+              alt="Reflective"
               className="agency-pillar-img"
               loading="lazy"
             />
@@ -231,7 +236,7 @@ export default function AgencyIntro() {
           <p className="agency-pillar-desc">
             Learners actively evaluate their own thinking, understand how they learn best, and turn everyday feedback into continuous growth.
           </p>
-          <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Create">
+          <Link to="/about" className="agency-pillar-link" aria-label="Learn more about Reflective">
             <svg
               className="agency-pillar-arrow"
               width="12"
@@ -250,12 +255,12 @@ export default function AgencyIntro() {
           </Link>
         </div>
 
-        {/* Card 3: EXECUTE */}
+        {/* Card 3: INNOVATIVE */}
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
               src="/images/s7.jpeg"
-              alt="Execute"
+              alt="Innovative"
               className="agency-pillar-img"
               loading="lazy"
             />
@@ -264,7 +269,7 @@ export default function AgencyIntro() {
           <p className="agency-pillar-desc">
             Children are encouraged to ask questions, think outside the box, and apply what they know to solve real-world problems creatively.
           </p>
-          <Link to="/services" className="agency-pillar-link" aria-label="Learn more about Execute">
+          <Link to="/about" className="agency-pillar-link" aria-label="Learn more about Innovative">
             <svg
               className="agency-pillar-arrow"
               width="12"
