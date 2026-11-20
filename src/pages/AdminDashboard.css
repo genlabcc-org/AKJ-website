@@ -1011,6 +1011,39 @@
   grid-template-columns: 2.15fr 1.15fr 0.85fr 1.05fr 0.85fr 0.75fr;
 }
 
+.logip-table-videos .logip-table-head,
+.logip-table-videos .logip-table-row {
+  grid-template-columns: 2fr 1.85fr 1.05fr 0.85fr 0.75fr;
+}
+
+.logip-cell-url {
+  padding-right: 14px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logip-video-url-link {
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logip-video-url-link:hover {
+  text-decoration: underline;
+}
+
+.logip-url-empty {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
 .logip-cell-actions {
   display: flex;
   align-items: center;
@@ -1073,87 +1106,31 @@
 /* =========================================================
    UPLOAD NEW VIDEO FULL-PAGE VIEW (matches reference image)
    ========================================================= */
-.logip-video-upload-group {
-  flex: 1;
-  min-height: 0;
+.logip-video-url-group {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
-.logip-video-dropzone {
-  flex: 1;
-  min-height: 190px;
-  border: 1.5px dashed #cbd5e1;
-  border-radius: 14px;
-  background-color: #f9fafb;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: border-color 0.18s ease, background-color 0.18s ease;
-  padding: 24px;
-  text-align: center;
+.logip-video-url-helper {
+  font-size: 12px;
+  color: #4b5563;
+  margin: 2px 0 0;
+  line-height: 1.45;
 }
 
-.logip-video-dropzone:hover {
-  border-color: #93c5fd;
-  background-color: #f0f7ff;
+.logip-video-url-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #f1f3f6;
+  margin-top: 22px;
 }
 
-.logip-video-drop-icon {
-  color: #111827;
-}
-
-.logip-video-drop-text {
-  font-size: 13px;
-  color: #1f2937;
-  font-weight: 400;
-}
-
-.logip-video-thumbs-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.logip-video-thumb-box {
-  position: relative;
-  width: 86px;
-  height: 60px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-  background: #111827;
-}
-
-.logip-video-thumb-box video {
+.logip-live-video-iframe {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-}
-
-.logip-video-add-slot {
-  width: 86px;
-  height: 60px;
-  border-radius: 10px;
-  border: 1.5px dashed #cbd5e1;
-  background-color: #f9fafb;
-  color: #111827;
-  font-size: 13px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.logip-video-add-slot:hover {
-  border-color: #93c5fd;
-  background-color: #f0f7ff;
+  border: none;
+  background: #000000;
 }
 
 .logip-live-video-card {

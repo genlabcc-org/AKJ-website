@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { supabase, BLOG_IMAGES_BUCKET, normalizeBlogRow, packLegacyBlogPayload } from '../supabase';
+import { supabase, BLOG_IMAGES_BUCKET, normalizeBlogRow, packLegacyBlogPayload, getVideoEmbedInfo } from '../supabase';
 import './AdminDashboard.css';
 
 function formatNowShort() {
@@ -27,7 +27,6 @@ export default function AdminDashboard() {
   const { adminUser, logout } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const videoInputRef = useRef(null);
   const contentAreaRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('blogs'); // 'blogs' | 'videos'
@@ -58,15 +57,19 @@ export default function AdminDashboard() {
   const [blogToDelete, setBlogToDelete] = useState(null);
   const [isDeletingBlog, setIsDeletingBlog] = useState(false);
 
-  // Upload New Video full-page state
+  // Upload / Edit Video full-page state
+  const [editingVideoId, setEditingVideoId] = useState(null);
   const [videoTitle, setVideoTitle] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [videoDate, setVideoDate] = useState(() => formatNowShort());
   const [videoStatus, setVideoStatus] = useState('Published');
-  const [videoFiles, setVideoFiles] = useState([]);
-  const [isUploadingVideos, setIsUploadingVideos] = useState(false);
-  const [videoUploadError, setVideoUploadError] = useState('');
+  const [videoUrlError, setVideoUrlError] = useState('');
   const [videoTitleError, setVideoTitleError] = useState('');
   const [isPublishingVideo, setIsPublishingVideo] = useState(false);
+
+  // Delete Video confirmation modal state
+  const [videoToDelete, setVideoToDelete] = useState(null);
+  const [isDeletingVideo, setIsDeletingVideo] = useState(false);
 
   const displayName = useMemo(() => {
     if (!adminUser?.name || adminUser.name === 'Administrator') {
@@ -385,97 +388,117 @@ export default function AdminDashboard() {
   };
 
   const handleOpenCreateVideo = () => {
+    setEditingVideoId(null);
     setVideoTitle('');
+    setVideoUrl('');
     setVideoDate(formatNowShort());
     setVideoStatus('Published');
-    setVideoFiles([]);
-    setVideoUploadError('');
+    setVideoUrlError('');
     setVideoTitleError('');
     setIsCreatingVideo(true);
   };
 
-  const handleVideoFilesSelected = async (files) => {
-    if (!files || !files.length) return;
-    setVideoUploadError('');
-    setIsUploadingVideos(true);
-
-    try {
-      const uploadedUrls = [];
-      for (const file of Array.from(files)) {
-        if (supabase) {
-          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-          const filePath = `videos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
-
-          const { data, error } = await supabase.storage
-            .from(BLOG_IMAGES_BUCKET)
-            .upload(filePath, file, { cacheControl: '3600', upsert: false });
-
-          if (!error && data) {
-            const { data: publicUrlData } = supabase.storage
-              .from(BLOG_IMAGES_BUCKET)
-              .getPublicUrl(data.path);
-
-            if (publicUrlData?.publicUrl) {
-              uploadedUrls.push(publicUrlData.publicUrl);
-              continue;
-            }
-          }
-        }
-        // Fallback to local object URL preview if bucket upload fails
-        uploadedUrls.push(URL.createObjectURL(file));
-      }
-
-      setVideoFiles((prev) => [...prev, ...uploadedUrls]);
-    } catch {
-      const localUrls = Array.from(files).map((f) => URL.createObjectURL(f));
-      setVideoFiles((prev) => [...prev, ...localUrls]);
-    } finally {
-      setIsUploadingVideos(false);
-    }
-  };
-
-  const handleRemoveVideoFile = (indexToRemove) => {
-    setVideoFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  const handleOpenEditVideo = (item) => {
+    setEditingVideoId(item.id);
+    setVideoTitle(item.title || '');
+    const existingUrl =
+      item.video_url ||
+      (typeof item.avatar === 'string' && item.avatar.startsWith('http')
+        ? item.avatar
+        : '') ||
+      (typeof item.thumb === 'string' && item.thumb.startsWith('http')
+        ? item.thumb
+        : '');
+    setVideoUrl(existingUrl);
+    setVideoDate(item.session_date || item.date || formatNowShort());
+    setVideoStatus(item.status || 'Published');
+    setVideoUrlError('');
+    setVideoTitleError('');
+    setIsCreatingVideo(true);
   };
 
   const handlePublishVideo = async () => {
+    let hasError = false;
     if (!videoTitle.trim()) {
       setVideoTitleError('Please enter a video title.');
-      return;
+      hasError = true;
     }
+    if (!videoUrl.trim()) {
+      setVideoUrlError('Please paste a video URL.');
+      hasError = true;
+    }
+    if (hasError) return;
 
     setVideoTitleError('');
+    setVideoUrlError('');
     setIsPublishingVideo(true);
 
-    const newVideoPayload = {
+    const embedInfo = getVideoEmbedInfo(videoUrl);
+
+    const videoPayload = {
       title: videoTitle.trim(),
-      thumb: videoFiles[0] || null,
+      thumb: embedInfo?.thumb || null,
       host: displayName,
-      avatar: null,
+      avatar: videoUrl.trim(),
       is_admin_icon: true,
-      duration: '45 mins',
+      duration: 'Video Link',
       session_date: videoDate.trim() || formatNowShort(),
       status: videoStatus,
     };
 
-    if (supabase) {
+    if (editingVideoId !== null) {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('videos')
+          .update(videoPayload)
+          .eq('id', editingVideoId)
+          .select()
+          .single();
+
+        const updatedItem =
+          !error && data ? data : { id: editingVideoId, ...videoPayload };
+        setVideos((prev) =>
+          prev.map((v) => (v.id === editingVideoId ? updatedItem : v))
+        );
+      } else {
+        setVideos((prev) =>
+          prev.map((v) =>
+            v.id === editingVideoId ? { ...v, ...videoPayload } : v
+          )
+        );
+      }
+    } else if (supabase) {
       const { data, error } = await supabase
         .from('videos')
-        .insert([newVideoPayload])
+        .insert([videoPayload])
         .select()
         .single();
 
       if (!error && data) {
         setVideos((prev) => [data, ...prev]);
       } else {
-        setVideos((prev) => [{ id: Date.now(), ...newVideoPayload }, ...prev]);
+        setVideos((prev) => [{ id: Date.now(), ...videoPayload }, ...prev]);
       }
     } else {
-      setVideos((prev) => [{ id: Date.now(), ...newVideoPayload }, ...prev]);
+      setVideos((prev) => [{ id: Date.now(), ...videoPayload }, ...prev]);
     }
 
     setIsPublishingVideo(false);
+    setEditingVideoId(null);
     setIsCreatingVideo(false);
+  };
+
+  const handleConfirmDeleteVideo = async () => {
+    if (!videoToDelete) return;
+    setIsDeletingVideo(true);
+
+    if (supabase) {
+      await supabase.from('videos').delete().eq('id', videoToDelete.id);
+    }
+
+    setVideos((prev) => prev.filter((v) => v.id !== videoToDelete.id));
+    setIsDeletingVideo(false);
+    setVideoToDelete(null);
   };
 
   const handleCycleStatus = async (item, table) => {
@@ -887,12 +910,15 @@ export default function AdminDashboard() {
             </div>
           </section>
         ) : activeTab === 'videos' && isCreatingVideo ? (
-          /* UPLOAD NEW VIDEO FULL-PAGE VIEW (matches reference image) */
+          /* UPLOAD / EDIT VIDEO FULL-PAGE VIEW (matches reference image) */
           <section className="logip-main logip-create-blog-main">
             <button
               type="button"
               className="logip-back-to-blogs"
-              onClick={() => setIsCreatingVideo(false)}
+              onClick={() => {
+                setEditingVideoId(null);
+                setIsCreatingVideo(false);
+              }}
             >
               <span>&larr;</span>
               <span>Back to Videos</span>
@@ -900,9 +926,13 @@ export default function AdminDashboard() {
 
             <div className="logip-create-header">
               <div>
-                <h1 className="logip-create-title">Upload New Video</h1>
+                <h1 className="logip-create-title">
+                  {editingVideoId !== null ? 'Edit Video' : 'Upload New Video'}
+                </h1>
                 <p className="logip-create-subtitle">
-                  Upload and publish a new video session.
+                  {editingVideoId !== null
+                    ? 'Update your video session details and publish status.'
+                    : 'Upload and publish a new video session.'}
                 </p>
               </div>
 
@@ -910,7 +940,10 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   className="logip-cancel-pill"
-                  onClick={() => setIsCreatingVideo(false)}
+                  onClick={() => {
+                    setEditingVideoId(null);
+                    setIsCreatingVideo(false);
+                  }}
                 >
                   Cancel
                 </button>
@@ -918,15 +951,21 @@ export default function AdminDashboard() {
                   type="button"
                   className="logip-publish-pill"
                   onClick={handlePublishVideo}
-                  disabled={isPublishingVideo || isUploadingVideos}
+                  disabled={isPublishingVideo}
                 >
-                  {isPublishingVideo ? 'Publishing...' : 'Publish Video'}
+                  {isPublishingVideo
+                    ? editingVideoId !== null
+                      ? 'Saving...'
+                      : 'Publishing...'
+                    : editingVideoId !== null
+                      ? 'Save Changes'
+                      : 'Publish Video'}
                 </button>
               </div>
             </div>
 
             <div className="logip-create-grid">
-              {/* LEFT COLUMN: Video Title + Large Video Upload Dropzone + "+ Add" */}
+              {/* LEFT COLUMN: Video Title + Video URL */}
               <div className="logip-create-left">
                 <div className="logip-field-group">
                   <label htmlFor="video-title-input">Video Title</label>
@@ -944,77 +983,24 @@ export default function AdminDashboard() {
                   {videoTitleError && <p className="logip-field-error">{videoTitleError}</p>}
                 </div>
 
-                <div className="logip-field-group logip-video-upload-group">
-                  <label>Videos</label>
+                <div className="logip-field-group logip-video-url-group">
+                  <label htmlFor="video-url-input">Video URL</label>
                   <input
-                    ref={videoInputRef}
-                    type="file"
-                    accept="video/mp4,video/quicktime,video/webm,video/*"
-                    multiple
-                    style={{ display: 'none' }}
+                    id="video-url-input"
+                    type="url"
+                    className="logip-pill-input"
+                    value={videoUrl}
                     onChange={(e) => {
-                      handleVideoFilesSelected(e.target.files);
-                      e.target.value = '';
+                      setVideoUrl(e.target.value);
+                      if (videoUrlError) setVideoUrlError('');
                     }}
+                    placeholder="Paste YouTube, Instagram Reel, or video link..."
                   />
-
-                  <div
-                    className="logip-video-dropzone"
-                    onClick={() => !isUploadingVideos && videoInputRef.current?.click()}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (!isUploadingVideos) {
-                        handleVideoFilesSelected(e.dataTransfer.files);
-                      }
-                    }}
-                  >
-                    <svg
-                      className="logip-video-drop-icon"
-                      width="42"
-                      height="42"
-                      viewBox="0 0 28 28"
-                      fill="none"
-                      stroke="#111827"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="2" y="6" width="15" height="12" rx="2.5" />
-                      <path d="M17 10.5L22 7.5V14" />
-                      <path d="M21 22V15" />
-                      <polyline points="18 17.5 21 14.5 24 17.5" />
-                    </svg>
-                    <span className="logip-video-drop-text">
-                      {isUploadingVideos
-                        ? 'Uploading video files...'
-                        : 'Click or drag to upload video files (MP4, MOV, WebM)'}
-                    </span>
-                  </div>
-                  {videoUploadError && <p className="logip-field-error">{videoUploadError}</p>}
-
-                  <div className="logip-video-thumbs-row">
-                    {videoFiles.map((vidSrc, idx) => (
-                      <div className="logip-video-thumb-box" key={`${vidSrc}-${idx}`}>
-                        <video src={vidSrc} muted />
-                        <button
-                          type="button"
-                          className="logip-thumb-remove"
-                          onClick={() => handleRemoveVideoFile(idx)}
-                          aria-label="Remove video"
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      className="logip-video-add-slot"
-                      onClick={() => videoInputRef.current?.click()}
-                    >
-                      + Add
-                    </button>
-                  </div>
+                  <p className="logip-video-url-helper">
+                    Supports YouTube, YouTube Shorts, Instagram Reels, and direct video links.
+                  </p>
+                  {videoUrlError && <p className="logip-field-error">{videoUrlError}</p>}
+                  <div className="logip-video-url-divider" aria-hidden="true"></div>
                 </div>
               </div>
 
@@ -1065,23 +1051,40 @@ export default function AdminDashboard() {
                   <label>Live Card Preview</label>
                   <div className="logip-live-card logip-live-video-card">
                     <div className="logip-live-video-wrap">
-                      {videoFiles[0] ? (
-                        <video
-                          src={videoFiles[0]}
-                          controls
-                          muted
-                          className="logip-live-video-player"
-                        />
-                      ) : (
-                        <div className="logip-live-video-placeholder">
-                          <span className="logip-video-play-circle" aria-hidden="true">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffffff">
-                              <polygon points="7 4 20 12 7 20 7 4" />
-                            </svg>
-                          </span>
-                          <span>No video selected</span>
-                        </div>
-                      )}
+                      {(() => {
+                        const embedInfo = getVideoEmbedInfo(videoUrl);
+                        if (!embedInfo) {
+                          return (
+                            <div className="logip-live-video-placeholder">
+                              <span className="logip-video-play-circle" aria-hidden="true">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffffff">
+                                  <polygon points="7 4 20 12 7 20 7 4" />
+                                </svg>
+                              </span>
+                              <span>No video selected</span>
+                            </div>
+                          );
+                        }
+                        if (embedInfo.type === 'iframe') {
+                          return (
+                            <iframe
+                              src={embedInfo.src}
+                              title={videoTitle.trim() || 'Video preview'}
+                              className="logip-live-video-iframe"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          );
+                        }
+                        return (
+                          <video
+                            src={embedInfo.src}
+                            controls
+                            muted
+                            className="logip-live-video-player"
+                          />
+                        );
+                      })()}
                     </div>
                     <div className="logip-live-video-body">
                       <span className="logip-live-video-date">
@@ -1091,8 +1094,8 @@ export default function AdminDashboard() {
                         {videoTitle.trim() || 'Untitled Video'}
                       </h3>
                       <p className="logip-live-video-desc">
-                        {videoFiles.length > 0
-                          ? 'Video ready to publish'
+                        {videoUrl.trim()
+                          ? videoUrl.trim()
                           : 'Video preview will appear here...'}
                       </p>
                     </div>
@@ -1382,13 +1385,13 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               ) : (
-                <div className="logip-table">
+                <div className="logip-table logip-table-videos">
                   <div className="logip-table-head">
-                    <span>Session</span>
-                    <span>Host</span>
-                    <span>Duration</span>
-                    <span>Session Date</span>
+                    <span>Video Title</span>
+                    <span>Video URL</span>
+                    <span>Date of Upload</span>
                     <span>Status</span>
+                    <span>Actions</span>
                   </div>
 
                   <div className="logip-table-body">
@@ -1398,13 +1401,23 @@ export default function AdminDashboard() {
                       </div>
                     ) : (
                       filteredVideos.map((item) => {
-                        const isAdminIcon = item.is_admin_icon ?? item.isAdminIcon ?? !item.avatar;
-                        const sessionDate = item.session_date || item.date;
+                        const sessionDate = item.session_date || item.date || '—';
+                        const rawVideoUrl =
+                          item.video_url ||
+                          (typeof item.avatar === 'string' && item.avatar.startsWith('http')
+                            ? item.avatar
+                            : '') ||
+                          (typeof item.thumb === 'string' && item.thumb.startsWith('http')
+                            ? item.thumb
+                            : '');
+                        const embedInfo = getVideoEmbedInfo(rawVideoUrl);
+                        const thumbUrl = embedInfo?.thumb || item.thumb;
+
                         return (
                           <div className="logip-table-row" key={item.id}>
                             <div className="logip-cell-main">
-                              {item.thumb ? (
-                                <img src={item.thumb} alt={item.title} className="logip-thumb" />
+                              {thumbUrl ? (
+                                <img src={thumbUrl} alt={item.title} className="logip-thumb" />
                               ) : (
                                 <div className="logip-thumb-placeholder" aria-hidden="true">
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -1416,21 +1429,22 @@ export default function AdminDashboard() {
                               <span className="logip-item-title">{item.title}</span>
                             </div>
 
-                            <div className="logip-cell-person">
-                              {isAdminIcon || !item.avatar ? (
-                                <span className="logip-admin-avatar">
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                  </svg>
-                                </span>
+                            <div className="logip-cell-url">
+                              {rawVideoUrl ? (
+                                <a
+                                  href={rawVideoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="logip-video-url-link"
+                                  title={rawVideoUrl}
+                                >
+                                  {rawVideoUrl}
+                                </a>
                               ) : (
-                                <img src={item.avatar} alt={item.host} className="logip-avatar" />
+                                <span className="logip-url-empty">—</span>
                               )}
-                              <span>{item.host}</span>
                             </div>
 
-                            <div className="logip-cell-text">{item.duration || '—'}</div>
                             <div className="logip-cell-date">{sessionDate}</div>
                             <div>
                               <button
@@ -1440,6 +1454,35 @@ export default function AdminDashboard() {
                                 title="Click to change status in Supabase"
                               >
                                 {item.status}
+                              </button>
+                            </div>
+                            <div className="logip-cell-actions">
+                              <button
+                                type="button"
+                                className="logip-action-btn"
+                                onClick={() => handleOpenEditVideo(item)}
+                                title="Edit video"
+                                aria-label={`Edit ${item.title}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M12 20h9" />
+                                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                className="logip-action-btn logip-action-delete"
+                                onClick={() => setVideoToDelete(item)}
+                                title="Delete video"
+                                aria-label={`Delete ${item.title}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                </svg>
                               </button>
                             </div>
                           </div>
@@ -1495,6 +1538,36 @@ export default function AdminDashboard() {
                 disabled={isDeletingBlog}
               >
                 {isDeletingBlog ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE VIDEO CONFIRMATION MODAL */}
+      {videoToDelete && (
+        <div className="logip-modal-backdrop" onClick={() => !isDeletingVideo && setVideoToDelete(null)}>
+          <div className="logip-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Video</h3>
+            <p className="logip-delete-message">
+              Are you sure you want to delete <strong>{videoToDelete.title}</strong>? This action cannot be undone.
+            </p>
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setVideoToDelete(null)}
+                className="logip-btn-cancel"
+                disabled={isDeletingVideo}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteVideo}
+                className="logip-btn-delete"
+                disabled={isDeletingVideo}
+              >
+                {isDeletingVideo ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

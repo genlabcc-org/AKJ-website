@@ -4,6 +4,7 @@ import PageHero from '../components/PageHero';
 import HeroVideo from '../components/HeroVideo';
 import AgencyIntro from '../components/AgencyIntro';
 import CaseStudies from '../components/CaseStudies';
+import HomeVideos from '../components/HomeVideos';
 import NewsFlash from '../components/NewsFlash';
 import TalkFeedback from '../components/TalkFeedback';
 import { supabase, normalizeBlogRow } from '../supabase';
@@ -56,6 +57,9 @@ export default function Home() {
 
       {/* CASE STUDIES (TANGIBLE CASE STUDIES) */}
       <CaseStudies />
+
+      {/* VIDEOS (FROM ADMIN VIDEOS PANEL) */}
+      <HomeVideos />
 
       {/* BLOG (LATEST 3 FROM ADMIN BLOGS) */}
       <NewsFlash blogs={recentBlogs} />

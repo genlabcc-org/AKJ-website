@@ -59,3 +59,40 @@ export function normalizeBlogRow(row) {
 
   return row;
 }
+
+/**
+ * Parses a video URL (YouTube, YouTube Shorts, Instagram Reel, or direct video)
+ * into an embeddable player configuration and optional thumbnail.
+ */
+export function getVideoEmbedInfo(rawUrl) {
+  const url = (rawUrl || '').trim();
+  if (!url) return null;
+
+  const ytMatch = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+  );
+  if (ytMatch && ytMatch[1]) {
+    const videoId = ytMatch[1];
+    return {
+      type: 'iframe',
+      src: `https://www.youtube.com/embed/${videoId}`,
+      thumb: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+    };
+  }
+
+  const igMatch = url.match(/instagram\.com\/(?:reel|reels|p)\/([a-zA-Z0-9_-]+)/);
+  if (igMatch && igMatch[1]) {
+    const code = igMatch[1];
+    return {
+      type: 'iframe',
+      src: `https://www.instagram.com/reel/${code}/embed`,
+      thumb: null,
+    };
+  }
+
+  return {
+    type: 'video',
+    src: url,
+    thumb: null,
+  };
+}
