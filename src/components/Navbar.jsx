@@ -11,7 +11,6 @@ const ABOUT_ITEMS = [
 
 const ACADEMIC_ITEMS = [
   { to: '/acedemics', label: 'EY1–Grade 10 Pathway' },
-  { to: '/services', label: 'Services' },
 ];
 
 const PORTAL_OPTIONS = [
@@ -40,7 +39,7 @@ export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
 
   const isAboutActive = ['/about', '/team', '/faq'].includes(location.pathname);
-  const isAcademicsActive = ['/acedemics', '/services'].includes(location.pathname);
+  const isAcademicsActive = location.pathname === '/acedemics';
   const isPortalActive =
     location.pathname.startsWith('/portal') ||
     location.pathname.startsWith('/admin');

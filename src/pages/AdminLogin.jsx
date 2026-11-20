@@ -65,29 +65,11 @@ export default function AdminLogin() {
           <div className="admin-login-left-inner">
             {/* Brand Logo Icon */}
             <Link to="/" className="admin-brand-mark" aria-label="Back to Home">
-              <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="brandGrad1" x1="4" y1="6" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#f472b6" />
-                    <stop offset="50%" stopColor="#a855f7" />
-                    <stop offset="100%" stopColor="#6366f1" />
-                  </linearGradient>
-                  <linearGradient id="brandGrad2" x1="18" y1="10" x2="36" y2="30" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#c084fc" />
-                    <stop offset="100%" stopColor="#60a5fa" />
-                  </linearGradient>
-                </defs>
-                <circle cx="20" cy="13" r="7.5" fill="url(#brandGrad1)" />
-                <circle cx="13" cy="22" r="7.5" fill="url(#brandGrad1)" opacity="0.9" />
-                <circle cx="27" cy="22" r="7.5" fill="url(#brandGrad2)" opacity="0.95" />
-                {/* Center 4-point sparkle */}
-                <path
-                  d="M20 15.5C20.4 18.6 21.4 19.6 24.5 20C21.4 20.4 20.4 21.4 20 24.5C19.6 21.4 18.6 20.4 15.5 20C18.6 19.6 19.6 18.6 20 15.5Z"
-                  fill="#ffffff"
-                />
-                {/* Bottom stem */}
-                <path d="M20 25.5L17 32H23L20 25.5Z" fill="#818cf8" />
-              </svg>
+              <img
+                src="/images/akj-logo.svg"
+                alt="AKJ Logo"
+                className="admin-brand-logo"
+              />
             </Link>
 
             {/* Heading */}

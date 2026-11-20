@@ -556,24 +556,13 @@ export default function AdminDashboard() {
       <div className="logip-admin-shell">
         {/* LEFT SIDEBAR */}
         <aside className="logip-sidebar">
-          <div className="logip-brand">
-            <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="8" cy="8" r="2.8" fill="#111827" />
-              <circle cx="17" cy="6" r="2.8" fill="#111827" />
-              <circle cx="7" cy="17" r="2.8" fill="#111827" />
-              <circle cx="15" cy="15" r="2.8" fill="#111827" />
-              <circle cx="22" cy="13" r="2.8" fill="#111827" />
-              <circle cx="6" cy="24" r="2.4" fill="#111827" />
-              <circle cx="14" cy="23" r="2.6" fill="#111827" />
-              <path
-                d="M8 8L15 15M17 6L15 15M7 17L15 15M22 13L15 15M7 17L6 24M15 15L14 23"
-                stroke="#111827"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span className="logip-brand-text">logip</span>
-          </div>
+          <Link to="/" className="logip-brand" aria-label="AKJ Home">
+            <img
+              src="/images/akj-logo.svg"
+              alt="AKJ Logo"
+              className="logip-brand-logo"
+            />
+          </Link>
 
           <nav className="logip-nav">
             <Link to="/" className="logip-nav-item">
@@ -1494,21 +1483,7 @@ export default function AdminDashboard() {
               )}
 
               {/* PAGINATION FOOTER */}
-              <div className="logip-pagination">
-                <span className="logip-page-count">
-                  {activeTab === 'blogs'
-                    ? `Showing ${filteredBlogs.length} of ${blogs.length}`
-                    : `Showing ${filteredVideos.length} of ${videos.length}`}
-                </span>
-                <div className="logip-page-btns">
-                  <button type="button" className="logip-page-btn" aria-label="Previous page">
-                    &lsaquo;
-                  </button>
-                  <button type="button" className="logip-page-btn" aria-label="Next page">
-                    &rsaquo;
-                  </button>
-                </div>
-              </div>
+              
             </div>
           </section>
         )}

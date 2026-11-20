@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase, normalizeBlogRow } from '../supabase';
 import './Blog.css';
 
-const FILTER_TABS = ['SEE ALL', 'NEWS', 'IDEARS', 'WHITE PAPERS', 'PRODUCTIONS'];
-
 function cleanMarkdownPreview(text) {
   if (!text) return '';
   return text
@@ -112,17 +110,12 @@ export default function Blog() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [activeFilter, setActiveFilter] = useState('SEE ALL');
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(Boolean(supabase));
   const [selectedArticle, setSelectedArticle] = useState(null);
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
+    if (!supabase) return;
     let active = true;
 
     const loadBlogs = async () => {
@@ -170,20 +163,92 @@ export default function Blog() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const filteredArticles = useMemo(() => {
-    if (activeFilter === 'SEE ALL') return articles;
-    const target = activeFilter.toLowerCase();
-    return articles.filter((art) => {
-      const cat = (art.category || '').toLowerCase();
-      return cat.includes(target);
-    });
-  }, [articles, activeFilter]);
+  // FULL-SCREEN ARTICLE PAGE
+  if (id && loading && !activeArticle) {
+    return (
+      <div className="bbb-blog-page bbb-full-article-page">
+        <div className="bbb-blog-container bbb-full-article-container">
+          <p className="bbb-empty-state">Loading article...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (activeArticle) {
+    const galleryImages =
+      Array.isArray(activeArticle.images) && activeArticle.images.length > 1
+        ? activeArticle.images.slice(1)
+        : [];
+
+    return (
+      <div className="bbb-blog-page bbb-full-article-page">
+        <div className="bbb-blog-container bbb-full-article-container">
+          <div className="bbb-full-back-bar">
+            <button
+              type="button"
+              className="bbb-full-back-btn"
+              onClick={handleBackToList}
+            >
+              <span>&larr;</span>
+              <span>Back to Blog</span>
+            </button>
+          </div>
+
+          <article className="bbb-full-article">
+            <header className="bbb-full-header">
+              <div className="bbb-full-meta">
+                {activeArticle.category && (
+                  <span className="bbb-full-tag">{activeArticle.category}</span>
+                )}
+                {activeArticle.publish_date && (
+                  <span>{activeArticle.publish_date}</span>
+                )}
+                {activeArticle.read_time && (
+                  <span>{activeArticle.read_time}</span>
+                )}
+              </div>
+
+              <h1 className="bbb-full-title">{activeArticle.title}</h1>
+
+              {activeArticle.author && (
+                <p className="bbb-full-author">By {activeArticle.author}</p>
+              )}
+            </header>
+
+            {activeArticle.thumb && (
+              <div className="bbb-full-hero-media">
+                <img
+                  src={activeArticle.thumb}
+                  alt={activeArticle.title}
+                  className="bbb-full-hero-img"
+                />
+              </div>
+            )}
+
+            <div className="bbb-full-body">
+              {renderArticleBlocks(activeArticle.content)}
+            </div>
+
+            {galleryImages.length > 0 && (
+              <div className="bbb-full-gallery">
+                {galleryImages.map((imgUrl, idx) => (
+                  <img
+                    key={`${imgUrl}-${idx}`}
+                    src={imgUrl}
+                    alt={`${activeArticle.title} - ${idx + 2}`}
+                    className="bbb-full-gallery-img"
+                  />
+                ))}
+              </div>
+            )}
+          </article>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bbb-blog-page">
-      {/* Fixed right-edge contact icon matching reference */}
-     
-
       <div className="bbb-blog-container">
         {/* TOP EDITORIAL HERO */}
         <section className="bbb-hero-section">
@@ -202,20 +267,18 @@ export default function Blog() {
           </div>
         </section>
 
-        {/* CATEGORY FILTER TABS */}
-        <nav className="bbb-filter-bar" aria-label="Blog categories">
-          
-        </nav>
+        {/* DIVIDER */}
+        <nav className="bbb-filter-bar" aria-label="Blog articles"></nav>
 
         {/* ARTICLES HORIZONTAL LIST */}
         <section className="bbb-articles-section">
           {loading ? (
             <p className="bbb-empty-state">Loading articles...</p>
-          ) : filteredArticles.length === 0 ? (
+          ) : articles.length === 0 ? (
             <p className="bbb-empty-state">No articles published yet.</p>
           ) : (
             <div className="bbb-articles-list">
-              {filteredArticles.map((art) => {
+              {articles.map((art) => {
                 const bannerCategory = art.category || 'UNIVERSITY GUIDE';
                 const bannerHeading = getShortBannerTitle(art.title);
                 const excerpt = getExcerpt(art);
@@ -266,50 +329,6 @@ export default function Blog() {
           )}
         </section>
       </div>
-
-      {/* ARTICLE READER MODAL */}
-      {selectedArticle && (
-        <div
-          className="bbb-modal-backdrop"
-          onClick={() => setSelectedArticle(null)}
-        >
-          <article className="bbb-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="bbb-modal-close"
-              onClick={() => setSelectedArticle(null)}
-              aria-label="Close article"
-            >
-              &times;
-            </button>
-            {selectedArticle.thumb && (
-              <img
-                src={selectedArticle.thumb}
-                alt={selectedArticle.title}
-                className="bbb-modal-img"
-              />
-            )}
-            <div className="bbb-modal-meta">
-              {selectedArticle.category && (
-                <span className="bbb-modal-tag">{selectedArticle.category}</span>
-              )}
-              {selectedArticle.publish_date && (
-                <span>{selectedArticle.publish_date}</span>
-              )}
-              {selectedArticle.read_time && (
-                <span>{selectedArticle.read_time}</span>
-              )}
-            </div>
-            <h2 className="bbb-modal-title">{selectedArticle.title}</h2>
-            {selectedArticle.author && (
-              <p className="bbb-modal-author">By {selectedArticle.author}</p>
-            )}
-            <div className="bbb-modal-content">
-              {selectedArticle.content || 'No article content available.'}
-            </div>
-          </article>
-        </div>
-      )}
     </div>
   );
 }

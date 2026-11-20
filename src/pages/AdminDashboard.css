@@ -35,16 +35,16 @@
 .logip-brand {
   display: flex;
   align-items: center;
-  gap: 9px;
   padding: 0 10px;
   margin-bottom: 30px;
+  text-decoration: none;
 }
 
-.logip-brand-text {
-  font-size: 20px;
-  font-weight: 700;
-  color: #111827;
-  letter-spacing: -0.03em;
+.logip-brand-logo {
+  height: 44px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .logip-nav {
@@ -461,15 +461,7 @@
   color: #8c5319;
 }
 
-/* PAGINATION FOOTER */
-.logip-pagination {
-  margin-top: auto;
-  padding-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-}
+
 
 .logip-page-count {
   font-size: 12px;
@@ -959,6 +951,7 @@
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
