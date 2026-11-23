@@ -119,12 +119,7 @@ export default function Navbar() {
             </div>
 
             <div className="site-utility-right">
-              <NavLink to="/blog" className="site-utility-link site-utility-blog-link">
-                <span>Blog</span>
-              </NavLink>
-
-              <span className="site-utility-divider">|</span>
-
+             
               {/* Portal Login Dropdown (Top Utility Bar) */}
               <div
                 className={`site-utility-portal ${portalDropdownOpen ? 'open' : ''}`}
@@ -339,7 +334,7 @@ export default function Navbar() {
                 `site-nav-link ${isActive ? 'active' : ''}`
               }
             >
-              Learners Achievements Corner
+               Achievements
             </NavLink>
 
             {/* Contact */}
@@ -350,6 +345,15 @@ export default function Navbar() {
               }
             >
               Contact
+            </NavLink>
+
+             <NavLink
+              to="/blog"
+              className={({ isActive }) =>
+                `site-nav-link ${isActive ? 'active' : ''}`
+              }
+            >
+              Blog
             </NavLink>
           </nav>
 

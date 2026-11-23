@@ -1154,19 +1154,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="logip-stat-card">
-                  <div className="logip-stat-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </div>
-                  <div className="logip-stat-info">
-                    <span className="logip-stat-label">Drafts / Scheduled</span>
-                    <strong className="logip-stat-value">{draftBlogsCount}</strong>
-                    <span className="logip-stat-trend text-green">Awaiting publish</span>
-                  </div>
-                </div>
+               
               </div>
             ) : (
               <div className="logip-stats-row">
