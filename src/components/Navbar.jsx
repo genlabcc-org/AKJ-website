@@ -208,7 +208,6 @@ export default function Navbar() {
                 </svg>
                 <span>+91 8072590214</span>
               </a>
-              <span className="site-utility-divider">•</span>
               <a href="mailto:info@akjinternationalschool.org" className="site-utility-link" aria-label="Email AKJ School">
                 <svg
                   className="site-utility-icon"
