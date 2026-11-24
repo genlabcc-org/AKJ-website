@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PageHero from '../components/PageHero';
 import './Contact.css';
 
 export default function Contact() {
@@ -34,14 +35,20 @@ export default function Contact() {
 
   return (
     <div className="bbb-contact-page">
-      {/* 1. OUR FORM / WRITE US SECTION (Exact reproduction of bb-b reference layout) */}
+      {/* HERO SECTION (Same placement & style as Home page) */}
+      <PageHero
+        title={
+          <>
+            <span className="site-hero-mainline">Cambridge Journey.</span>
+            <span className="site-hero-subline">Building Minds Beyond Borders.</span>
+          </>
+        }
+        subtitle="A Cambridge School in Thuckalay . EY1 to Grade 10"
+      />
+
+      {/* 1. OUR FORM / WRITE US SECTION */}
       <section className="bbb-form-section">
         <div className="bbb-form-container">
-          <div className="bbb-form-header">
-            <span className="bbb-form-kicker">Building Minds Beyond Borders.</span>
-            <h1 className="bbb-form-title">Cambridge Journey.</h1>
-          </div>
-
           {submitted ? (
             <div className="bbb-form-success">
               <span className="bbb-success-badge">✓ MESSAGE SENT</span>

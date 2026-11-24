@@ -1,240 +1,211 @@
 /* ==========================================================================
-   ADMISSION PAGE STYLES (Prestigious Cambridge School Layout)
-   Authorized Palette: #1E459F (Blue), #CF2A2A (Crimson), #FABD32 (Gold), #E1DCCA (Stone), White (#ffffff)
+   AKJ INTERNATIONAL SCHOOL - EDITORIAL ADMISSION FORM (CONTACT FORM STYLING)
+   Exact match to the Contact page form layout:
+   - Pure white page background
+   - Uppercase kicker & bold display title
+   - Flat warm-stone background input blocks (#ECE8E1) with zero borders
+   - Asymmetric 2-column layout (Address textarea occupies left column)
+   - Square checkbox consent notice
+   - Cambridge blue & crimson accents (#1E459F / #CF2A2A)
    ========================================================================== */
 
 .admission-page {
   background-color: #ffffff;
   min-height: 100vh;
-}
-
-.admission-content-section {
-  padding: 48px 24px 80px;
-  background-color: #ffffff;
-}
-
-.admission-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  color: #000000;
 }
 
 /* --------------------------------------------------------------------------
-   Layout Grid (Main Form + Informational Sidebar)
+   1. ADMISSION FORM SECTION & HEADER
    -------------------------------------------------------------------------- */
-.admission-layout-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.1fr);
-  gap: 40px;
-  align-items: start;
-}
-
-.admission-layout-grid:has(> .admission-card:only-child) {
-  grid-template-columns: 1fr;
-  max-width: 860px;
-  margin: 0 auto;
-}
-
-@media (max-width: 960px) {
-  .admission-layout-grid {
-    grid-template-columns: 1fr;
-    gap: 36px;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   Main Form Card
-   -------------------------------------------------------------------------- */
-.admission-card {
+.admission-form-section {
+  width: 100%;
   background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-radius: 12px;
-  padding: 40px 36px;
-  box-shadow: 0 4px 24px rgba(30, 69, 159, 0.05);
+  padding: 0 0 90px 0;
 }
 
-@media (max-width: 640px) {
-  .admission-card {
-    padding: 28px 20px;
+.admission-form-container {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 3vw, 40px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .admission-form-container {
+    padding: 0 20px;
   }
 }
 
-.admission-header-box {
-  margin-bottom: 28px;
-  border-bottom: 1px solid #E1DCCA;
-  padding-bottom: 20px;
+.admission-form-header {
+  margin-bottom: 38px;
 }
 
-.admission-kicker-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.admission-kicker {
-  font-family: var(--font-family, inherit);
-  font-size: 12px;
-  font-weight: 700;
+.admission-form-kicker {
+  display: block;
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #CF2A2A;
-}
-
-.admission-status-pill {
-  font-family: var(--font-family, inherit);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #1E459F;
-  background-color: rgba(30, 69, 159, 0.08);
-  border: 1px solid rgba(30, 69, 159, 0.2);
-  padding: 3px 12px;
-  border-radius: 20px;
-  display: inline-flex;
-  align-items: center;
+  color: #000000;
+  margin-bottom: 18px;
 }
 
 .admission-form-title {
-  font-family: var(--font-family, inherit);
-  font-size: 26px;
-  font-weight: 700;
-  color: #1E459F;
-  margin: 0 0 8px 0;
-  letter-spacing: -0.01em;
-}
-
-.admission-form-desc {
-  font-family: var(--font-family, inherit);
-  font-size: 14px;
-  line-height: 1.6;
-  color: #4b5563;
-  margin: 0;
-}
-
-/* --------------------------------------------------------------------------
-   Form Fields & Grid
-   -------------------------------------------------------------------------- */
-.admission-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.admission-form-group-title {
-  font-family: var(--font-family, inherit);
-  font-size: 13px;
-  font-weight: 700;
+  font-family: var(--font-family);
+  font-size: 86px;
+  line-height: 86px;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #1E459F;
-  border-bottom: 1px dashed #E1DCCA;
-  padding-bottom: 6px;
-  margin-bottom: 8px;
+  letter-spacing: normal;
+  word-spacing: 0px;
+  color: #000000;
+  margin: 0;
+  padding: 6.88px 0 0;
 }
 
-.admission-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
+@media (max-width: 768px) {
+  .admission-form-kicker {
+    font-size: 14px;
+    line-height: 1.35;
+  }
 
-@media (max-width: 640px) {
-  .admission-form-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  .admission-form-title {
+    font-size: 44px;
+    line-height: 46px;
   }
 }
 
-.admission-form-field {
-  display: flex;
-  flex-direction: column;
-}
-
-.admission-form-field.admission-full-width {
+/* --------------------------------------------------------------------------
+   2. FORM GRID & INPUT FIELDS (Warm Stone #ECE8E1, Zero Border, Sharp Edges)
+   -------------------------------------------------------------------------- */
+.admission-form {
   width: 100%;
 }
 
-.admission-form-field label {
-  font-family: var(--font-family, inherit);
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 7px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.admission-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  row-gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.field-required {
-  color: #CF2A2A;
-  font-weight: 700;
+@media (max-width: 768px) {
+  .admission-form-grid {
+    grid-template-columns: 1fr;
+    row-gap: 14px;
+  }
+}
+
+.admission-field-col {
+  width: 100%;
+}
+
+.admission-empty-col {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .admission-empty-col {
+    display: none;
+  }
 }
 
 .admission-input {
   width: 100%;
-  padding: 11px 14px;
-  font-family: var(--font-family, inherit);
+  height: 52px;
+  background-color: #F3F5F9;
+  border: none;
+  border-radius: 0;
+  padding: 0 20px;
+  font-family: var(--font-family);
   font-size: 14px;
-  line-height: 1.5;
-  color: #111827;
-  background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-radius: 6px;
-  outline: none;
+  color: #000000;
   box-sizing: border-box;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  outline: none;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .admission-input::placeholder {
-  color: #9ca3af;
-  font-size: 13.5px;
+  color: #4b5563;
+  opacity: 1;
+  font-family: var(--font-family);
+  font-size: 14px;
 }
 
 .admission-input:focus {
-  border-color: #1E459F;
-  box-shadow: 0 0 0 3px rgba(30, 69, 159, 0.12);
+  background-color: #EBF0F8;
+  box-shadow: inset 0 0 0 2px #1E459F;
 }
 
 .admission-date-input {
   cursor: pointer;
 }
 
+.admission-textarea {
+  height: auto;
+  min-height: 140px;
+  padding: 16px 20px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
 .admission-select {
   cursor: pointer;
-  appearance: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 14px;
+  padding-right: 44px;
+}
+
+.admission-select option,
+.admission-select optgroup {
   background-color: #ffffff;
+  color: #000000;
+  padding: 10px;
 }
 
-.admission-textarea {
-  resize: vertical;
-  min-height: 88px;
-  line-height: 1.5;
-}
-
-/* Privacy Note */
-.admission-privacy-note {
+/* --------------------------------------------------------------------------
+   3. CONSENT CHECKBOX & SUBMIT BUTTON
+   -------------------------------------------------------------------------- */
+.admission-consent-row {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  font-family: var(--font-family, inherit);
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #6b7280;
-  background-color: rgba(225, 220, 202, 0.25);
-  padding: 10px 14px;
-  border-radius: 6px;
-  margin-top: 4px;
+  gap: 12px;
+  margin-top: 24px;
+  max-width: 580px;
+  box-sizing: border-box;
 }
 
-.privacy-icon {
+.admission-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #777777;
+  border-radius: 0;
+  margin-top: 2px;
   flex-shrink: 0;
-  margin-top: 1px;
+  cursor: pointer;
+  accent-color: #1E459F;
 }
 
-/* Submit Button */
-.admission-submit-container {
-  margin-top: 12px;
+.admission-consent-label {
+  font-family: var(--font-family);
+  font-size: 12px;
+  line-height: 1.55;
+  color: #222222;
+  cursor: pointer;
+}
+
+.admission-submit-row {
+  margin-top: 28px;
 }
 
 .admission-submit-btn {
@@ -242,28 +213,24 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 100%;
-  padding: 13px 28px;
   background-color: #1E459F;
   color: #ffffff !important;
-  font-family: var(--font-family, inherit);
-  font-size: 14px;
+  font-family: var(--font-family);
+  font-size: 13.5px;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 13px 30px;
   border: 1px solid #1E459F;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 3px 12px rgba(30, 69, 159, 0.25);
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .admission-submit-btn:hover:not(:disabled) {
   background-color: #CF2A2A;
   border-color: #CF2A2A;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(207, 42, 42, 0.35);
 }
 
 .admission-submit-btn:active:not(:disabled) {
@@ -275,124 +242,50 @@
   cursor: not-allowed;
 }
 
-.admission-btn-arrow {
-  transition: transform 0.18s ease;
-}
-
-.admission-submit-btn:hover:not(:disabled) .admission-btn-arrow {
-  transform: translateX(3px);
-}
-
-.admission-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #ffffff;
-  border-radius: 50%;
-  animation: admissionSpin 0.7s linear infinite;
-}
-
-@keyframes admissionSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* --------------------------------------------------------------------------
-   Submission Success Card
+   4. SUCCESS CONFIRMATION BOX
    -------------------------------------------------------------------------- */
-.admission-success-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 20px 8px;
+.admission-form-success {
+  background-color: #F3F5F9;
+  padding: 40px clamp(24px, 4vw, 48px);
+  border-left: 4px solid #1E459F;
+  max-width: 720px;
 }
 
-.admission-success-icon-box {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: rgba(30, 69, 159, 0.08);
-  border: 2px solid #1E459F;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.admission-badge-success {
-  font-family: var(--font-family, inherit);
-  font-size: 11px;
+.admission-success-badge {
+  font-family: var(--font-family);
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #1E459F;
-  background-color: rgba(30, 69, 159, 0.1);
-  padding: 4px 12px;
-  border-radius: 20px;
-  margin-bottom: 12px;
+  display: inline-block;
+  margin-bottom: 10px;
 }
 
-.admission-success-title {
-  font-family: var(--font-family, inherit);
-  font-size: 26px;
-  font-weight: 700;
-  color: #1E459F;
+.admission-success-heading {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 800;
+  color: #000000;
   margin: 0 0 10px 0;
-}
-
-.admission-success-lead {
-  font-family: var(--font-family, inherit);
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: #4b5563;
-  max-width: 540px;
-  margin: 0 0 24px 0;
-}
-
-.admission-ref-box {
-  background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-left: 4px solid #1E459F;
-  border-radius: 6px;
-  padding: 12px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 24px;
-  width: 100%;
-  max-width: 360px;
-}
-
-.admission-ref-label {
-  font-family: var(--font-family, inherit);
-  font-size: 11.5px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #6b7280;
-  margin-bottom: 4px;
 }
 
-.admission-ref-number {
-  font-family: var(--font-family, inherit);
-  font-size: 18px;
-  font-weight: 700;
-  color: #1E459F;
-  letter-spacing: 0.04em;
+.admission-success-text {
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333333;
+  margin: 0 0 24px 0;
 }
 
 .admission-summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 18px;
-  width: 100%;
-  text-align: left;
-  background-color: rgba(225, 220, 202, 0.2);
-  border: 1px solid #E1DCCA;
-  border-radius: 8px;
-  padding: 18px 20px;
-  margin-bottom: 24px;
+  gap: 14px 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 600px) {
@@ -404,226 +297,21 @@
 .admission-summary-item {
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 
 .admission-summary-label {
-  font-size: 11.5px;
-  font-weight: 600;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-  margin-bottom: 2px;
+  color: #666666;
 }
 
 .admission-summary-val {
+  font-family: var(--font-family);
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
-}
-
-.admission-success-steps {
-  width: 100%;
-  text-align: left;
-  border-top: 1px solid #E1DCCA;
-  padding-top: 20px;
-  margin-bottom: 24px;
-}
-
-.admission-steps-heading {
-  font-family: var(--font-family, inherit);
-  font-size: 14px;
-  font-weight: 700;
-  color: #1E459F;
-  margin: 0 0 12px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.admission-steps-list {
-  padding-left: 20px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: #4b5563;
-}
-
-.admission-steps-list strong {
-  color: #111827;
-}
-
-.admission-reset-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 11px 24px;
-  font-family: var(--font-family, inherit);
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #1E459F;
-  background-color: transparent;
-  border: 1px solid #1E459F;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.18s ease, color 0.18s ease;
-}
-
-.admission-reset-btn:hover {
-  background-color: #1E459F;
-  color: #ffffff;
-}
-
-/* --------------------------------------------------------------------------
-   Sidebar Informational Cards
-   -------------------------------------------------------------------------- */
-.admission-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.admission-info-card,
-.admission-pathway-card {
-  background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-radius: 12px;
-  padding: 28px 26px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-}
-
-.admission-card-tag {
-  font-family: var(--font-family, inherit);
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #CF2A2A;
-  margin-bottom: 8px;
-}
-
-.admission-info-title {
-  font-family: var(--font-family, inherit);
-  font-size: 20px;
-  font-weight: 700;
-  color: #1E459F;
-  margin: 0 0 8px 0;
-}
-
-.admission-info-desc {
-  font-family: var(--font-family, inherit);
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: #4b5563;
-  margin: 0 0 20px 0;
-}
-
-.admission-contact-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.admission-contact-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.admission-contact-icon-box {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background-color: rgba(30, 69, 159, 0.08);
-  color: #1E459F;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.contact-label {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-  margin-bottom: 2px;
-}
-
-.contact-val-link {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #1E459F;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.contact-val-link:hover {
-  color: #CF2A2A;
-  text-decoration: underline;
-}
-
-.contact-val-text {
-  font-size: 13px;
-  line-height: 1.45;
-  color: #374151;
-}
-
-/* Cambridge Pathway Overview */
-.admission-pathway-title {
-  font-family: var(--font-family, inherit);
-  font-size: 16px;
-  font-weight: 700;
-  color: #1E459F;
-  margin: 0 0 16px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid #E1DCCA;
-  padding-bottom: 10px;
-}
-
-.admission-pathway-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.admission-pathway-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.pathway-stage {
-  font-family: var(--font-family, inherit);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  background-color: #1E459F;
-  padding: 3px 8px;
-  border-radius: 4px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.pathway-desc strong {
-  display: block;
-  font-size: 13.5px;
-  color: #111827;
-  margin-bottom: 2px;
-}
-
-.pathway-desc p {
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: #6b7280;
-  margin: 0;
+  color: #000000;
 }

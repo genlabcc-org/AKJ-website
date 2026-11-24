@@ -22,6 +22,7 @@ const SPLIT_HEADING_SELECTOR = [
   '.bbb-faq-kicker',
   '.bbb-team-kicker',
   '.bbb-form-kicker',
+  '.admission-form-kicker',
   '.case-study-tag',
   '.newsflash-item-date',
   '.home-video-date',
@@ -62,6 +63,10 @@ const GLIDE_ITEM_SELECTOR = [
   '.approach-box li',
   '.admission-step-item',
   '.admission-field label',
+  '.bbb-consent-label',
+  '.admission-consent-label',
+  '.bbb-submit-btn',
+  '.admission-submit-btn',
 ].join(', ');
 
 const SKIP_ANCESTOR_SELECTOR = [
