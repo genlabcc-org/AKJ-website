@@ -22,13 +22,12 @@
   text-decoration: none;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
-  box-shadow: -2px 4px 14px rgba(30, 69, 159, 0.3);
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  box-shadow: none;
+  transition: background-color 0.2s ease;
 }
 
 .akj-floating-mail-btn:hover {
   background-color: #CF2A2A;
-  transform: translateX(-3px);
 }
 
 /* --------------------------------------------------------------------------
@@ -40,16 +39,7 @@
   background-color: #f6f2f0;
   overflow: hidden;
   box-sizing: border-box;
-}
-
-@media (min-width: 1024px) {
-  .akj-footer-section {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1;
-  }
+  z-index: 1;
 }
 
 /* --------------------------------------------------------------------------

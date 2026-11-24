@@ -1,6 +1,35 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Footer.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+export function FloatingMailButton() {
+  return (
+    <a
+      href="mailto:akjinternationalschool@gmail.com"
+      className="akj-floating-mail-btn"
+      aria-label="Send email to akjinternationalschool@gmail.com"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="2" y="4" width="20" height="16" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      </svg>
+    </a>
+  );
+}
 
 export default function Footer() {
   const footerRef = useRef(null);
@@ -8,53 +37,30 @@ export default function Footer() {
   useEffect(() => {
     if (!footerRef.current) return;
 
-    const updateHeight = () => {
-      if (footerRef.current) {
-        const height = footerRef.current.offsetHeight;
-        document.documentElement.style.setProperty('--footer-height', `${height}px`);
-      }
-    };
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1024px)', () => {
+      gsap.fromTo(
+        footerRef.current,
+        { yPercent: -25 },
+        {
+          yPercent: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top bottom',
+            end: 'bottom bottom',
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        }
+      );
+    });
 
-    updateHeight();
-
-    let ro = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(updateHeight);
-      ro.observe(footerRef.current);
-    }
-    window.addEventListener('resize', updateHeight);
-
-    return () => {
-      if (ro) ro.disconnect();
-      window.removeEventListener('resize', updateHeight);
-    };
+    return () => mm.revert();
   }, []);
 
   return (
-    <>
-      {/* FLOATING ACTION MAIL BUTTON (Fixed on right edge) */}
-      <a
-        href="mailto:akjinternationalschool@gmail.com"
-        className="akj-floating-mail-btn"
-        aria-label="Send email to akjinternationalschool@gmail.com"
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <rect x="2" y="4" width="20" height="16" rx="2" />
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-        </svg>
-      </a>
-
-      {/* FOOTER SECTION (Curtain reveal under main content on desktop) */}
+      /* FOOTER SECTION (Curtain reveal under main content on desktop) */
       <footer ref={footerRef} className="akj-footer-section" aria-label="Site Footer">
         {/* BACKGROUND IMAGE: WHITE EDUCATIONAL DOODLE BANNER (INSTEAD OF RED) */}
         <div className="akj-footer-bg">
@@ -244,6 +250,5 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-    </>
   );
 }

@@ -42,7 +42,7 @@ export default function Home() {
       <PageHero
         title={
           <>
-            Cambridge Journey.<br />
+            <span className="site-hero-mainline">Cambridge Journey.</span>
             <span className="site-hero-subline">Building Minds Beyond Borders.</span>
           </>
         }

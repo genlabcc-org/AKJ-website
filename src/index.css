@@ -173,7 +173,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   font-family: var(--font-family);
   background-color: #ffffff;
   color: var(--color-dark);

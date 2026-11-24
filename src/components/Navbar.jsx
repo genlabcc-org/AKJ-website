@@ -13,28 +13,115 @@ const ACADEMIC_ITEMS = [
   { to: '/acedemics', label: 'EY1–Grade 10 Pathway' },
 ];
 
-const PORTAL_OPTIONS = [
-  { label: 'Parent/Student', to: '/portal/parent-student' },
-  { label: 'Teacher', to: '/portal/teacher' },
-  { label: 'Admin', to: '/admin', requiresAuth: true },
+const FACULTY_OPTIONS = [
   { label: 'Web Admin', to: '/admin', requiresAuth: true },
+  { label: 'Staff', to: '/portal/teacher' },
 ];
+
+function FacultyDropdown({
+  isActive,
+  isAuthenticated,
+  onLogout,
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div
+      className={`site-utility-portal ${open ? 'open' : ''}`}
+      ref={containerRef}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        className={`site-utility-topbar-btn ${isActive ? 'active' : ''}`}
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        <span>Faculty Login</span>
+        <svg
+          className={`site-portal-chevron ${open ? 'open' : ''}`}
+          width="9"
+          height="5"
+          viewBox="0 0 10 6"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M1 1L5 5L9 1"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      <div className="site-portal-menu" role="menu">
+        {FACULTY_OPTIONS.map((item) => {
+          const targetTo = item.requiresAuth
+            ? (isAuthenticated ? '/admin' : '/admin/login')
+            : item.to;
+          return (
+            <Link
+              key={item.label}
+              to={targetTo}
+              className="site-portal-item"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              <span>{item.label}</span>
+              {item.requiresAuth && isAuthenticated && (
+                <span className="site-portal-badge">Active</span>
+              )}
+            </Link>
+          );
+        })}
+
+        {isAuthenticated && (
+          <button
+            type="button"
+            className="site-portal-item site-portal-logout-btn"
+            role="menuitem"
+            onClick={async () => {
+              setOpen(false);
+              await onLogout();
+            }}
+          >
+            <span>Sign Out</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
   const [academicsDropdownOpen, setAcademicsDropdownOpen] = useState(false);
-  const [portalDropdownOpen, setPortalDropdownOpen] = useState(false);
 
   // Mobile accordion states
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
   const [mobileAcademicsOpen, setMobileAcademicsOpen] = useState(false);
   const [mobilePortalOpen, setMobilePortalOpen] = useState(false);
+  const [mobileFacultyOpen, setMobileFacultyOpen] = useState(false);
 
   const headerRef = useRef(null);
   const aboutRef = useRef(null);
   const academicsRef = useRef(null);
-  const portalRef = useRef(null);
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
 
@@ -48,12 +135,39 @@ export default function Navbar() {
     setMobileMenuOpen(false);
     setAboutDropdownOpen(false);
     setAcademicsDropdownOpen(false);
-    setPortalDropdownOpen(false);
     setMobileAboutOpen(false);
     setMobileAcademicsOpen(false);
     setMobilePortalOpen(false);
-    window.scrollTo(0, 0);
+    setMobileFacultyOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        document.documentElement.style.setProperty(
+          '--header-height',
+          `${headerRef.current.offsetHeight}px`
+        );
+      }
+    };
+
+    updateHeaderHeight();
+
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(updateHeaderHeight);
+      ro.observe(el);
+    }
+    window.addEventListener('resize', updateHeaderHeight);
+
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', updateHeaderHeight);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -62,9 +176,6 @@ export default function Navbar() {
       }
       if (academicsRef.current && !academicsRef.current.contains(event.target)) {
         setAcademicsDropdownOpen(false);
-      }
-      if (portalRef.current && !portalRef.current.contains(event.target)) {
-        setPortalDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -97,7 +208,7 @@ export default function Navbar() {
                 </svg>
                 <span>+91 8072590214</span>
               </a>
-              <span className="site-utility-divider">•</span>
+
               <a href="mailto:akjinternationalschool@gmail.com" className="site-utility-link" aria-label="Email AKJ School">
                 <svg
                   className="site-utility-icon"
@@ -119,92 +230,28 @@ export default function Navbar() {
             </div>
 
             <div className="site-utility-right">
-             
-              {/* Portal Login Dropdown (Top Utility Bar) */}
-              <div
-                className={`site-utility-portal ${portalDropdownOpen ? 'open' : ''}`}
-                ref={portalRef}
-                onMouseEnter={() => setPortalDropdownOpen(true)}
-                onMouseLeave={() => setPortalDropdownOpen(false)}
+              <span className="site-utility-pipe" aria-hidden="true"></span>
+              <FacultyDropdown
+                key={`faculty-${location.pathname}`}
+                isActive={isPortalActive}
+                isAuthenticated={isAuthenticated}
+                onLogout={logout}
+              />
+              <span className="site-utility-pipe" aria-hidden="true"></span>
+              <Link
+                to="/portal/parent-student"
+                className={`site-utility-topbar-btn ${location.pathname === '/portal/parent-student' ? 'active' : ''}`}
               >
-                <button
-                  type="button"
-                  className={`site-utility-portal-btn ${isPortalActive ? 'active' : ''}`}
-                  onClick={() => setPortalDropdownOpen((prev) => !prev)}
-                  aria-expanded={portalDropdownOpen}
-                  aria-haspopup="true"
-                >
-                  <svg
-                    className="site-utility-icon"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                    <polyline points="10 17 15 12 10 7" />
-                    <line x1="15" y1="12" x2="3" y2="12" />
-                  </svg>
-                  <span>Portal Login</span>
-                  <svg
-                    className={`site-portal-chevron ${portalDropdownOpen ? 'open' : ''}`}
-                    width="9"
-                    height="5"
-                    viewBox="0 0 10 6"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 1L5 5L9 1"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-
-                <div className="site-portal-menu site-utility-portal-menu" role="menu">
-                  {PORTAL_OPTIONS.map((item) => {
-                    const targetTo = item.requiresAuth
-                      ? (isAuthenticated ? '/admin' : '/admin/login')
-                      : item.to;
-                    return (
-                      <Link
-                        key={item.label}
-                        to={targetTo}
-                        className="site-portal-item"
-                        role="menuitem"
-                        onClick={() => setPortalDropdownOpen(false)}
-                      >
-                        <span>{item.label}</span>
-                        {item.requiresAuth && isAuthenticated && (
-                          <span className="site-portal-badge">Active</span>
-                        )}
-                      </Link>
-                    );
-                  })}
-
-                  {isAuthenticated && (
-                    <button
-                      type="button"
-                      className="site-portal-item site-portal-logout-btn"
-                      role="menuitem"
-                      onClick={async () => {
-                        setPortalDropdownOpen(false);
-                        await logout();
-                      }}
-                    >
-                      <span>Sign Out</span>
-                    </button>
-                  )}
-                </div>
-              </div>
+                Student Login
+              </Link>
+              <span className="site-utility-pipe" aria-hidden="true"></span>
+              <Link
+                to="/portal/management"
+                className={`site-utility-topbar-btn ${location.pathname === '/portal/management' ? 'active' : ''}`}
+              >
+                Management Login
+              </Link>
+              <span className="site-utility-pipe" aria-hidden="true"></span>
             </div>
           </div>
         </div>
@@ -537,24 +584,69 @@ export default function Navbar() {
 
             {mobilePortalOpen && (
               <div className="site-mobile-sublinks">
-                {PORTAL_OPTIONS.map((item) => {
-                  const targetTo = item.requiresAuth
-                    ? (isAuthenticated ? '/admin' : '/admin/login')
-                    : item.to;
-                  return (
-                    <Link
-                      key={item.label}
-                      to={targetTo}
-                      className="site-mobile-sublink"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <span>{item.label}</span>
-                      {item.requiresAuth && isAuthenticated && (
-                        <span className="site-portal-badge">Active</span>
-                      )}
-                    </Link>
-                  );
-                })}
+                <Link
+                  to="/portal/parent-student"
+                  className="site-mobile-sublink"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span>Student Login</span>
+                </Link>
+
+                <button
+                  type="button"
+                  className={`site-mobile-sublink site-mobile-sub-accordion ${mobileFacultyOpen ? 'open' : ''}`}
+                  onClick={() => setMobileFacultyOpen((prev) => !prev)}
+                  aria-expanded={mobileFacultyOpen}
+                >
+                  <span>Faculty Login</span>
+                  <svg
+                    className={`site-portal-chevron ${mobileFacultyOpen ? 'open' : ''}`}
+                    width="10"
+                    height="6"
+                    viewBox="0 0 10 6"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 1L5 5L9 1"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {mobileFacultyOpen && (
+                  <div className="site-mobile-nested-sublinks">
+                    {FACULTY_OPTIONS.map((item) => {
+                      const targetTo = item.requiresAuth
+                        ? (isAuthenticated ? '/admin' : '/admin/login')
+                        : item.to;
+                      return (
+                        <Link
+                          key={item.label}
+                          to={targetTo}
+                          className="site-mobile-sublink"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <span>{item.label}</span>
+                          {item.requiresAuth && isAuthenticated && (
+                            <span className="site-portal-badge">Active</span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <Link
+                  to="/portal/management"
+                  className="site-mobile-sublink"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span>Management Login</span>
+                </Link>
 
                 {isAuthenticated && (
                   <button

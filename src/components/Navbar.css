@@ -4,7 +4,7 @@
    ========================================================================== */
 
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -28,15 +28,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   height: 38px;
   width: 100%;
 }
 
-.site-utility-left,
+.site-utility-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .site-utility-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0;
+}
+
+.site-utility-pipe {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
 }
 
 .site-utility-link {
@@ -48,6 +61,7 @@
   font-weight: 400;
   color: #ffffff;
   text-decoration: none;
+  white-space: nowrap;
   transition: color 0.15s ease;
 }
 
@@ -60,53 +74,38 @@
   stroke: currentColor;
 }
 
-.site-utility-divider {
-  color: rgba(225, 220, 202, 0.45);
-  font-size: 12px;
-  user-select: none;
-}
-
-.site-utility-blog-link {
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-
-.site-utility-blog-link.active {
-  color: #FABD32;
-}
-
-/* Top Utility Bar Portal Login */
+/* Top Utility Bar Faculty / Student Login */
 .site-utility-portal {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
-.site-utility-portal-btn {
+.site-utility-topbar-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(250, 189, 50, 0.4);
-  border-radius: 4px;
+  background: transparent;
+  border: none;
   color: #ffffff;
   font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
+  font-size: 12.5px;
+  font-weight: 400;
+  padding: 6px 14px;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  text-decoration: none;
+  box-shadow: none;
+  transition: color 0.15s ease;
 }
 
-.site-utility-portal-btn:hover,
-.site-utility-portal.open .site-utility-portal-btn {
-  background-color: #FABD32;
-  color: #1E459F;
-  border-color: #FABD32;
+.site-utility-topbar-btn:hover,
+.site-utility-portal.open .site-utility-topbar-btn,
+.site-utility-topbar-btn.active {
+  color: #FABD32;
 }
 
-.site-utility-portal-btn .site-portal-chevron {
+.site-utility-topbar-btn .site-portal-chevron {
   transition: transform 0.2s ease;
   flex-shrink: 0;
   stroke: currentColor;
@@ -122,25 +121,26 @@
   position: absolute;
   top: 100%;
   right: 0;
-  min-width: 200px;
+  min-width: 215px;
   background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-radius: 6px;
-  box-shadow: 0 12px 36px rgba(30, 69, 159, 0.15), 0 2px 6px rgba(0, 0, 0, 0.04);
-  padding: 8px 0;
-  margin-top: 6px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(30, 69, 159, 0.06);
+  padding: 8px;
+  margin-top: 8px;
   z-index: 1100;
   display: none;
   flex-direction: column;
+  gap: 2px;
 }
 
 .site-portal-menu::before {
   content: '';
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 0;
   right: 0;
-  height: 10px;
+  height: 12px;
 }
 
 .site-utility-portal.open .site-portal-menu,
@@ -152,7 +152,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 18px;
+  padding: 10px 14px;
+  border-radius: 6px;
   font-family: var(--font-family);
   font-size: 13.5px;
   font-weight: 400;
@@ -163,13 +164,12 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .site-portal-item:hover {
-  background-color: #E1DCCA;
+  background-color: #F3F6FB;
   color: #1E459F;
-  padding-left: 22px;
 }
 
 .site-portal-badge {
@@ -184,16 +184,14 @@
 }
 
 .site-portal-logout-btn {
-  border-top: 1px solid #E1DCCA;
+  border: none;
   margin-top: 4px;
-  padding-top: 10px;
   color: #CF2A2A;
 }
 
 .site-portal-logout-btn:hover {
   color: #CF2A2A;
-  background-color: #E1DCCA;
-  padding-left: 22px;
+  background-color: #FEF2F2;
 }
 
 /* ==========================================================================
@@ -216,12 +214,11 @@
   align-items: center;
   text-decoration: none;
   flex-shrink: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .site-brand:hover {
   opacity: 0.88;
-  transform: scale(1.03);
 }
 
 .site-logo-img {
@@ -300,26 +297,27 @@
 .site-dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
-  min-width: 220px;
+  left: -8px;
+  min-width: 230px;
   background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-radius: 6px;
-  box-shadow: 0 12px 32px rgba(30, 69, 159, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
-  padding: 8px 0;
-  margin-top: 6px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(30, 69, 159, 0.06);
+  padding: 8px;
+  margin-top: 8px;
   z-index: 1050;
   display: none;
   flex-direction: column;
+  gap: 2px;
 }
 
 .site-dropdown-menu::before {
   content: '';
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 0;
   right: 0;
-  height: 10px;
+  height: 12px;
 }
 
 .site-nav-dropdown.open .site-dropdown-menu,
@@ -329,22 +327,23 @@
 
 .site-dropdown-item {
   display: block;
-  padding: 10px 18px;
+  padding: 10px 14px;
+  border-radius: 6px;
   font-family: var(--font-family);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--color-dark);
   text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .site-dropdown-item:hover {
-  background-color: #E1DCCA;
+  background-color: #F3F6FB;
   color: #1E459F;
-  padding-left: 22px;
 }
 
 .site-dropdown-item.active {
+  background-color: #EEF2FA;
   color: #1E459F;
   font-weight: 500;
 }
@@ -375,20 +374,15 @@
   border: 1px solid #1E459F;
   text-decoration: none;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(30, 69, 159, 0.25);
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+  box-shadow: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .site-cta-admission-btn:hover {
   background-color: #CF2A2A;
   border-color: #CF2A2A;
   color: #ffffff !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(207, 42, 42, 0.35);
-}
-
-.site-cta-admission-btn:active {
-  transform: translateY(0);
+  box-shadow: none;
 }
 
 /* ==========================================================================
@@ -502,13 +496,12 @@
 .site-mobile-sublinks {
   display: flex;
   flex-direction: column;
-  padding: 6px 0 6px 14px;
-  background-color: #ffffff;
-  border: 1px solid #E1DCCA;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
+  padding: 6px;
+  background-color: #F8FAFC;
+  border: none;
+  border-radius: 8px;
   gap: 2px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .site-mobile-sublink {
@@ -520,25 +513,41 @@
   font-weight: 400;
   color: var(--color-dark);
   padding: 9px 12px;
+  border-radius: 6px;
   text-decoration: none;
   background: none;
   border: none;
   cursor: pointer;
   width: 100%;
   text-align: left;
-  transition: color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .site-mobile-sublink:hover,
 .site-mobile-sublink.active {
+  background-color: #EEF2FA;
   color: #1E459F;
 }
 
 .site-mobile-portal-logout {
   color: #CF2A2A;
-  border-top: 1px solid #E1DCCA;
+  border: none;
   margin-top: 4px;
-  padding-top: 9px;
+}
+
+.site-mobile-sub-accordion {
+  font-weight: 500;
+}
+
+.site-mobile-sub-accordion.open .site-portal-chevron {
+  transform: rotate(180deg);
+}
+
+.site-mobile-nested-sublinks {
+  display: flex;
+  flex-direction: column;
+  padding-left: 14px;
+  gap: 2px;
 }
 
 .site-mobile-admission-cta {
@@ -556,7 +565,7 @@
   letter-spacing: 0.04em;
   border-radius: 4px;
   text-decoration: none;
-  box-shadow: 0 3px 10px rgba(30, 69, 159, 0.25);
+  box-shadow: none;
   transition: background-color 0.18s ease;
 }
 
@@ -588,18 +597,16 @@
    ========================================================================== */
 @media (max-width: 960px) {
   .site-utility-bar {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 
   .site-utility-inner {
     height: 34px;
+    gap: 12px;
   }
 
-  .site-utility-divider,
-  .site-utility-left a:nth-child(3),
-  .site-utility-blog-link,
-  .site-utility-right .site-utility-divider {
-    display: none;
+  .site-utility-link {
+    font-size: 11.5px;
   }
 
   .site-header-inner {
@@ -619,5 +626,17 @@
   .site-mobile-drawer {
     display: flex;
     top: 94px;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-utility-right {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-utility-left a:nth-child(2) {
+    display: none;
   }
 }

@@ -125,11 +125,13 @@ export default function Pathway() {
 
             {/* RIGHT PANE: ACTIVE SUBJECT DETAILS */}
             <main className="bbb-subject-content-pane">
-              <h2 className="bbb-subject-title">{activeSubject.name}</h2>
+              <div key={activeSubject.id}>
+                <h2 className="bbb-subject-title">{activeSubject.name}</h2>
 
-              <p className="bbb-subject-lead-desc">
-                {activeSubject.description}
-              </p>
+                <p className="bbb-subject-lead-desc">
+                  {activeSubject.description}
+                </p>
+              </div>
 
               {/* INQUIRY BUTTON MATCHING SCREENSHOT */}
               <div className="bbb-subject-action-row">
