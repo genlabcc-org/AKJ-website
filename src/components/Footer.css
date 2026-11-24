@@ -205,12 +205,21 @@
 
 /* Column 2: Sitemap Links */
 .akj-footer-list {
-  list-style: none;
+  list-style: none !important;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 9px;
+}
+
+.akj-footer-list li {
+  list-style: none !important;
+}
+
+.akj-footer-list li::marker {
+  content: none;
+  display: none;
 }
 
 .akj-footer-list a {
@@ -293,9 +302,9 @@
   border: 1px solid #1E459F;
   text-decoration: none;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(30, 69, 159, 0.25);
+  box-shadow: none;
   margin-bottom: 20px;
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
 }
 
 .akj-footer-cta-btn:hover {
@@ -303,7 +312,7 @@
   border-color: #CF2A2A;
   color: #ffffff !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(207, 42, 42, 0.35);
+  box-shadow: none;
 }
 
 .akj-footer-cta-btn:active {
@@ -378,7 +387,7 @@
 .akj-footer-legal-links {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 18px;
   font-family: var(--font-family);
   font-size: 12.5px;
 }

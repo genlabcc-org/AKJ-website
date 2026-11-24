@@ -243,7 +243,6 @@ export default function Footer() {
               </div>
               <div className="akj-footer-legal-links">
                 <Link to="/about" className="akj-footer-legal-link">Privacy Policy</Link>
-                <span className="akj-footer-legal-divider">•</span>
                 <Link to="/about" className="akj-footer-legal-link">Terms &amp; Conditions</Link>
               </div>
             </div>
