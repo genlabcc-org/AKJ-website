@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PageHero from '../components/PageHero';
+import { supabase } from '../supabase';
 import './Admission.css';
 
 const CLASS_OPTIONS = [
@@ -36,19 +37,55 @@ export default function Admission() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     const now = new Date();
     const refId = `AKJ-ADM-${now.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    const applicationRecord = {
+      ref_id: refId,
+      first_name: formData.firstName.trim(),
+      last_name: formData.lastName.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      date_of_birth: formData.dateOfBirth,
+      applied_class: formData.appliedClass,
+      address: formData.address.trim(),
+      status: 'Pending',
+    };
+
+    if (supabase) {
+      try {
+        const { error } = await supabase.from('admissions').insert([applicationRecord]);
+        if (error) {
+          console.warn('Supabase admission insert notice:', error.message);
+        }
+      } catch (err) {
+        console.warn('Network / Supabase error saving admission:', err);
+      }
+    }
+
     try {
       const existing = JSON.parse(localStorage.getItem('akj_admission_applications') || '[]');
       existing.unshift({
         id: refId,
-        ...formData,
+        ref_id: refId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        dateOfBirth: formData.dateOfBirth,
+        date_of_birth: formData.dateOfBirth,
+        appliedClass: formData.appliedClass,
+        applied_class: formData.appliedClass,
+        address: formData.address,
+        status: 'Pending',
         submittedAt: now.toISOString(),
+        created_at: now.toISOString(),
       });
       localStorage.setItem('akj_admission_applications', JSON.stringify(existing));
     } catch {
@@ -59,7 +96,7 @@ export default function Admission() {
       setIsSubmitting(false);
       setApplicationRef(refId);
       setSubmitted(true);
-    }, 600);
+    }, 400);
   };
 
   const handleReset = () => {

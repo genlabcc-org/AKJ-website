@@ -15,6 +15,21 @@ function formatNowShort() {
   });
 }
 
+function formatAppDate(isoString) {
+  if (!isoString) return '—';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return String(isoString);
+    return d.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return String(isoString);
+  }
+}
+
 function extractStoragePathFromUrl(url) {
   if (!url || typeof url !== 'string') return null;
   const marker = `/storage/v1/object/public/${BLOG_IMAGES_BUCKET}/`;
@@ -29,7 +44,7 @@ export default function AdminDashboard() {
   const fileInputRef = useRef(null);
   const contentAreaRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState('blogs'); // 'blogs' | 'videos'
+  const [activeTab, setActiveTab] = useState('blogs'); // 'blogs' | 'videos' | 'admission'
   const [isCreatingBlog, setIsCreatingBlog] = useState(false);
   const [isCreatingVideo, setIsCreatingVideo] = useState(false);
 
@@ -37,8 +52,17 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [blogs, setBlogs] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [admissions, setAdmissions] = useState([]);
   const [dbLoading, setDbLoading] = useState(false);
   const [dbNotice, setDbNotice] = useState('');
+
+  // Admission Modal & Delete states
+  const [selectedAdmission, setSelectedAdmission] = useState(null);
+  const [modalStatus, setModalStatus] = useState('Pending');
+  const [modalNotes, setModalNotes] = useState('');
+  const [isUpdatingAdmission, setIsUpdatingAdmission] = useState(false);
+  const [admissionToDelete, setAdmissionToDelete] = useState(null);
+  const [isDeletingAdmission, setIsDeletingAdmission] = useState(false);
 
   // Create / Edit Blog full-page state
   const [editingBlogId, setEditingBlogId] = useState(null);
@@ -104,6 +128,38 @@ export default function AdminDashboard() {
       if (!videosError) {
         setVideos(videosData || []);
       }
+
+      const { data: admissionsData, error: admissionsError } = await supabase
+        .from('admissions')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (!admissionsError && admissionsData) {
+        setAdmissions(admissionsData);
+      } else {
+        // Fallback to localStorage if table doesn't exist yet
+        try {
+          const local = JSON.parse(localStorage.getItem('akj_admission_applications') || '[]');
+          setAdmissions(
+            local.map((item, idx) => ({
+              id: item.id || idx + 1,
+              ref_id: item.ref_id || item.id,
+              first_name: item.first_name || item.firstName,
+              last_name: item.last_name || item.lastName,
+              email: item.email,
+              phone: item.phone,
+              date_of_birth: item.date_of_birth || item.dateOfBirth,
+              applied_class: item.applied_class || item.appliedClass,
+              address: item.address,
+              status: item.status || 'Pending',
+              notes: item.notes || '',
+              created_at: item.created_at || item.submittedAt || new Date().toISOString(),
+            }))
+          );
+        } catch {
+          // ignore
+        }
+      }
     } catch {
       setDbNotice('Unable to load data from Supabase.');
     } finally {
@@ -159,6 +215,166 @@ export default function AdminDashboard() {
       return matchesSearch && matchesStatus;
     });
   }, [videos, searchQuery, statusFilter]);
+
+  const filteredAdmissions = useMemo(() => {
+    return admissions.filter((item) => {
+      const studentName = `${item.first_name || item.firstName || ''} ${item.last_name || item.lastName || ''}`.trim();
+      const email = item.email || '';
+      const phone = item.phone || '';
+      const appliedClass = item.applied_class || item.appliedClass || '';
+      const refId = item.ref_id || item.id || '';
+      const query = searchQuery.toLowerCase();
+
+      const matchesSearch =
+        studentName.toLowerCase().includes(query) ||
+        email.toLowerCase().includes(query) ||
+        phone.toLowerCase().includes(query) ||
+        appliedClass.toLowerCase().includes(query) ||
+        String(refId).toLowerCase().includes(query);
+
+      const itemStatus = item.status || 'Pending';
+      const matchesStatus = statusFilter === 'All Status' || itemStatus === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [admissions, searchQuery, statusFilter]);
+
+  const pendingAdmissionsCount = admissions.filter(
+    (a) => (a.status || 'Pending') === 'Pending' || a.status === 'Under Review'
+  ).length;
+  const approvedAdmissionsCount = admissions.filter((a) => a.status === 'Approved').length;
+
+  const handleOpenAdmissionDetail = (item) => {
+    setSelectedAdmission(item);
+    setModalStatus(item.status || 'Pending');
+    setModalNotes(item.notes || '');
+  };
+
+  const handleCycleAdmissionStatus = async (item) => {
+    const order = ['Pending', 'Under Review', 'Approved', 'Rejected'];
+    const current = item.status || 'Pending';
+    const nextStatus = order[(order.indexOf(current) + 1) % order.length];
+
+    setAdmissions((prev) =>
+      prev.map((a) => (a.id === item.id ? { ...a, status: nextStatus } : a))
+    );
+
+    if (supabase) {
+      await supabase.from('admissions').update({ status: nextStatus }).eq('id', item.id);
+    }
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('akj_admission_applications') || '[]');
+      const updated = existing.map((a) =>
+        a.id === item.id || a.ref_id === item.ref_id ? { ...a, status: nextStatus } : a
+      );
+      localStorage.setItem('akj_admission_applications', JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleSaveAdmissionModal = async () => {
+    if (!selectedAdmission) return;
+    setIsUpdatingAdmission(true);
+
+    const updated = {
+      ...selectedAdmission,
+      status: modalStatus,
+      notes: modalNotes,
+    };
+
+    setAdmissions((prev) =>
+      prev.map((a) => (a.id === selectedAdmission.id ? updated : a))
+    );
+
+    if (supabase) {
+      await supabase
+        .from('admissions')
+        .update({ status: modalStatus, notes: modalNotes })
+        .eq('id', selectedAdmission.id);
+    }
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('akj_admission_applications') || '[]');
+      const updatedList = existing.map((a) =>
+        a.id === selectedAdmission.id || a.ref_id === selectedAdmission.ref_id
+          ? { ...a, status: modalStatus, notes: modalNotes }
+          : a
+      );
+      localStorage.setItem('akj_admission_applications', JSON.stringify(updatedList));
+    } catch {
+      // ignore
+    }
+
+    setIsUpdatingAdmission(false);
+    setSelectedAdmission(null);
+  };
+
+  const handleConfirmDeleteAdmission = async () => {
+    if (!admissionToDelete) return;
+    setIsDeletingAdmission(true);
+
+    if (supabase) {
+      await supabase.from('admissions').delete().eq('id', admissionToDelete.id);
+    }
+
+    setAdmissions((prev) => prev.filter((a) => a.id !== admissionToDelete.id));
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('akj_admission_applications') || '[]');
+      const updated = existing.filter(
+        (a) => a.id !== admissionToDelete.id && a.ref_id !== admissionToDelete.ref_id
+      );
+      localStorage.setItem('akj_admission_applications', JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+
+    setIsDeletingAdmission(false);
+    setAdmissionToDelete(null);
+  };
+
+  const handleExportAdmissionsCSV = () => {
+    if (!admissions.length) return;
+    const headers = [
+      'Reference ID',
+      'First Name',
+      'Last Name',
+      'Email',
+      'Phone',
+      'Date of Birth',
+      'Applied Class',
+      'Address',
+      'Status',
+      'Notes',
+      'Submitted At',
+    ];
+    const rows = filteredAdmissions.map((item) => [
+      `"${item.ref_id || item.id || ''}"`,
+      `"${(item.first_name || item.firstName || '').replace(/"/g, '""')}"`,
+      `"${(item.last_name || item.lastName || '').replace(/"/g, '""')}"`,
+      `"${(item.email || '').replace(/"/g, '""')}"`,
+      `"${(item.phone || '').replace(/"/g, '""')}"`,
+      `"${item.date_of_birth || item.dateOfBirth || ''}"`,
+      `"${(item.applied_class || item.appliedClass || '').replace(/"/g, '""')}"`,
+      `"${(item.address || '').replace(/"/g, '""')}"`,
+      `"${item.status || 'Pending'}"`,
+      `"${(item.notes || '').replace(/"/g, '""')}"`,
+      `"${item.created_at || item.submittedAt || ''}"`,
+    ]);
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `akj-admissions-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Image upload handlers for Create / Edit Blog (Supabase Storage)
   const handleFilesSelected = async (files) => {
@@ -528,6 +744,14 @@ export default function AdminDashboard() {
         return 'status-scheduled';
       case 'Draft':
         return 'status-draft';
+      case 'Approved':
+        return 'status-approved';
+      case 'Under Review':
+        return 'status-under-review';
+      case 'Pending':
+        return 'status-pending';
+      case 'Rejected':
+        return 'status-rejected';
       default:
         return 'status-published';
     }
@@ -597,6 +821,18 @@ export default function AdminDashboard() {
                 <path d="M17 9.5l5-2.5v10l-5-2.5" />
               </svg>
               <span>Videos</span>
+            </button>
+
+            <button
+              type="button"
+              className={`logip-nav-item ${activeTab === 'admission' ? 'active' : ''}`}
+              onClick={() => handleTabSwitch('admission')}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5" />
+              </svg>
+              <span>Admission</span>
             </button>
           </nav>
 
@@ -1103,7 +1339,9 @@ export default function AdminDashboard() {
                 <p className="logip-subgreeting">
                   {activeTab === 'blogs'
                     ? 'Manage your blog posts below.'
-                    : 'Manage your video sessions below.'}
+                    : activeTab === 'videos'
+                      ? 'Manage your video sessions below.'
+                      : 'Review and manage student admission applications below.'}
                   {dbNotice && <span className="logip-db-hint"> ({dbNotice})</span>}
                 </p>
               </div>
@@ -1153,10 +1391,8 @@ export default function AdminDashboard() {
                     <span className="logip-stat-trend text-green">{publishedBlogsRate}</span>
                   </div>
                 </div>
-
-               
               </div>
-            ) : (
+            ) : activeTab === 'videos' ? (
               <div className="logip-stats-row">
                 <div className="logip-stat-card">
                   <div className="logip-stat-icon">
@@ -1203,6 +1439,52 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="logip-stats-row">
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Total Applications</span>
+                    <strong className="logip-stat-value">{admissions.length}</strong>
+                    <span className="logip-stat-pill pill-blue">Stored in database</span>
+                  </div>
+                </div>
+
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Pending / Review</span>
+                    <strong className="logip-stat-value">{pendingAdmissionsCount}</strong>
+                    <span className="logip-stat-pill pill-amber">Awaiting decision</span>
+                  </div>
+                </div>
+
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Approved</span>
+                    <strong className="logip-stat-value">{approvedAdmissionsCount}</strong>
+                    <span className="logip-stat-pill pill-green">Accepted students</span>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* SEARCH & FILTER CONTROLS */}
@@ -1219,7 +1501,9 @@ export default function AdminDashboard() {
                   placeholder={
                     activeTab === 'blogs'
                       ? 'Search blogs, authors...'
-                      : 'Search video sessions, hosts...'
+                      : activeTab === 'videos'
+                        ? 'Search video sessions, hosts...'
+                        : 'Search student, email, grade, ref ID...'
                   }
                 />
               </div>
@@ -1231,35 +1515,66 @@ export default function AdminDashboard() {
                   aria-label="Filter by status"
                 >
                   <option value="All Status">All Status</option>
-                  <option value="Published">Published</option>
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="Draft">Draft</option>
+                  {activeTab === 'admission' ? (
+                    <>
+                      <option value="Pending">Pending</option>
+                      <option value="Under Review">Under Review</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="Published">Published</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="Draft">Draft</option>
+                    </>
+                  )}
                 </select>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
 
-              <button
-                type="button"
-                className="logip-add-btn"
-                onClick={() => {
-                  if (activeTab === 'blogs') {
-                    handleOpenCreateBlog();
-                  } else {
-                    handleOpenCreateVideo();
-                  }
-                }}
-              >
-                <span>+</span>
-                <span>{activeTab === 'blogs' ? 'New Blog' : 'New Video'}</span>
-              </button>
+              {activeTab === 'admission' ? (
+                <button
+                  type="button"
+                  className="logip-add-btn"
+                  onClick={handleExportAdmissionsCSV}
+                  title="Export admission applications as CSV"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Export CSV</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="logip-add-btn"
+                  onClick={() => {
+                    if (activeTab === 'blogs') {
+                      handleOpenCreateBlog();
+                    } else {
+                      handleOpenCreateVideo();
+                    }
+                  }}
+                >
+                  <span>+</span>
+                  <span>{activeTab === 'blogs' ? 'New Blog' : 'New Video'}</span>
+                </button>
+              )}
             </div>
 
             {/* TABLE SECTION */}
             <div className="logip-table-section">
               <h2 className="logip-section-title">
-                {activeTab === 'blogs' ? 'Blogs' : 'Videos Sessions'}
+                {activeTab === 'blogs'
+                  ? 'Blogs'
+                  : activeTab === 'videos'
+                    ? 'Videos Sessions'
+                    : 'Admission Applications'}
               </h2>
 
               {activeTab === 'blogs' ? (
@@ -1361,7 +1676,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
-              ) : (
+              ) : activeTab === 'videos' ? (
                 <div className="logip-table logip-table-videos">
                   <div className="logip-table-head">
                     <span>Video Title</span>
@@ -1468,6 +1783,108 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
+              ) : (
+                <div className="logip-table logip-table-admissions">
+                  <div className="logip-table-head">
+                    <span>Applicant</span>
+                    <span>Applying Grade</span>
+                    <span>Parent Contact</span>
+                    <span>Date of Birth</span>
+                    <span>Applied Date</span>
+                    <span>Status</span>
+                    <span>Actions</span>
+                  </div>
+
+                  <div className="logip-table-body">
+                    {filteredAdmissions.length === 0 ? (
+                      <div className="logip-empty-row">
+                        {dbLoading ? 'Loading applications...' : 'No admission applications found.'}
+                      </div>
+                    ) : (
+                      filteredAdmissions.map((item) => {
+                        const studentName = `${item.first_name || item.firstName || ''} ${item.last_name || item.lastName || ''}`.trim() || 'Unnamed Applicant';
+                        const refId = item.ref_id || item.id;
+                        const appliedClass = item.applied_class || item.appliedClass || '—';
+                        const dob = item.date_of_birth || item.dateOfBirth || '—';
+                        const dateStr = formatAppDate(item.created_at || item.submittedAt);
+                        const currentStatus = item.status || 'Pending';
+
+                        return (
+                          <div className="logip-table-row" key={item.id || refId}>
+                            <div className="logip-cell-main">
+                              <div className="logip-student-icon" aria-hidden="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                  <circle cx="12" cy="7" r="4" />
+                                </svg>
+                              </div>
+                              <div className="logip-applicant-info">
+                                <span className="logip-item-title">{studentName}</span>
+                                <span className="logip-cell-ref">{refId}</span>
+                              </div>
+                            </div>
+
+                            <div className="logip-cell-text">
+                              <span className="logip-grade-badge">{appliedClass}</span>
+                            </div>
+
+                            <div className="logip-contact-line">
+                              <a href={`mailto:${item.email}`} className="logip-contact-email" title={item.email}>
+                                {item.email}
+                              </a>
+                              <span className="logip-contact-phone">{item.phone}</span>
+                            </div>
+
+                            <div className="logip-cell-date">{dob}</div>
+
+                            <div className="logip-cell-date">{dateStr}</div>
+
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => handleCycleAdmissionStatus(item)}
+                                className={`logip-status-badge ${getStatusClass(currentStatus)}`}
+                                title="Click to cycle status (Pending -> Under Review -> Approved -> Rejected)"
+                              >
+                                {currentStatus}
+                              </button>
+                            </div>
+
+                            <div className="logip-cell-actions">
+                              <button
+                                type="button"
+                                className="logip-action-btn"
+                                onClick={() => handleOpenAdmissionDetail(item)}
+                                title="View full details"
+                                aria-label={`View details of ${studentName}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                  <circle cx="12" cy="12" r="3" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                className="logip-action-btn logip-action-delete"
+                                onClick={() => setAdmissionToDelete(item)}
+                                title="Delete application"
+                                aria-label={`Delete ${studentName}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               )}
 
               {/* PAGINATION FOOTER */}
@@ -1531,6 +1948,171 @@ export default function AdminDashboard() {
                 disabled={isDeletingVideo}
               >
                 {isDeletingVideo ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADMISSION APPLICATION DETAILS MODAL */}
+      {selectedAdmission && (
+        <div
+          className="logip-modal-backdrop"
+          onClick={() => !isUpdatingAdmission && setSelectedAdmission(null)}
+        >
+          <div
+            className="logip-modal logip-modal-detail"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="logip-detail-modal-header">
+              <div>
+                <span className="logip-detail-ref-badge">
+                  {selectedAdmission.ref_id || selectedAdmission.id}
+                </span>
+                <h3 className="logip-detail-modal-title">
+                  {selectedAdmission.first_name || selectedAdmission.firstName}{' '}
+                  {selectedAdmission.last_name || selectedAdmission.lastName}
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="logip-modal-close-btn"
+                onClick={() => setSelectedAdmission(null)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="logip-detail-grid">
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Applying Grade / Class</span>
+                <strong className="logip-detail-val">
+                  {selectedAdmission.applied_class || selectedAdmission.appliedClass || '—'}
+                </strong>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Date of Birth</span>
+                <span className="logip-detail-val">
+                  {selectedAdmission.date_of_birth || selectedAdmission.dateOfBirth || '—'}
+                </span>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Parent / Guardian Email</span>
+                <a
+                  href={`mailto:${selectedAdmission.email}`}
+                  className="logip-detail-val text-link"
+                >
+                  {selectedAdmission.email}
+                </a>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Parent / Guardian Phone</span>
+                <a
+                  href={`tel:${selectedAdmission.phone}`}
+                  className="logip-detail-val text-link"
+                >
+                  {selectedAdmission.phone}
+                </a>
+              </div>
+
+              <div className="logip-detail-item full-width">
+                <span className="logip-detail-label">Residential Address</span>
+                <p className="logip-detail-val logip-address-box">
+                  {selectedAdmission.address || 'No address provided'}
+                </p>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Submitted On</span>
+                <span className="logip-detail-val">
+                  {formatAppDate(selectedAdmission.created_at || selectedAdmission.submittedAt)}
+                </span>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Application Status</span>
+                <select
+                  className="logip-pill-input"
+                  value={modalStatus}
+                  onChange={(e) => setModalStatus(e.target.value)}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Under Review">Under Review</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div className="logip-detail-item full-width">
+                <span className="logip-detail-label">Internal Admin Notes</span>
+                <textarea
+                  rows="3"
+                  className="logip-notes-input"
+                  value={modalNotes}
+                  onChange={(e) => setModalNotes(e.target.value)}
+                  placeholder="Add notes for this applicant (e.g., Interview scheduled, documents verified, etc.)..."
+                />
+              </div>
+            </div>
+
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setSelectedAdmission(null)}
+                className="logip-btn-cancel"
+                disabled={isUpdatingAdmission}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveAdmissionModal}
+                className="logip-btn-save"
+                disabled={isUpdatingAdmission}
+              >
+                {isUpdatingAdmission ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE ADMISSION CONFIRMATION MODAL */}
+      {admissionToDelete && (
+        <div
+          className="logip-modal-backdrop"
+          onClick={() => !isDeletingAdmission && setAdmissionToDelete(null)}
+        >
+          <div className="logip-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Admission Application</h3>
+            <p className="logip-delete-message">
+              Are you sure you want to delete the application for{' '}
+              <strong>
+                {admissionToDelete.first_name || admissionToDelete.firstName}{' '}
+                {admissionToDelete.last_name || admissionToDelete.lastName}
+              </strong>{' '}
+              (Ref: {admissionToDelete.ref_id || admissionToDelete.id})? This action cannot be undone.
+            </p>
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setAdmissionToDelete(null)}
+                className="logip-btn-cancel"
+                disabled={isDeletingAdmission}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteAdmission}
+                className="logip-btn-delete"
+                disabled={isDeletingAdmission}
+              >
+                {isDeletingAdmission ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

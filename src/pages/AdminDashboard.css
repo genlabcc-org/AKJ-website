@@ -245,6 +245,11 @@
   color: #1e4e79;
 }
 
+.logip-stat-pill.pill-amber {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
 /* SEARCH, FILTER & NEW BUTTON */
 .logip-controls-row {
   display: grid;
@@ -459,6 +464,26 @@
 .status-draft {
   background-color: #f6dec5;
   color: #8c5319;
+}
+
+.status-approved {
+  background-color: #cce8d6;
+  color: #276749;
+}
+
+.status-under-review {
+  background-color: #c2dcf2;
+  color: #1e4e79;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 
@@ -1195,6 +1220,201 @@
 .logip-live-video-desc {
   font-size: 12px;
   color: #4b5563;
+}
+
+/* =========================================================
+   ADMISSION APPLICATIONS TABLE & MODAL
+   ========================================================= */
+.logip-table-admissions .logip-table-head,
+.logip-table-admissions .logip-table-row {
+  grid-template-columns: 2fr 1.3fr 1.6fr 0.95fr 1fr 1fr 0.85fr;
+  align-items: center;
+}
+
+.logip-student-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #eaedf1;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logip-applicant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logip-cell-ref {
+  font-size: 11px;
+  color: #6b7280;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 500;
+}
+
+.logip-grade-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.logip-contact-line {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logip-contact-email {
+  font-size: 12px;
+  font-weight: 500;
+  color: #111827;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.logip-contact-email:hover {
+  text-decoration: underline;
+  color: #2563eb;
+}
+
+.logip-contact-phone {
+  font-size: 11.5px;
+  color: #6b7280;
+}
+
+/* Detail Modal Styles */
+.logip-modal-detail {
+  max-width: 580px;
+  width: 92%;
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: 20px;
+}
+
+.logip-detail-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.logip-detail-ref-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: #eaedf1;
+  color: #4b5563;
+  margin-bottom: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.logip-detail-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.logip-modal-close-btn {
+  font-size: 24px;
+  line-height: 1;
+  color: #9ca3af;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.logip-modal-close-btn:hover {
+  color: #111827;
+}
+
+.logip-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+  background-color: #f9fafb;
+  border: 1px solid #eef0f3;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.logip-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.logip-detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.logip-detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.logip-detail-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  word-break: break-word;
+}
+
+.logip-detail-val.text-link {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.logip-detail-val.text-link:hover {
+  text-decoration: underline;
+}
+
+.logip-address-box {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #374151;
+  margin: 2px 0 0;
+}
+
+.logip-notes-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: #111827;
+  background-color: #ffffff;
+  resize: vertical;
+  outline: none;
+}
+
+.logip-notes-input:focus {
+  border-color: #93c5fd;
 }
 
 @media (max-width: 860px) {
