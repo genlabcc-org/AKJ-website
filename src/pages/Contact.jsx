@@ -219,8 +219,8 @@ export default function Contact() {
 
               <div className="bbb-campus-item">
                 <span className="bbb-campus-label">EMAIL</span>
-                <a href="mailto:akjinternationalschool@gmail.com" className="bbb-campus-link">
-                  akjinternationalschool@gmail.com
+                <a href="mailto:info@akjinternationalschool.org" className="bbb-campus-link">
+                  info@akjinternationalschool.org
                 </a>
               </div>
 

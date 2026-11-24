@@ -84,34 +84,6 @@
   gap: 8px;
 }
 
-.bbb-hero-kicker {
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #edba3a;
-}
-
-.bbb-hero-title {
-  font-family: var(--font-family);
-  font-size: clamp(32px, 5vw, 56px);
-  line-height: 1.08;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.bbb-hero-desc {
-  font-family: var(--font-family-light);
-  font-size: clamp(15px, 1.8vw, 19px);
-  line-height: 1.5;
-  color: #e2e8f0;
-  margin: 4px 0 0;
-}
-
 /* --------------------------------------------------------------------------
    2. EDITORIAL SPLIT SECTION (THE CAMBRIDGE CONTINUUM)
    -------------------------------------------------------------------------- */
@@ -487,312 +459,70 @@
 }
 
 /* --------------------------------------------------------------------------
-   5. FEATURED SPOTLIGHT: EARLY YEARS READING (WITH SECOND UPLOADED PHOTO)
+   5. CAMPUS LEARNING SPACES GALLERY (3 PICS)
    -------------------------------------------------------------------------- */
-.bbb-pathway-earlyyears-spotlight {
-  border-top: 1px solid #e6e6e6;
-  padding: 64px 0;
+.bbb-campus-gallery-section {
+  width: 100%;
+  padding: 32px 0 64px;
 }
 
-.bbb-spotlight-inner {
+.bbb-campus-gallery-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 56px;
-  align-items: center;
-  background-color: #fafafa;
-  border-radius: 6px;
-  overflow: hidden;
-  padding: 44px 44px;
-  box-sizing: border-box;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
 }
 
 @media (max-width: 992px) {
-  .bbb-spotlight-inner {
-    grid-template-columns: 1fr;
-    padding: 28px 20px;
-    gap: 32px;
+  .bbb-campus-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 }
 
-.bbb-spotlight-text-side {
-  display: flex;
-  flex-direction: column;
+@media (max-width: 640px) {
+  .bbb-campus-gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
-.bbb-spotlight-kicker {
-  font-family: var(--font-family);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #1e459f;
-  margin-bottom: 8px;
-}
-
-.bbb-spotlight-title {
-  font-family: var(--font-family);
-  font-size: clamp(24px, 2.8vw, 32px);
-  line-height: 1.25;
-  font-weight: 500;
-  color: #000000;
-  margin: 0 0 16px 0;
-  text-transform: uppercase;
-}
-
-.bbb-spotlight-body {
-  font-family: var(--font-family-light);
-  font-size: 15px;
-  line-height: 24px;
-  color: #4b5563;
-  margin: 0 0 28px 0;
-}
-
-.bbb-spotlight-points {
-  display: flex;
-  gap: 28px;
-  flex-wrap: wrap;
-}
-
-.bbb-point-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-width: 220px;
-}
-
-.bbb-point-num {
-  font-family: var(--font-family);
-  font-size: 26px;
-  font-weight: 700;
-  color: #edba3a;
-}
-
-.bbb-point-label {
-  font-family: var(--font-family-light);
-  font-size: 12.5px;
-  line-height: 18px;
-  color: #555555;
-}
-
-.bbb-spotlight-img-side {
+.bbb-gallery-item {
   width: 100%;
-  height: clamp(280px, 30vw, 380px);
-  border-radius: 4px;
+  background-color: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.bbb-spotlight-img {
+.bbb-gallery-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.bbb-gallery-img {
   width: 100%;
   height: 100%;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
-/* --------------------------------------------------------------------------
-   6. THE 5 CAMBRIDGE LEARNER ATTRIBUTES
-   -------------------------------------------------------------------------- */
-.bbb-pathway-attributes-section {
-  border-top: 1px solid #e6e6e6;
-  padding: 64px 0 72px;
-}
-
-.bbb-attributes-header {
+.bbb-campus-gallery-text-wrap {
+  max-width: 960px;
+  margin: 44px auto 0;
   text-align: center;
-  max-width: 760px;
-  margin: 0 auto 48px;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
-.bbb-attributes-kicker {
-  display: block;
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #1e459f;
-  margin-bottom: 8px;
-}
-
-.bbb-attributes-title {
-  font-family: var(--font-family);
-  font-size: clamp(26px, 3.4vw, 38px);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: #000000;
-  text-transform: uppercase;
-  margin: 0 0 14px 0;
-}
-
-.bbb-attributes-lead {
-  font-family: var(--font-family-light);
-  font-size: 16px;
-  line-height: 25px;
-  color: #555555;
+.bbb-campus-gallery-desc {
+  font-family: var(--font-family-light, inherit);
+  font-size: clamp(16px, 1.8vw, 19px);
+  line-height: 1.75;
+  color: #475569;
   margin: 0;
-}
-
-.bbb-attributes-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-}
-
-@media (max-width: 1100px) {
-  .bbb-attributes-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .bbb-attributes-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.bbb-attribute-card {
-  background-color: #fafafa;
-  padding: 26px 22px 24px;
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  border-top: 2px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.bbb-attribute-card:hover {
-  border-top-color: #edba3a;
-  background-color: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-}
-
-.bbb-attribute-num {
-  font-family: var(--font-family);
-  font-size: 13px;
-  font-weight: 700;
-  color: #1e459f;
-  letter-spacing: 1px;
-}
-
-.bbb-attribute-name {
-  font-family: var(--font-family);
-  font-size: 17px;
-  font-weight: 600;
-  color: #000000;
-  margin: 0;
-}
-
-.bbb-attribute-sub {
-  font-family: var(--font-family);
-  font-size: 12px;
-  font-weight: 500;
-  color: #edba3a;
-  line-height: 1.4;
-}
-
-.bbb-attribute-desc {
-  font-family: var(--font-family-light);
-  font-size: 13.5px;
-  line-height: 20px;
-  color: #555555;
-  margin: 4px 0 0;
-}
-
-/* --------------------------------------------------------------------------
-   7. BOTTOM CALLOUT
-   -------------------------------------------------------------------------- */
-.bbb-pathway-bottom-callout {
-  border-top: 1px solid #e6e6e6;
-  padding: 64px 0 20px;
-}
-
-.bbb-callout-card {
-  background-color: #152238;
-  color: #ffffff;
-  border-radius: 6px;
-  padding: 56px 48px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-@media (max-width: 768px) {
-  .bbb-callout-card {
-    padding: 36px 24px;
-  }
-}
-
-.bbb-callout-tag {
-  font-family: var(--font-family);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #edba3a;
-  margin-bottom: 12px;
-}
-
-.bbb-callout-heading {
-  font-family: var(--font-family);
-  font-size: clamp(24px, 3.2vw, 36px);
-  line-height: 1.25;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 16px 0;
-  max-width: 640px;
-}
-
-.bbb-callout-text {
-  font-family: var(--font-family-light);
-  font-size: 15.5px;
-  line-height: 25px;
-  color: #cbd7e5;
-  margin: 0 0 32px 0;
-  max-width: 580px;
-}
-
-.bbb-callout-buttons {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.bbb-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  padding: 12px 26px;
-  background-color: #edba3a;
-  color: #152238;
-  border-radius: 4px;
-  text-decoration: none;
-  font-family: var(--font-family);
-  font-size: 13.5px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  transition: opacity 0.2s ease;
-}
-
-.bbb-btn-primary:hover {
-  opacity: 0.9;
-}
-
-.bbb-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  padding: 12px 26px;
-  background-color: transparent;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 4px;
-  text-decoration: none;
-  font-family: var(--font-family);
-  font-size: 13.5px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: all 0.2s ease;
-}
-
-.bbb-btn-secondary:hover {
-  border-color: #ffffff;
 }

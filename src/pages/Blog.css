@@ -25,7 +25,7 @@
 }
 
 /* HERO SECTION */
-.bbb-hero-section {
+.bbb-blog-page .bbb-hero-section {
   display: grid;
   grid-template-columns: 1fr 1.12fr;
   gap: 56px;
@@ -33,7 +33,7 @@
   align-items: start;
 }
 
-.bbb-hero-kicker {
+.bbb-blog-page .bbb-hero-kicker {
   display: inline-block;
   font-size: 13px;
   font-weight: 700;
@@ -42,7 +42,7 @@
   color: #000000;
 }
 
-.bbb-hero-title {
+.bbb-blog-page .bbb-hero-title {
   font-size: 36px;
   font-weight: 700;
   text-transform: uppercase;
@@ -52,8 +52,8 @@
   margin: -4px 0 24px;
 }
 
-.bbb-hero-desc {
-  font-family: var(--font-family-light);
+.bbb-blog-page .bbb-hero-desc {
+  font-family: var(--font-family-light, inherit);
   font-size: 16.5px;
   line-height: 1.58;
   color: #1a1a1a;

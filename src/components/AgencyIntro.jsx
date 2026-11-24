@@ -203,23 +203,6 @@ export default function AgencyIntro() {
           <p className="agency-pillar-desc">
             Students develop the self-assurance to speak up, share ideas, and tackle new challenges without fear of making mistakes.
           </p>
-          <Link to="/about" className="agency-pillar-link" aria-label="Learn more about Confident">
-            <svg
-              className="agency-pillar-arrow"
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                stroke="currentColor"
-                strokeWidth="1.5"
-                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
-              />
-            </svg>
-            <span>Learn more</span>
-          </Link>
         </div>
 
         {/* Card 2: REFLECTIVE */}
@@ -236,23 +219,6 @@ export default function AgencyIntro() {
           <p className="agency-pillar-desc">
             Learners actively evaluate their own thinking, understand how they learn best, and turn everyday feedback into continuous growth.
           </p>
-          <Link to="/about" className="agency-pillar-link" aria-label="Learn more about Reflective">
-            <svg
-              className="agency-pillar-arrow"
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                stroke="currentColor"
-                strokeWidth="1.5"
-                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
-              />
-            </svg>
-            <span>Learn more</span>
-          </Link>
         </div>
 
         {/* Card 3: INNOVATIVE */}
@@ -269,23 +235,6 @@ export default function AgencyIntro() {
           <p className="agency-pillar-desc">
             Children are encouraged to ask questions, think outside the box, and apply what they know to solve real-world problems creatively.
           </p>
-          <Link to="/about" className="agency-pillar-link" aria-label="Learn more about Innovative">
-            <svg
-              className="agency-pillar-arrow"
-              width="12"
-              height="12"
-              viewBox="0 0 12 12"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                stroke="currentColor"
-                strokeWidth="1.5"
-                d="M9.514 9.45 2 2m7.514 7.45H3.252m6.262 0V3.242"
-              />
-            </svg>
-            <span>Learn more</span>
-          </Link>
         </div>
       </div>
     </section>

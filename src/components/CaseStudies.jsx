@@ -96,9 +96,9 @@ export default function CaseStudies() {
               Weekly Friday clubs and year-round events at AKJ International School inspire creativity, teamwork, and real-world confidence.
             </p>
             <Link
-              to="/services"
+              to="/academics"
               className="case-study-link"
-              aria-label="Learn more about Zonegreen case study"
+              aria-label="Learn more about Academics at AKJ"
             >
               <svg
                 className="case-study-arrow"
@@ -139,9 +139,9 @@ export default function CaseStudies() {
               At AKJ International School, students take initiative, make responsible choices, and grow into confident, compassionate leaders.
             </p>
             <Link
-              to="/services"
+              to="/academics"
               className="case-study-link"
-              aria-label="Learn more about Binder Magnetic case study"
+              aria-label="Learn more about Academics at AKJ"
             >
               <svg
                 className="case-study-arrow"
@@ -182,9 +182,9 @@ export default function CaseStudies() {
               At AKJ International School, our dedicated facilitators go beyond textbooks—guiding, mentoring, and empowering every child to think independently and reach their fullest potential.
             </p>
             <Link
-              to="/services"
+              to="/academics"
               className="case-study-link"
-              aria-label="Learn more about Frénéhard Pliage case study"
+              aria-label="Learn more about Academics at AKJ"
             >
               <svg
                 className="case-study-arrow"
@@ -225,9 +225,9 @@ export default function CaseStudies() {
               At AKJ International School, students collaborate on hands-on projects, share bold ideas, and discover the true value of teamwork and creative problem-solving.
             </p>
             <Link
-              to="/services"
+              to="/academics"
               className="case-study-link"
-              aria-label="Learn more about BrightLoop Brand case study"
+              aria-label="Learn more about Academics at AKJ"
             >
               <svg
                 className="case-study-arrow"
@@ -251,7 +251,7 @@ export default function CaseStudies() {
 
       {/* MORE REFERENCES CTA BUTTON */}
       <div className="case-studies-cta-wrap">
-        <Link to="/services" className="case-studies-more-btn" aria-label="Explore more references">
+        <Link to="/academics" className="case-studies-more-btn" aria-label="Explore Academics">
           <svg
             className="case-studies-more-arrow"
             width="12"
