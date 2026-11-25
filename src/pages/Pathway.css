@@ -279,6 +279,10 @@
   background-color: #f8fafc;
 }
 
+.bbb-subject-nav-btn:last-child {
+  border-bottom: none;
+}
+
 .bbb-subject-nav-btn.active {
   color: #1e3a8a;
   font-weight: 600;
@@ -366,7 +370,7 @@
 .bbb-handbook-section {
   width: 100%;
   padding: 48px 0 64px;
-  border-top: 1px solid #e6e6e6;
+  border-top: none;
 }
 
 .bbb-handbook-grid {
