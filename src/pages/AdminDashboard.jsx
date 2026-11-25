@@ -44,7 +44,9 @@ export default function AdminDashboard() {
   const fileInputRef = useRef(null);
   const contentAreaRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState('blogs'); // 'blogs' | 'videos' | 'admission'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'blogs' | 'videos' | 'admission' | 'contact'
+  const [admissionChartMode, setAdmissionChartMode] = useState('stages'); // 'stages' | 'timeline'
+  const [currentMonthAnchor] = useState(() => new Date());
   const [isCreatingBlog, setIsCreatingBlog] = useState(false);
   const [isCreatingVideo, setIsCreatingVideo] = useState(false);
 
@@ -53,6 +55,7 @@ export default function AdminDashboard() {
   const [blogs, setBlogs] = useState([]);
   const [videos, setVideos] = useState([]);
   const [admissions, setAdmissions] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [dbLoading, setDbLoading] = useState(false);
   const [dbNotice, setDbNotice] = useState('');
 
@@ -63,6 +66,14 @@ export default function AdminDashboard() {
   const [isUpdatingAdmission, setIsUpdatingAdmission] = useState(false);
   const [admissionToDelete, setAdmissionToDelete] = useState(null);
   const [isDeletingAdmission, setIsDeletingAdmission] = useState(false);
+
+  // Contact Modal & Delete states
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [contactModalStatus, setContactModalStatus] = useState('New');
+  const [contactModalNotes, setContactModalNotes] = useState('');
+  const [isUpdatingContact, setIsUpdatingContact] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null);
+  const [isDeletingContact, setIsDeletingContact] = useState(false);
 
   // Create / Edit Blog full-page state
   const [editingBlogId, setEditingBlogId] = useState(null);
@@ -160,6 +171,35 @@ export default function AdminDashboard() {
           // ignore
         }
       }
+
+      const { data: contactsData, error: contactsError } = await supabase
+        .from('contacts')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (!contactsError && contactsData) {
+        setContacts(contactsData);
+      } else {
+        try {
+          const localContacts = JSON.parse(localStorage.getItem('akj_contact_messages') || '[]');
+          setContacts(
+            localContacts.map((item, idx) => ({
+              id: item.id || idx + 1,
+              ref_id: item.ref_id || item.id,
+              name: item.name,
+              email: item.email,
+              phone: item.phone,
+              purpose: item.purpose || item.society || '',
+              message: item.message,
+              status: item.status || 'New',
+              notes: item.notes || '',
+              created_at: item.created_at || item.submittedAt || new Date().toISOString(),
+            }))
+          );
+        } catch {
+          // ignore
+        }
+      }
     } catch {
       setDbNotice('Unable to load data from Supabase.');
     } finally {
@@ -207,10 +247,10 @@ export default function AdminDashboard() {
   const filteredVideos = useMemo(() => {
     return videos.filter((item) => {
       const title = item.title || '';
-      const host = item.host || '';
+      const url = item.video_url || '';
       const matchesSearch =
         title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        host.toLowerCase().includes(searchQuery.toLowerCase());
+        url.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === 'All Status' || item.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -371,6 +411,161 @@ export default function AdminDashboard() {
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
     link.setAttribute('download', `akj-admissions-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const filteredContacts = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return contacts.filter((item) => {
+      const name = item.name || '';
+      const email = item.email || '';
+      const phone = item.phone || '';
+      const purpose = item.purpose || item.society || '';
+      const message = item.message || '';
+      const refId = item.ref_id || item.id || '';
+
+      const matchesSearch =
+        name.toLowerCase().includes(query) ||
+        email.toLowerCase().includes(query) ||
+        phone.toLowerCase().includes(query) ||
+        purpose.toLowerCase().includes(query) ||
+        message.toLowerCase().includes(query) ||
+        String(refId).toLowerCase().includes(query);
+
+      const itemStatus = item.status || 'New';
+      const matchesStatus = statusFilter === 'All Status' || itemStatus === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [contacts, searchQuery, statusFilter]);
+
+  const openContactsCount = contacts.filter(
+    (c) => (c.status || 'New') === 'New' || c.status === 'In Progress'
+  ).length;
+  const resolvedContactsCount = contacts.filter((c) => c.status === 'Resolved').length;
+
+  const syncLocalContacts = (updater) => {
+    try {
+      const existing = JSON.parse(localStorage.getItem('akj_contact_messages') || '[]');
+      localStorage.setItem('akj_contact_messages', JSON.stringify(updater(existing)));
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleOpenContactDetail = (item) => {
+    setSelectedContact(item);
+    setContactModalStatus(item.status || 'New');
+    setContactModalNotes(item.notes || '');
+  };
+
+  const handleCycleContactStatus = async (item) => {
+    const order = ['New', 'In Progress', 'Resolved'];
+    const current = item.status || 'New';
+    const nextStatus = order[(order.indexOf(current) + 1) % order.length];
+
+    setContacts((prev) =>
+      prev.map((c) => (c.id === item.id ? { ...c, status: nextStatus } : c))
+    );
+
+    if (supabase) {
+      await supabase.from('contacts').update({ status: nextStatus }).eq('id', item.id);
+    }
+
+    syncLocalContacts((existing) =>
+      existing.map((c) =>
+        c.id === item.id || c.ref_id === item.ref_id ? { ...c, status: nextStatus } : c
+      )
+    );
+  };
+
+  const handleSaveContactModal = async () => {
+    if (!selectedContact) return;
+    setIsUpdatingContact(true);
+
+    const updated = {
+      ...selectedContact,
+      status: contactModalStatus,
+      notes: contactModalNotes,
+    };
+
+    setContacts((prev) =>
+      prev.map((c) => (c.id === selectedContact.id ? updated : c))
+    );
+
+    if (supabase) {
+      await supabase
+        .from('contacts')
+        .update({ status: contactModalStatus, notes: contactModalNotes })
+        .eq('id', selectedContact.id);
+    }
+
+    syncLocalContacts((existing) =>
+      existing.map((c) =>
+        c.id === selectedContact.id || c.ref_id === selectedContact.ref_id
+          ? { ...c, status: contactModalStatus, notes: contactModalNotes }
+          : c
+      )
+    );
+
+    setIsUpdatingContact(false);
+    setSelectedContact(null);
+  };
+
+  const handleConfirmDeleteContact = async () => {
+    if (!contactToDelete) return;
+    setIsDeletingContact(true);
+
+    if (supabase) {
+      await supabase.from('contacts').delete().eq('id', contactToDelete.id);
+    }
+
+    setContacts((prev) => prev.filter((c) => c.id !== contactToDelete.id));
+
+    syncLocalContacts((existing) =>
+      existing.filter(
+        (c) => c.id !== contactToDelete.id && c.ref_id !== contactToDelete.ref_id
+      )
+    );
+
+    setIsDeletingContact(false);
+    setContactToDelete(null);
+  };
+
+  const handleExportContactsCSV = () => {
+    if (!contacts.length) return;
+    const headers = [
+      'Reference ID',
+      'Name',
+      'Email',
+      'Phone',
+      'Purpose',
+      'Message',
+      'Status',
+      'Notes',
+      'Received At',
+    ];
+    const rows = filteredContacts.map((item) => [
+      `"${item.ref_id || item.id || ''}"`,
+      `"${(item.name || '').replace(/"/g, '""')}"`,
+      `"${(item.email || '').replace(/"/g, '""')}"`,
+      `"${(item.phone || '').replace(/"/g, '""')}"`,
+      `"${(item.purpose || item.society || '').replace(/"/g, '""')}"`,
+      `"${(item.message || '').replace(/"/g, '""')}"`,
+      `"${item.status || 'New'}"`,
+      `"${(item.notes || '').replace(/"/g, '""')}"`,
+      `"${item.created_at || item.submittedAt || ''}"`,
+    ]);
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `akj-contacts-${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -617,17 +812,10 @@ export default function AdminDashboard() {
   const handleOpenEditVideo = (item) => {
     setEditingVideoId(item.id);
     setVideoTitle(item.title || '');
-    const existingUrl =
-      item.video_url ||
-      (typeof item.avatar === 'string' && item.avatar.startsWith('http')
-        ? item.avatar
-        : '') ||
-      (typeof item.thumb === 'string' && item.thumb.startsWith('http')
-        ? item.thumb
-        : '');
+    const existingUrl = item.video_url || '';
     setVideoUrl(existingUrl);
     setVideoDate(item.session_date || item.date || formatNowShort());
-    setVideoStatus(item.status || 'Published');
+    setVideoStatus(item.status === 'Scheduled' ? 'Draft' : item.status || 'Published');
     setVideoUrlError('');
     setVideoTitleError('');
     setIsCreatingVideo(true);
@@ -653,11 +841,8 @@ export default function AdminDashboard() {
 
     const videoPayload = {
       title: videoTitle.trim(),
+      video_url: videoUrl.trim(),
       thumb: embedInfo?.thumb || null,
-      host: displayName,
-      avatar: videoUrl.trim(),
-      is_admin_icon: true,
-      duration: 'Video Link',
       session_date: videoDate.trim() || formatNowShort(),
       status: videoStatus,
     };
@@ -718,8 +903,9 @@ export default function AdminDashboard() {
   };
 
   const handleCycleStatus = async (item, table) => {
-    const order = ['Published', 'Scheduled', 'Draft'];
-    const nextStatus = order[(order.indexOf(item.status) + 1) % order.length];
+    const order = table === 'videos' ? ['Published', 'Draft'] : ['Published', 'Scheduled', 'Draft'];
+    const currentIndex = order.indexOf(item.status);
+    const nextStatus = order[(currentIndex + 1) % order.length];
 
     if (table === 'blogs') {
       setBlogs((prev) =>
@@ -752,6 +938,12 @@ export default function AdminDashboard() {
         return 'status-pending';
       case 'Rejected':
         return 'status-rejected';
+      case 'New':
+        return 'status-new';
+      case 'In Progress':
+        return 'status-in-progress';
+      case 'Resolved':
+        return 'status-resolved';
       default:
         return 'status-published';
     }
@@ -764,7 +956,107 @@ export default function AdminDashboard() {
     : '0% rate';
 
   const publishedVideosCount = videos.filter((v) => v.status === 'Published').length;
-  const scheduledVideosCount = videos.filter((v) => v.status === 'Scheduled').length;
+  const draftVideosCount = videos.length - publishedVideosCount;
+
+  const admissionAnalytics = useMemo(() => {
+    const statusMap = {
+      Approved: 0,
+      Pending: 0,
+      'Under Review': 0,
+      Rejected: 0,
+    };
+    const stageCounts = {
+      'Early Years': 0,
+      Primary: 0,
+      'Lower Sec': 0,
+      IGCSE: 0,
+    };
+
+    const months = [];
+    for (let i = 5; i >= 0; i -= 1) {
+      const d = new Date(
+        currentMonthAnchor.getFullYear(),
+        currentMonthAnchor.getMonth() - i,
+        1
+      );
+      months.push({
+        key: `${d.getFullYear()}-${d.getMonth()}`,
+        label: d.toLocaleString('en-US', { month: 'short' }),
+        count: 0,
+      });
+    }
+
+    admissions.forEach((item) => {
+      const st = item.status || 'Pending';
+      if (Object.prototype.hasOwnProperty.call(statusMap, st)) {
+        statusMap[st] += 1;
+      } else {
+        statusMap.Pending += 1;
+      }
+
+      const cls = String(item.applied_class || item.appliedClass || '').toLowerCase();
+      if (cls.includes('ey') || cls.includes('pre-kg') || cls.includes('lkg') || cls.includes('ukg')) {
+        stageCounts['Early Years'] += 1;
+      } else if (/grade\s*[1-5]\b/.test(cls)) {
+        stageCounts.Primary += 1;
+      } else if (/grade\s*[6-8]\b/.test(cls)) {
+        stageCounts['Lower Sec'] += 1;
+      } else if (/grade\s*(9|10)\b/.test(cls) || cls.includes('igcse')) {
+        stageCounts.IGCSE += 1;
+      } else if (cls) {
+        stageCounts.Primary += 1;
+      }
+
+      const rawDate = item.created_at || item.submittedAt;
+      if (rawDate) {
+        const parsed = new Date(rawDate);
+        if (!Number.isNaN(parsed.getTime())) {
+          const monthKey = `${parsed.getFullYear()}-${parsed.getMonth()}`;
+          const target = months.find((m) => m.key === monthKey);
+          if (target) target.count += 1;
+        }
+      }
+    });
+
+    const total = admissions.length;
+    const statusItems = [
+      { label: 'Approved', count: statusMap.Approved, color: '#1E459F' },
+      { label: 'Pending', count: statusMap.Pending, color: '#CF2A2A' },
+      { label: 'Under Review', count: statusMap['Under Review'], color: '#FABD32' },
+      { label: 'Rejected', count: statusMap.Rejected, color: '#E1DCCA' },
+    ].map((entry) => ({
+      ...entry,
+      pct: total > 0 ? Math.round((entry.count / total) * 100) : 0,
+    }));
+
+    const stageItems = [
+      { label: 'Early Years', sub: 'EY1 – EY3', count: stageCounts['Early Years'], color: '#1E459F' },
+      { label: 'Primary', sub: 'Grades 1 – 5', count: stageCounts.Primary, color: '#FABD32' },
+      { label: 'Lower Sec', sub: 'Grades 6 – 8', count: stageCounts['Lower Sec'], color: '#CF2A2A' },
+      { label: 'IGCSE', sub: 'Grades 9 – 10', count: stageCounts.IGCSE, color: '#E1DCCA', stroke: '#B8B09C' },
+    ];
+
+    const rawMax = Math.max(
+      1,
+      ...stageItems.map((s) => s.count),
+      ...months.map((m) => m.count)
+    );
+    const yStep = Math.max(1, Math.ceil(rawMax / 4));
+    const yMax = yStep * 4;
+    const yTicks = [0, yStep, yStep * 2, yStep * 3, yMax];
+
+    const approvalRate = total > 0 ? Math.round((statusMap.Approved / total) * 100) : 0;
+
+    return {
+      total,
+      approvalRate,
+      statusItems,
+      stageItems,
+      months,
+      yMax,
+      yTicks,
+    };
+  }, [admissions, currentMonthAnchor]);
 
   const previewTitle = blogTitle.trim() || 'Untitled Blog';
   const previewCategory = blogCategory.trim() || 'General';
@@ -789,12 +1081,16 @@ export default function AdminDashboard() {
           </Link>
 
           <nav className="logip-nav">
-            <Link to="/" className="logip-nav-item">
+            <button
+              type="button"
+              className={`logip-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+              onClick={() => handleTabSwitch('home')}
+            >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5z" />
               </svg>
               <span>Home</span>
-            </Link>
+            </button>
 
             <button
               type="button"
@@ -834,9 +1130,30 @@ export default function AdminDashboard() {
               </svg>
               <span>Admission</span>
             </button>
+
+            <button
+              type="button"
+              className={`logip-nav-item ${activeTab === 'contact' ? 'active' : ''}`}
+              onClick={() => handleTabSwitch('contact')}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <span>Contact</span>
+            </button>
           </nav>
 
           <div className="logip-sidebar-bottom">
+            <Link to="/" className="logip-bottom-link">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+              <span>Visit Website</span>
+            </Link>
+
             <button type="button" className="logip-bottom-link" onClick={fetchSupabaseData}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="10" />
@@ -1267,7 +1584,6 @@ export default function AdminDashboard() {
                     onChange={(e) => setVideoStatus(e.target.value)}
                   >
                     <option value="Published">Published</option>
-                    <option value="Scheduled">Scheduled</option>
                     <option value="Draft">Draft</option>
                   </select>
                 </div>
@@ -1329,8 +1645,561 @@ export default function AdminDashboard() {
               </div>
             </div>
           </section>
+        ) : activeTab === 'home' ? (
+          /* HOME OVERVIEW DASHBOARD */
+          <section className="logip-main logip-home-main">
+            <header className="logip-header">
+              <div>
+                <h1 className="logip-greeting">Hello, {displayName}</h1>
+                <p className="logip-subgreeting">
+                  Overview across Admissions, Contact Inquiries, Blogs, and Videos.
+                  {dbNotice && <span className="logip-db-hint"> ({dbNotice})</span>}
+                </p>
+              </div>
+
+              <div className="logip-date-box">
+                <span className="logip-date-text">{formatNowShort()}</span>
+                <span className="logip-calendar-btn" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </span>
+              </div>
+            </header>
+
+            <div className="logip-home-scroll">
+              {/* 4 SUMMARY CARDS: ADMISSION, CONTACT, BLOG, VIDEO */}
+              <div className="logip-overview-grid">
+                <button
+                  type="button"
+                  className="logip-overview-card card-blue"
+                  onClick={() => handleTabSwitch('admission')}
+                >
+                  <div className="logip-overview-top">
+                    <span className="logip-overview-icon icon-blue">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                        <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5" />
+                      </svg>
+                    </span>
+                    <span className="logip-overview-arrow">&rarr;</span>
+                  </div>
+                  <div className="logip-overview-body">
+                    <span className="logip-overview-label">Admission</span>
+                    <strong className="logip-overview-value">{admissions.length}</strong>
+                    <span className="logip-overview-meta">
+                      {approvedAdmissionsCount} Approved · {pendingAdmissionsCount} Pending
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className="logip-overview-card card-red"
+                  onClick={() => handleTabSwitch('contact')}
+                >
+                  <div className="logip-overview-top">
+                    <span className="logip-overview-icon icon-red">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                      </svg>
+                    </span>
+                    <span className="logip-overview-arrow">&rarr;</span>
+                  </div>
+                  <div className="logip-overview-body">
+                    <span className="logip-overview-label">Contact</span>
+                    <strong className="logip-overview-value">{contacts.length}</strong>
+                    <span className="logip-overview-meta">
+                      {openContactsCount} Open · {resolvedContactsCount} Resolved
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className="logip-overview-card card-gold"
+                  onClick={() => handleTabSwitch('blogs')}
+                >
+                  <div className="logip-overview-top">
+                    <span className="logip-overview-icon icon-gold">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="8" y1="13" x2="16" y2="13" />
+                        <line x1="8" y1="17" x2="13" y2="17" />
+                      </svg>
+                    </span>
+                    <span className="logip-overview-arrow">&rarr;</span>
+                  </div>
+                  <div className="logip-overview-body">
+                    <span className="logip-overview-label">Blog</span>
+                    <strong className="logip-overview-value">{blogs.length}</strong>
+                    <span className="logip-overview-meta">
+                      {publishedBlogsCount} Published · {draftBlogsCount} Draft / Sched
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className="logip-overview-card card-stone"
+                  onClick={() => handleTabSwitch('videos')}
+                >
+                  <div className="logip-overview-top">
+                    <span className="logip-overview-icon icon-stone">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                        <rect x="2" y="5" width="15" height="14" rx="2" />
+                        <polygon points="8 9.5 12.5 12 8 14.5 8 9.5" fill="currentColor" stroke="none" />
+                        <path d="M17 9.5l5-2.5v10l-5-2.5" />
+                      </svg>
+                    </span>
+                    <span className="logip-overview-arrow">&rarr;</span>
+                  </div>
+                  <div className="logip-overview-body">
+                    <span className="logip-overview-label">Video</span>
+                    <strong className="logip-overview-value">{videos.length}</strong>
+                    <span className="logip-overview-meta">
+                      {publishedVideosCount} Published · {draftVideosCount} Draft
+                    </span>
+                  </div>
+                </button>
+              </div>
+
+              {/* ADMISSION GRAPHS */}
+              <div className="logip-charts-grid">
+                {/* LEFT GRAPH: ADMISSIONS BAR / TREND */}
+                <div className="logip-chart-card">
+                  <div className="logip-chart-head">
+                    <div>
+                      <h2 className="logip-chart-title">Admission Applications Graph</h2>
+                      <p className="logip-chart-subtitle">
+                        {admissionChartMode === 'stages'
+                          ? 'Distribution across Cambridge grade stages'
+                          : '6-month admission submission trend'}
+                      </p>
+                    </div>
+                    <div className="logip-chart-toggle" role="tablist" aria-label="Admission graph view">
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={admissionChartMode === 'stages'}
+                        className={`logip-chart-toggle-btn ${admissionChartMode === 'stages' ? 'active' : ''}`}
+                        onClick={() => setAdmissionChartMode('stages')}
+                      >
+                        By Stage
+                      </button>
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={admissionChartMode === 'timeline'}
+                        className={`logip-chart-toggle-btn ${admissionChartMode === 'timeline' ? 'active' : ''}`}
+                        onClick={() => setAdmissionChartMode('timeline')}
+                      >
+                        Monthly
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="logip-svg-chart-wrap">
+                    {(() => {
+                      const svgW = 540;
+                      const svgH = 220;
+                      const padL = 34;
+                      const padR = 18;
+                      const padT = 18;
+                      const padB = 42;
+                      const plotW = svgW - padL - padR;
+                      const plotH = svgH - padT - padB;
+                      const { yMax, yTicks, stageItems, months } = admissionAnalytics;
+                      const items = admissionChartMode === 'stages' ? stageItems : months;
+                      const slotW = plotW / items.length;
+                      const barW = Math.min(48, slotW * 0.46);
+
+                      const points = items.map((item, idx) => {
+                        const cx = padL + slotW * idx + slotW / 2;
+                        const barH = yMax > 0 ? (item.count / yMax) * plotH : 0;
+                        const cy = padT + plotH - barH;
+                        return { ...item, cx, cy, barH };
+                      });
+
+                      const polylinePts = points.map((p) => `${p.cx},${p.cy}`).join(' ');
+
+                      return (
+                        <svg
+                          viewBox={`0 0 ${svgW} ${svgH}`}
+                          className="logip-admission-svg"
+                          role="img"
+                          aria-label="Admission applications bar graph"
+                        >
+                          {/* Horizontal Gridlines & Y-Axis Ticks */}
+                          {yTicks.map((tick) => {
+                            const y = padT + plotH - (tick / yMax) * plotH;
+                            return (
+                              <g key={tick}>
+                                <line
+                                  x1={padL}
+                                  y1={y}
+                                  x2={svgW - padR}
+                                  y2={y}
+                                  stroke="#E1DCCA"
+                                  strokeWidth="1"
+                                  strokeDasharray={tick === 0 ? undefined : '4 4'}
+                                />
+                                <text
+                                  x={padL - 8}
+                                  y={y + 4}
+                                  textAnchor="end"
+                                  fontSize="10.5"
+                                  fill="#6b7280"
+                                >
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          {/* Bars */}
+                          {points.map((p, idx) => {
+                            const barColor =
+                              admissionChartMode === 'stages'
+                                ? p.color
+                                : idx % 3 === 0
+                                  ? '#1E459F'
+                                  : idx % 3 === 1
+                                    ? '#FABD32'
+                                    : '#CF2A2A';
+                            const x = p.cx - barW / 2;
+                            const safeH = p.count > 0 ? Math.max(6, p.barH) : 0;
+                            const y = padT + plotH - safeH;
+                            return (
+                              <g key={p.label}>
+                                <rect
+                                  x={x}
+                                  y={y}
+                                  width={barW}
+                                  height={safeH}
+                                  rx="6"
+                                  fill={barColor}
+                                  stroke={p.stroke || 'none'}
+                                  strokeWidth={p.stroke ? '1' : '0'}
+                                />
+                                <text
+                                  x={p.cx}
+                                  y={Math.max(12, y - 6)}
+                                  textAnchor="middle"
+                                  fontSize="11.5"
+                                  fontWeight="700"
+                                  fill="#111827"
+                                >
+                                  {p.count}
+                                </text>
+                                <text
+                                  x={p.cx}
+                                  y={padT + plotH + 17}
+                                  textAnchor="middle"
+                                  fontSize="11"
+                                  fontWeight="600"
+                                  fill="#1f2937"
+                                >
+                                  {p.label}
+                                </text>
+                                {p.sub && (
+                                  <text
+                                    x={p.cx}
+                                    y={padT + plotH + 31}
+                                    textAnchor="middle"
+                                    fontSize="9.5"
+                                    fill="#6b7280"
+                                  >
+                                    {p.sub}
+                                  </text>
+                                )}
+                              </g>
+                            );
+                          })}
+
+                          {/* Trend line overlay for Monthly view */}
+                          {admissionChartMode === 'timeline' && points.length > 1 && (
+                            <g>
+                              <polyline
+                                fill="none"
+                                stroke="#1E459F"
+                                strokeWidth="2.2"
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                                points={polylinePts}
+                              />
+                              {points.map((p) => (
+                                <circle
+                                  key={`pt-${p.label}`}
+                                  cx={p.cx}
+                                  cy={p.cy}
+                                  r="4"
+                                  fill="#FABD32"
+                                  stroke="#1E459F"
+                                  strokeWidth="2"
+                                />
+                              ))}
+                            </g>
+                          )}
+                        </svg>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* RIGHT GRAPH: ADMISSION STATUS DONUT */}
+                <div className="logip-chart-card">
+                  <div className="logip-chart-head">
+                    <div>
+                      <h2 className="logip-chart-title">Admission Status</h2>
+                      <p className="logip-chart-subtitle">
+                        Pipeline status across all applications
+                      </p>
+                    </div>
+                    <span className="logip-approval-chip">
+                      {admissionAnalytics.approvalRate}% Approved
+                    </span>
+                  </div>
+
+                  <div className="logip-donut-layout">
+                    <div className="logip-donut-wrap">
+                      {(() => {
+                        const r = 54;
+                        const c = 2 * Math.PI * r;
+                        const { total, statusItems } = admissionAnalytics;
+                        const segments = statusItems.reduce((acc, item) => {
+                          const prevTotal =
+                            acc.length > 0
+                              ? acc[acc.length - 1].cumulativeEnd
+                              : 0;
+                          const len = total > 0 ? (item.count / total) * c : 0;
+                          acc.push({
+                            ...item,
+                            len,
+                            offset: -prevTotal,
+                            cumulativeEnd: prevTotal + len,
+                          });
+                          return acc;
+                        }, []);
+
+                        return (
+                          <svg viewBox="0 0 140 140" className="logip-donut-svg" role="img" aria-label="Admission status donut chart">
+                            <circle
+                              cx="70"
+                              cy="70"
+                              r={r}
+                              fill="none"
+                              stroke="#E1DCCA"
+                              strokeWidth="16"
+                            />
+                            {total > 0 &&
+                              segments.map((seg) =>
+                                seg.len > 0 ? (
+                                  <circle
+                                    key={seg.label}
+                                    cx="70"
+                                    cy="70"
+                                    r={r}
+                                    fill="none"
+                                    stroke={seg.color}
+                                    strokeWidth="16"
+                                    strokeDasharray={`${seg.len} ${c - seg.len}`}
+                                    strokeDashoffset={seg.offset}
+                                    transform="rotate(-90 70 70)"
+                                  />
+                                ) : null
+                              )}
+                            <text
+                              x="70"
+                              y="67"
+                              textAnchor="middle"
+                              fontSize="22"
+                              fontWeight="700"
+                              fill="#111827"
+                            >
+                              {total}
+                            </text>
+                            <text
+                              x="70"
+                              y="83"
+                              textAnchor="middle"
+                              fontSize="10"
+                              fontWeight="600"
+                              fill="#6b7280"
+                            >
+                              APPLICANTS
+                            </text>
+                          </svg>
+                        );
+                      })()}
+                    </div>
+
+                    <div className="logip-donut-legend">
+                      {admissionAnalytics.statusItems.map((item) => (
+                        <div className="logip-legend-row" key={item.label}>
+                          <span
+                            className="logip-legend-dot"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="logip-legend-name">{item.label}</span>
+                          <strong className="logip-legend-count">{item.count}</strong>
+                          <span className="logip-legend-pct">{item.pct}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RECENT UPDATES ACROSS ALL 4 MODULES */}
+              <div className="logip-home-recent-grid">
+                <div className="logip-recent-card">
+                  <div className="logip-recent-head">
+                    <h3>Recent Admissions</h3>
+                    <button type="button" onClick={() => handleTabSwitch('admission')}>
+                      View all &rarr;
+                    </button>
+                  </div>
+                  <div className="logip-recent-list">
+                    {admissions.length === 0 ? (
+                      <p className="logip-recent-empty">No admission applications yet.</p>
+                    ) : (
+                      admissions.slice(0, 3).map((item) => {
+                        const name = `${item.first_name || item.firstName || ''} ${item.last_name || item.lastName || ''}`.trim() || 'Applicant';
+                        const cls = item.applied_class || item.appliedClass || '—';
+                        const status = item.status || 'Pending';
+                        return (
+                          <button
+                            type="button"
+                            key={item.id || item.ref_id}
+                            className="logip-recent-row"
+                            onClick={() => handleOpenAdmissionDetail(item)}
+                          >
+                            <div className="logip-recent-info">
+                              <strong>{name}</strong>
+                              <span>{cls} · {item.ref_id || item.id}</span>
+                            </div>
+                            <span className={`logip-status-badge ${getStatusClass(status)}`}>
+                              {status}
+                            </span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                <div className="logip-recent-card">
+                  <div className="logip-recent-head">
+                    <h3>Recent Contact Inquiries</h3>
+                    <button type="button" onClick={() => handleTabSwitch('contact')}>
+                      View all &rarr;
+                    </button>
+                  </div>
+                  <div className="logip-recent-list">
+                    {contacts.length === 0 ? (
+                      <p className="logip-recent-empty">No contact inquiries yet.</p>
+                    ) : (
+                      contacts.slice(0, 3).map((item) => {
+                        const status = item.status || 'New';
+                        return (
+                          <button
+                            type="button"
+                            key={item.id || item.ref_id}
+                            className="logip-recent-row"
+                            onClick={() => handleOpenContactDetail(item)}
+                          >
+                            <div className="logip-recent-info">
+                              <strong>{item.name || 'Sender'}</strong>
+                              <span>{item.purpose || item.society || 'General Inquiry'}</span>
+                            </div>
+                            <span className={`logip-status-badge ${getStatusClass(status)}`}>
+                              {status}
+                            </span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+
+                <div className="logip-recent-card">
+                  <div className="logip-recent-head">
+                    <h3>Latest Blogs</h3>
+                    <button type="button" onClick={() => handleTabSwitch('blogs')}>
+                      View all &rarr;
+                    </button>
+                  </div>
+                  <div className="logip-recent-list">
+                    {blogs.length === 0 ? (
+                      <p className="logip-recent-empty">No blog posts yet.</p>
+                    ) : (
+                      blogs.slice(0, 3).map((item) => (
+                        <button
+                          type="button"
+                          key={item.id}
+                          className="logip-recent-row"
+                          onClick={() => {
+                            setActiveTab('blogs');
+                            handleOpenEditBlog(item);
+                          }}
+                        >
+                          <div className="logip-recent-info">
+                            <strong>{item.title}</strong>
+                            <span>{item.publish_date || item.date || '—'} · {item.author}</span>
+                          </div>
+                          <span className={`logip-status-badge ${getStatusClass(item.status)}`}>
+                            {item.status}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="logip-recent-card">
+                  <div className="logip-recent-head">
+                    <h3>Latest Videos</h3>
+                    <button type="button" onClick={() => handleTabSwitch('videos')}>
+                      View all &rarr;
+                    </button>
+                  </div>
+                  <div className="logip-recent-list">
+                    {videos.length === 0 ? (
+                      <p className="logip-recent-empty">No video sessions yet.</p>
+                    ) : (
+                      videos.slice(0, 3).map((item) => (
+                        <button
+                          type="button"
+                          key={item.id}
+                          className="logip-recent-row"
+                          onClick={() => {
+                            setActiveTab('videos');
+                            handleOpenEditVideo(item);
+                          }}
+                        >
+                          <div className="logip-recent-info">
+                            <strong>{item.title}</strong>
+                            <span>{item.session_date || item.date || '—'}</span>
+                          </div>
+                          <span className={`logip-status-badge ${getStatusClass(item.status)}`}>
+                            {item.status}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         ) : (
-          /* BLOGS & VIDEOS LIST VIEW */
+          /* BLOGS, VIDEOS, ADMISSION & CONTACT LIST VIEW */
           <section className="logip-main">
             {/* Top Greeting & Date */}
             <header className="logip-header">
@@ -1341,7 +2210,9 @@ export default function AdminDashboard() {
                     ? 'Manage your blog posts below.'
                     : activeTab === 'videos'
                       ? 'Manage your video sessions below.'
-                      : 'Review and manage student admission applications below.'}
+                      : activeTab === 'admission'
+                        ? 'Review and manage student admission applications below.'
+                        : 'Review and respond to contact form inquiries below.'}
                   {dbNotice && <span className="logip-db-hint"> ({dbNotice})</span>}
                 </p>
               </div>
@@ -1411,23 +2282,6 @@ export default function AdminDashboard() {
                 <div className="logip-stat-card">
                   <div className="logip-stat-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <rect x="3" y="4" width="18" height="18" rx="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                      <circle cx="12" cy="15" r="2" />
-                    </svg>
-                  </div>
-                  <div className="logip-stat-info">
-                    <span className="logip-stat-label">Scheduled</span>
-                    <strong className="logip-stat-value">{scheduledVideosCount}</strong>
-                    <span className="logip-stat-pill pill-blue">Upcoming</span>
-                  </div>
-                </div>
-
-                <div className="logip-stat-card">
-                  <div className="logip-stat-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
@@ -1439,7 +2293,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : activeTab === 'admission' ? (
               <div className="logip-stats-row">
                 <div className="logip-stat-card">
                   <div className="logip-stat-icon">
@@ -1485,6 +2339,50 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="logip-stats-row">
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                      <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Total Inquiries</span>
+                    <strong className="logip-stat-value">{contacts.length}</strong>
+                    <span className="logip-stat-pill pill-blue">Stored in database</span>
+                  </div>
+                </div>
+
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">New / In Progress</span>
+                    <strong className="logip-stat-value">{openContactsCount}</strong>
+                    <span className="logip-stat-pill pill-amber">Needs response</span>
+                  </div>
+                </div>
+
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Resolved</span>
+                    <strong className="logip-stat-value">{resolvedContactsCount}</strong>
+                    <span className="logip-stat-pill pill-green">Handled</span>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* SEARCH & FILTER CONTROLS */}
@@ -1502,8 +2400,10 @@ export default function AdminDashboard() {
                     activeTab === 'blogs'
                       ? 'Search blogs, authors...'
                       : activeTab === 'videos'
-                        ? 'Search video sessions, hosts...'
-                        : 'Search student, email, grade, ref ID...'
+                        ? 'Search video sessions...'
+                        : activeTab === 'admission'
+                          ? 'Search student, email, grade, ref ID...'
+                          : 'Search name, email, purpose, message...'
                   }
                 />
               </div>
@@ -1522,6 +2422,17 @@ export default function AdminDashboard() {
                       <option value="Approved">Approved</option>
                       <option value="Rejected">Rejected</option>
                     </>
+                  ) : activeTab === 'contact' ? (
+                    <>
+                      <option value="New">New</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                    </>
+                  ) : activeTab === 'videos' ? (
+                    <>
+                      <option value="Published">Published</option>
+                      <option value="Draft">Draft</option>
+                    </>
                   ) : (
                     <>
                       <option value="Published">Published</option>
@@ -1535,12 +2446,20 @@ export default function AdminDashboard() {
                 </svg>
               </div>
 
-              {activeTab === 'admission' ? (
+              {activeTab === 'admission' || activeTab === 'contact' ? (
                 <button
                   type="button"
                   className="logip-add-btn"
-                  onClick={handleExportAdmissionsCSV}
-                  title="Export admission applications as CSV"
+                  onClick={
+                    activeTab === 'admission'
+                      ? handleExportAdmissionsCSV
+                      : handleExportContactsCSV
+                  }
+                  title={
+                    activeTab === 'admission'
+                      ? 'Export admission applications as CSV'
+                      : 'Export contact responses as CSV'
+                  }
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -1574,7 +2493,9 @@ export default function AdminDashboard() {
                   ? 'Blogs'
                   : activeTab === 'videos'
                     ? 'Videos Sessions'
-                    : 'Admission Applications'}
+                    : activeTab === 'admission'
+                      ? 'Admission Applications'
+                      : 'Contact Responses'}
               </h2>
 
               {activeTab === 'blogs' ? (
@@ -1694,14 +2615,7 @@ export default function AdminDashboard() {
                     ) : (
                       filteredVideos.map((item) => {
                         const sessionDate = item.session_date || item.date || '—';
-                        const rawVideoUrl =
-                          item.video_url ||
-                          (typeof item.avatar === 'string' && item.avatar.startsWith('http')
-                            ? item.avatar
-                            : '') ||
-                          (typeof item.thumb === 'string' && item.thumb.startsWith('http')
-                            ? item.thumb
-                            : '');
+                        const rawVideoUrl = item.video_url || '';
                         const embedInfo = getVideoEmbedInfo(rawVideoUrl);
                         const thumbUrl = embedInfo?.thumb || item.thumb;
 
@@ -1783,7 +2697,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
-              ) : (
+              ) : activeTab === 'admission' ? (
                 <div className="logip-table logip-table-admissions">
                   <div className="logip-table-head">
                     <span>Applicant</span>
@@ -1869,6 +2783,109 @@ export default function AdminDashboard() {
                                 onClick={() => setAdmissionToDelete(item)}
                                 title="Delete application"
                                 aria-label={`Delete ${studentName}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="logip-table logip-table-contacts">
+                  <div className="logip-table-head">
+                    <span>Sender</span>
+                    <span>Purpose</span>
+                    <span>Contact Info</span>
+                    <span>Message</span>
+                    <span>Received</span>
+                    <span>Status</span>
+                    <span>Actions</span>
+                  </div>
+
+                  <div className="logip-table-body">
+                    {filteredContacts.length === 0 ? (
+                      <div className="logip-empty-row">
+                        {dbLoading ? 'Loading contact inquiries...' : 'No contact responses found.'}
+                      </div>
+                    ) : (
+                      filteredContacts.map((item) => {
+                        const senderName = item.name || 'Anonymous';
+                        const refId = item.ref_id || item.id;
+                        const purpose = item.purpose || item.society || 'General Inquiry';
+                        const dateStr = formatAppDate(item.created_at || item.submittedAt);
+                        const currentStatus = item.status || 'New';
+
+                        return (
+                          <div className="logip-table-row" key={item.id || refId}>
+                            <div className="logip-cell-main">
+                              <div className="logip-student-icon" aria-hidden="true">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                  <polyline points="22,6 12,13 2,6" />
+                                </svg>
+                              </div>
+                              <div className="logip-applicant-info">
+                                <span className="logip-item-title">{senderName}</span>
+                                <span className="logip-cell-ref">{refId}</span>
+                              </div>
+                            </div>
+
+                            <div className="logip-cell-text">
+                              <span className="logip-grade-badge">{purpose}</span>
+                            </div>
+
+                            <div className="logip-contact-line">
+                              <a href={`mailto:${item.email}`} className="logip-contact-email" title={item.email}>
+                                {item.email}
+                              </a>
+                              <span className="logip-contact-phone">{item.phone}</span>
+                            </div>
+
+                            <div className="logip-message-preview" title={item.message}>
+                              {item.message || '—'}
+                            </div>
+
+                            <div className="logip-cell-date">{dateStr}</div>
+
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => handleCycleContactStatus(item)}
+                                className={`logip-status-badge ${getStatusClass(currentStatus)}`}
+                                title="Click to cycle status (New -> In Progress -> Resolved)"
+                              >
+                                {currentStatus}
+                              </button>
+                            </div>
+
+                            <div className="logip-cell-actions">
+                              <button
+                                type="button"
+                                className="logip-action-btn"
+                                onClick={() => handleOpenContactDetail(item)}
+                                title="View full message"
+                                aria-label={`View message from ${senderName}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                  <circle cx="12" cy="12" r="3" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                className="logip-action-btn logip-action-delete"
+                                onClick={() => setContactToDelete(item)}
+                                title="Delete response"
+                                aria-label={`Delete message from ${senderName}`}
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                   <polyline points="3 6 5 6 21 6" />
@@ -2113,6 +3130,159 @@ export default function AdminDashboard() {
                 disabled={isDeletingAdmission}
               >
                 {isDeletingAdmission ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTACT INQUIRY DETAILS MODAL */}
+      {selectedContact && (
+        <div
+          className="logip-modal-backdrop"
+          onClick={() => !isUpdatingContact && setSelectedContact(null)}
+        >
+          <div
+            className="logip-modal logip-modal-detail"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="logip-detail-modal-header">
+              <div>
+                <span className="logip-detail-ref-badge">
+                  {selectedContact.ref_id || selectedContact.id}
+                </span>
+                <h3 className="logip-detail-modal-title">
+                  {selectedContact.name || 'Contact Inquiry'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="logip-modal-close-btn"
+                onClick={() => setSelectedContact(null)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="logip-detail-grid">
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Purpose / Inquiry</span>
+                <strong className="logip-detail-val">
+                  {selectedContact.purpose || selectedContact.society || 'General Inquiry'}
+                </strong>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Received On</span>
+                <span className="logip-detail-val">
+                  {formatAppDate(selectedContact.created_at || selectedContact.submittedAt)}
+                </span>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Email</span>
+                <a
+                  href={`mailto:${selectedContact.email}`}
+                  className="logip-detail-val text-link"
+                >
+                  {selectedContact.email}
+                </a>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Phone</span>
+                <a
+                  href={`tel:${selectedContact.phone}`}
+                  className="logip-detail-val text-link"
+                >
+                  {selectedContact.phone}
+                </a>
+              </div>
+
+              <div className="logip-detail-item full-width">
+                <span className="logip-detail-label">Message</span>
+                <p className="logip-detail-val logip-address-box logip-message-box">
+                  {selectedContact.message || 'No message provided'}
+                </p>
+              </div>
+
+              <div className="logip-detail-item">
+                <span className="logip-detail-label">Inquiry Status</span>
+                <select
+                  className="logip-pill-input"
+                  value={contactModalStatus}
+                  onChange={(e) => setContactModalStatus(e.target.value)}
+                >
+                  <option value="New">New</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+              </div>
+
+              <div className="logip-detail-item full-width">
+                <span className="logip-detail-label">Internal Admin Notes</span>
+                <textarea
+                  rows="3"
+                  className="logip-notes-input"
+                  value={contactModalNotes}
+                  onChange={(e) => setContactModalNotes(e.target.value)}
+                  placeholder="Add follow-up notes for this inquiry (e.g., Called back, tour scheduled, etc.)..."
+                />
+              </div>
+            </div>
+
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setSelectedContact(null)}
+                className="logip-btn-cancel"
+                disabled={isUpdatingContact}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveContactModal}
+                className="logip-btn-save"
+                disabled={isUpdatingContact}
+              >
+                {isUpdatingContact ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONTACT CONFIRMATION MODAL */}
+      {contactToDelete && (
+        <div
+          className="logip-modal-backdrop"
+          onClick={() => !isDeletingContact && setContactToDelete(null)}
+        >
+          <div className="logip-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Contact Response</h3>
+            <p className="logip-delete-message">
+              Are you sure you want to delete the inquiry from{' '}
+              <strong>{contactToDelete.name}</strong>{' '}
+              (Ref: {contactToDelete.ref_id || contactToDelete.id})? This action cannot be undone.
+            </p>
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setContactToDelete(null)}
+                className="logip-btn-cancel"
+                disabled={isDeletingContact}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteContact}
+                className="logip-btn-delete"
+                disabled={isDeletingContact}
+              >
+                {isDeletingContact ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

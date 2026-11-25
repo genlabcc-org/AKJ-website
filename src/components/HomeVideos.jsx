@@ -41,14 +41,7 @@ export default function HomeVideos() {
   const durationSeconds = Math.max(28, videos.length * 11);
 
   const renderVideoCard = (item, index) => {
-    const rawUrl =
-      item.video_url ||
-      (typeof item.avatar === 'string' && item.avatar.startsWith('http')
-        ? item.avatar
-        : '') ||
-      (typeof item.thumb === 'string' && item.thumb.startsWith('http')
-        ? item.thumb
-        : '');
+    const rawUrl = item.video_url || '';
     const embedInfo = getVideoEmbedInfo(rawUrl);
     const sessionDate = item.session_date || item.date || '';
 

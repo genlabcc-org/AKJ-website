@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PageHero from '../components/PageHero';
+import { supabase } from '../supabase';
 import './Contact.css';
 
 export default function Contact() {
@@ -14,13 +15,53 @@ export default function Contact() {
 
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactRef, setContactRef] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const now = new Date();
+    const refId = `AKJ-CON-${now.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const contactPayload = {
+      ref_id: refId,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      purpose: formData.society,
+      message: formData.message.trim(),
+      status: 'New',
+    };
+
+    if (supabase) {
+      try {
+        const { error } = await supabase.from('contacts').insert([contactPayload]);
+        if (error) {
+          console.warn('Supabase contact insert notice:', error.message);
+        }
+      } catch (err) {
+        console.warn('Network / Supabase error saving contact message:', err);
+      }
+    }
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('akj_contact_messages') || '[]');
+      existing.unshift({
+        id: refId,
+        ...contactPayload,
+        society: formData.society,
+        submittedAt: now.toISOString(),
+        created_at: now.toISOString(),
+      });
+      localStorage.setItem('akj_contact_messages', JSON.stringify(existing));
+    } catch {
+      // LocalStorage fallback handling
+    }
+
     setTimeout(() => {
       setIsSubmitting(false);
+      setContactRef(refId);
       setSubmitted(true);
       setFormData({
         name: '',
@@ -30,7 +71,7 @@ export default function Contact() {
         message: '',
         agreed: false,
       });
-    }, 600);
+    }, 400);
   };
 
   return (
@@ -51,7 +92,9 @@ export default function Contact() {
         <div className="bbb-form-container">
           {submitted ? (
             <div className="bbb-form-success">
-              <span className="bbb-success-badge">✓ MESSAGE SENT</span>
+              <span className="bbb-success-badge">
+                ✓ MESSAGE SENT{contactRef ? ` · REF: ${contactRef}` : ''}
+              </span>
               <h2 className="bbb-success-heading">Thank You for Writing to Us</h2>
               <p className="bbb-success-text">
                 Your message has been received. Our admissions team at AKJ International School will get in touch with you shortly.
