@@ -13,12 +13,14 @@ const TEAM_GROUPS = [
         role: 'Chairman',
         group: 'Leadership',
         initials: 'JJ',
+        photo: '/AKJ_team/jin.jpg',
       },
       {
         name: 'Ms. Geetha Viswanathan',
         role: 'Director / Principal',
         group: 'Leadership',
         initials: 'GV',
+        photo: '/AKJ_team/geetha.jpg',
       },
     ],
   },
@@ -32,24 +34,28 @@ const TEAM_GROUPS = [
         role: 'Academic Head',
         group: 'Administration',
         initials: 'SP',
+        photo: '/AKJ_team/priya.jpg',
       },
       {
         name: 'Mr. Avinash R G',
         role: 'Executive Director',
         group: 'Administration',
         initials: 'AR',
+        photo: '/AKJ_team/avinash.jpg',
       },
       {
         name: 'Mr. Satheendiran S',
         role: 'Operations Manager',
         group: 'Administration',
         initials: 'SS',
+        photo: '/AKJ_team/satheendran.jpg',
       },
       {
         name: 'Ms. Nima S',
         role: 'Inventory & Resources Manager',
         group: 'Administration',
         initials: 'NS',
+        photo: '/AKJ_team/nima.jpg',
       },
     ],
   },
@@ -63,24 +69,28 @@ const TEAM_GROUPS = [
         role: 'Exams Officer',
         group: 'Coordinators',
         initials: 'AV',
+        photo: '/AKJ_team/ananthi.jpg',
       },
       {
         name: 'Ms. Adansia Mary B',
         role: 'Primary & Lower Secondary Coordinator',
         group: 'Coordinators',
         initials: 'AM',
+        photo: '/AKJ_team/adansia.jpg',
       },
       {
         name: 'Ms. Divya M',
         role: 'Early Years Coordinator',
         group: 'Coordinators',
         initials: 'DM',
+        photo: '/AKJ_team/divya.jpg',
       },
       {
         name: 'Ms. Jeba Jincy R',
         role: 'Co-curricular Coordinator',
         group: 'Coordinators',
         initials: 'JJ',
+        photo: '/AKJ_team/jeba.jpg',
       },
     ],
   },
@@ -90,22 +100,31 @@ const TEAM_GROUPS = [
     subtitle: 'Primary, Secondary & Specialist Educators',
     members: [
       {
-        name: 'Saranya G R',
-        role: 'Facilitator',
-        group: 'Facilitators',
-        initials: 'SG',
-      },
-      {
         name: 'Shanolija F',
         role: 'Facilitator',
         group: 'Facilitators',
         initials: 'SF',
+        photo: '/AKJ_team/shano.jpg',
       },
       {
         name: 'Abisha A',
         role: 'Facilitator',
         group: 'Facilitators',
         initials: 'AA',
+        photo: '/AKJ_team/abisha.jpg',
+      },
+      {
+        name: 'Nisha L',
+        role: 'Facilitator',
+        group: 'Facilitators',
+        initials: 'NL',
+        photo: '/AKJ_team/nisha.jpg',
+      },
+      {
+        name: 'Saranya G R',
+        role: 'Facilitator',
+        group: 'Facilitators',
+        initials: 'SG',
       },
       {
         name: 'Akilsha A',
@@ -118,12 +137,6 @@ const TEAM_GROUPS = [
         role: 'Facilitator',
         group: 'Facilitators',
         initials: 'SG',
-      },
-      {
-        name: 'Nisha L',
-        role: 'Facilitator',
-        group: 'Facilitators',
-        initials: 'NL',
       },
       {
         name: 'Mr. Abinesh T',
@@ -143,30 +156,35 @@ const TEAM_GROUPS = [
         role: 'Early Years Facilitator',
         group: 'Early Years Facilitators',
         initials: 'JJ',
+        photo: '/AKJ_team/joyel jeba.jpg',
       },
       {
         name: 'Anesha Ragavi R V',
         role: 'Early Years Facilitator',
         group: 'Early Years Facilitators',
         initials: 'AR',
+        photo: '/AKJ_team/aneesha.jpg',
       },
       {
         name: 'Pathalis Anusha D',
         role: 'Early Years Facilitator',
         group: 'Early Years Facilitators',
         initials: 'PA',
+        photo: '/AKJ_team/anusha.jpg',
       },
       {
         name: 'Shyla F',
         role: 'Early Years Facilitator',
         group: 'Early Years Facilitators',
         initials: 'SF',
+        photo: '/AKJ_team/shyla.jpg',
       },
       {
         name: 'Jeba Shiny',
         role: 'Early Years Facilitator',
         group: 'Early Years Facilitators',
         initials: 'JS',
+        photo: '/AKJ_team/jeba shiny.jpg',
       },
     ],
   },
@@ -180,6 +198,7 @@ const TEAM_GROUPS = [
         role: 'Front Office Administrator',
         group: 'Front Office',
         initials: 'KP',
+        photo: '/AKJ_team/kanmani.jpg',
       },
     ],
   },
@@ -283,13 +302,24 @@ export default function Team() {
                   <div className="bbb-team-cards-grid">
                     {group.members.map((member, index) => (
                       <article key={`${member.name}-${index}`} className="bbb-team-card">
-                        <div className="bbb-team-card-header">
-                          <div className="bbb-team-avatar" aria-hidden="true">
-                            <span>{member.initials}</span>
-                          </div>
-                          <span className="bbb-team-card-dept">{member.group}</span>
+                        <div className="bbb-team-photo-wrap">
+                          {member.photo ? (
+                            <img
+                              src={member.photo}
+                              alt={member.name}
+                              className="bbb-team-photo"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="bbb-team-photo-placeholder" aria-hidden="true">
+                              <div className="bbb-team-avatar">
+                                <span>{member.initials}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <div className="bbb-team-card-body">
+                          <span className="bbb-team-card-dept">{member.group}</span>
                           <h2 className="bbb-team-card-name">{member.name}</h2>
                           <p className="bbb-team-card-role">{member.role}</p>
                         </div>
