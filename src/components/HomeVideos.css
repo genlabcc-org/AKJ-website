@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOME VIDEOS SECTION (Above Blog Section)
+   HOME VIDEOS SECTION (Full-Width Vertical Video Section)
    ========================================================================== */
 
 .home-videos-section {
@@ -13,9 +13,9 @@
 
 .home-videos-divider {
   width: 100%;
+  margin: 0 0 56px;
   height: 1px;
   background-color: #e6e6e6;
-  margin-bottom: 56px;
 }
 
 .home-videos-header-row {
@@ -24,6 +24,7 @@
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 44px;
+  box-sizing: border-box;
 }
 
 .home-videos-header {
@@ -73,15 +74,16 @@
   padding: 24px 0;
 }
 
-/* STATIC GRID (< 3 videos) */
+/* STATIC GRID (< 4 vertical videos) */
 .home-videos-static-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 270px));
+  gap: 24px;
   width: 100%;
+  box-sizing: border-box;
 }
 
-/* AUTO-MOVING MARQUEE (>= 3 videos, no scrollbar) */
+/* AUTO-MOVING MARQUEE (>= 4 vertical videos) */
 .home-videos-marquee-viewport {
   width: 100%;
   overflow: hidden;
@@ -90,19 +92,15 @@
 
 .home-videos-marquee-track {
   display: flex;
-  gap: 28px;
-  padding-right: 28px;
+  gap: 24px;
+  padding-right: 24px;
   width: max-content;
-  animation: homeVideosMarquee var(--marquee-duration, 34s) linear infinite;
+  animation: homeVideosMarquee var(--marquee-duration, 18s) linear infinite;
   will-change: transform;
 }
 
-.home-videos-marquee-viewport:hover .home-videos-marquee-track {
-  animation-play-state: paused;
-}
-
 .home-videos-marquee-track .home-video-card {
-  width: 390px;
+  width: 260px;
   flex-shrink: 0;
 }
 
@@ -118,15 +116,16 @@
 .home-video-card {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
-  border: 1px solid #e6e6e6;
+  background-color: transparent;
+  border: none;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 .home-video-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 9 / 13.5;
   background-color: #111111;
   overflow: hidden;
 }
@@ -142,10 +141,11 @@
 }
 
 .home-video-meta {
-  padding: 18px 20px 22px;
+  padding: 16px 18px 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background-color: #f6f7fa;
 }
 
 .home-video-date {
@@ -156,7 +156,7 @@
 
 .home-video-title {
   font-family: var(--font-family);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.35;
   text-transform: uppercase;
@@ -170,7 +170,7 @@
   }
 
   .home-videos-marquee-track .home-video-card {
-    width: 320px;
+    width: 235px;
   }
 }
 
@@ -185,7 +185,12 @@
     margin-bottom: 28px;
   }
 
+  .home-videos-static-grid {
+    grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+    gap: 20px;
+  }
+
   .home-videos-marquee-track .home-video-card {
-    width: 280px;
+    width: 215px;
   }
 }

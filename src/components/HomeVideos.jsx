@@ -36,9 +36,9 @@ export default function HomeVideos() {
     return null;
   }
 
-  const isMarquee = videos.length >= 3;
+  const isMarquee = videos.length >= 4;
   const displayVideos = isMarquee ? [...videos, ...videos] : videos;
-  const durationSeconds = Math.max(28, videos.length * 11);
+  const durationSeconds = Math.max(16, videos.length * 5.5);
 
   const renderVideoCard = (item, index) => {
     const rawUrl = item.video_url || '';
@@ -61,6 +61,7 @@ export default function HomeVideos() {
             <video
               src={embedInfo.src}
               controls
+              playsInline
               preload="metadata"
               className="home-video-player"
             />
