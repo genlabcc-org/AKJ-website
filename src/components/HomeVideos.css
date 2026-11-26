@@ -140,12 +140,28 @@
   display: block;
 }
 
+.home-video-redirect-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
 .home-video-meta {
   padding: 16px 18px 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   background-color: #f6f7fa;
+  text-decoration: none;
+}
+
+.home-video-meta-link {
+  cursor: pointer;
+}
+
+.home-video-meta-link:hover .home-video-title {
+  color: #1E459F;
 }
 
 .home-video-date {

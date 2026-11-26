@@ -41,9 +41,11 @@ export default function HomeVideos() {
   const durationSeconds = Math.max(16, videos.length * 5.5);
 
   const renderVideoCard = (item, index) => {
-    const rawUrl = item.video_url || '';
+    const rawUrl = (item.video_url || '').trim();
     const embedInfo = getVideoEmbedInfo(rawUrl);
     const sessionDate = item.session_date || item.date || '';
+    const thumbSrc = item.thumb || embedInfo?.thumb || '';
+    const isExternalLink = Boolean(rawUrl && /^https?:\/\//i.test(rawUrl));
 
     return (
       <article key={`${item.id}-${index}`} className="home-video-card">
@@ -65,22 +67,46 @@ export default function HomeVideos() {
               preload="metadata"
               className="home-video-player"
             />
-          ) : item.thumb ? (
+          ) : thumbSrc ? (
             <img
-              src={item.thumb}
+              src={thumbSrc}
               alt={item.title}
               className="home-video-poster"
               loading="lazy"
             />
           ) : null}
+
+          {isExternalLink && (
+            <a
+              href={rawUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="home-video-redirect-overlay"
+              aria-label={`Watch ${item.title} on YouTube`}
+            />
+          )}
         </div>
 
-        <div className="home-video-meta">
-          {sessionDate && (
-            <span className="home-video-date">{sessionDate}</span>
-          )}
-          <h3 className="home-video-title">{item.title}</h3>
-        </div>
+        {isExternalLink ? (
+          <a
+            href={rawUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="home-video-meta home-video-meta-link"
+          >
+            {sessionDate && (
+              <span className="home-video-date">{sessionDate}</span>
+            )}
+            <h3 className="home-video-title">{item.title}</h3>
+          </a>
+        ) : (
+          <div className="home-video-meta">
+            {sessionDate && (
+              <span className="home-video-date">{sessionDate}</span>
+            )}
+            <h3 className="home-video-title">{item.title}</h3>
+          </div>
+        )}
       </article>
     );
   };
