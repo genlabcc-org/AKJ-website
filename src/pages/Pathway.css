@@ -219,8 +219,6 @@
 /* Left sidebar navigation */
 .bbb-subjects-sidebar {
   width: 100%;
-  position: sticky;
-  top: 96px;
 }
 
 .bbb-subjects-nav {
@@ -306,6 +304,13 @@
 .bbb-subject-content-pane {
   display: flex;
   flex-direction: column;
+  padding-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .bbb-subject-content-pane {
+    padding-top: 0;
+  }
 }
 
 .bbb-subject-title {

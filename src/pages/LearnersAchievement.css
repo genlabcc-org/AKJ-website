@@ -328,13 +328,47 @@
 .bbb-learner-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 24px 22px;
   background-color: #fafafa;
   border: none;
   border-radius: 4px;
+  overflow: hidden;
   min-height: 160px;
   box-sizing: border-box;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.bbb-learner-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.bbb-learner-photo-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #efefef;
+  position: relative;
+}
+
+.bbb-learner-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bbb-learner-card:hover .bbb-learner-photo {
+  transform: scale(1.03);
+}
+
+.bbb-learner-card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 24px 22px;
+  flex: 1;
 }
 
 .bbb-learner-card-header {
