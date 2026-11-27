@@ -92,7 +92,7 @@ function AppLayout() {
         const mm = gsap.matchMedia();
         mm.add('(min-width: 901px)', () => {
           const stickyEls = gsap.utils.toArray(
-            '.bbb-team-group-left, .bbb-learners-group-left, .bbb-subjects-sidebar'
+            '.bbb-team-group-left, .bbb-learners-group-left'
           );
           stickyEls.forEach((el) => {
             const parent = el.parentElement;

@@ -21,6 +21,7 @@ const LEARNER_CATEGORIES = [
         grades: 'Grade 1 – Grade 5',
         focus: 'Foundational Mastery',
         highlight: 'Strong foundations in English, Mathematics and Cambridge Science with hands-on investigation.',
+        image: '/images/s14.JPG',
       },
       {
         id: 'acad-lower-sec',
@@ -365,23 +366,35 @@ export default function LearnersAchievement() {
                 <div className="bbb-learners-group-right">
                   <div className="bbb-learners-cards-grid">
                     {cat.stages.map((stg) => (
-                      <article key={stg.id} className="bbb-learner-card">
-                        <div className="bbb-learner-card-header">
-                          <span className="bbb-learner-stage-pill">
-                            {stg.stage}
-                          </span>
-                          <span className="bbb-learner-grades-tag">
-                            {stg.grades}
-                          </span>
-                        </div>
+                      <article key={stg.id} className={`bbb-learner-card ${stg.image ? 'has-image' : ''}`}>
+                        {stg.image && (
+                          <div className="bbb-learner-photo-wrap">
+                            <img
+                              src={stg.image}
+                              alt={`${stg.stage} - ${stg.focus}`}
+                              className="bbb-learner-photo"
+                              loading="lazy"
+                            />
+                          </div>
+                        )}
+                        <div className="bbb-learner-card-content">
+                          <div className="bbb-learner-card-header">
+                            <span className="bbb-learner-stage-pill">
+                              {stg.stage}
+                            </span>
+                            <span className="bbb-learner-grades-tag">
+                              {stg.grades}
+                            </span>
+                          </div>
 
-                        <div className="bbb-learner-card-body">
-                          <h2 className="bbb-learner-card-title">
-                            {stg.focus}
-                          </h2>
-                          <p className="bbb-learner-card-desc">
-                            {stg.highlight}
-                          </p>
+                          <div className="bbb-learner-card-body">
+                            <h2 className="bbb-learner-card-title">
+                              {stg.focus}
+                            </h2>
+                            <p className="bbb-learner-card-desc">
+                              {stg.highlight}
+                            </p>
+                          </div>
                         </div>
                       </article>
                     ))}
