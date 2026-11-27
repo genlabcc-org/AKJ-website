@@ -114,7 +114,16 @@ export default function Pathway() {
                       key={subj.id}
                       type="button"
                       className={`bbb-subject-nav-btn ${isActive ? 'active' : ''}`}
-                      onClick={() => setActiveSubjectId(subj.id)}
+                      onClick={(e) => {
+                        setActiveSubjectId(subj.id);
+                        if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+                          e.currentTarget.scrollIntoView({
+                            behavior: 'smooth',
+                            inline: 'center',
+                            block: 'nearest',
+                          });
+                        }
+                      }}
                     >
                       <span className="bbb-subject-btn-text">{subj.name}</span>
                     </button>

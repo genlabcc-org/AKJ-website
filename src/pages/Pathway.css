@@ -168,6 +168,17 @@
   border-radius: 2px;
 }
 
+@media (max-width: 768px) {
+  .bbb-pathway-centre-tag {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 10px 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 .bbb-centre-badge {
   font-family: var(--font-family);
   font-size: 12px;
@@ -195,6 +206,12 @@
   border-top: 1px solid #e6e6e6;
 }
 
+@media (max-width: 768px) {
+  .bbb-subjects-section {
+    padding: 32px 0 48px;
+  }
+}
+
 .bbb-subjects-layout {
   display: grid;
   grid-template-columns: 290px 1fr;
@@ -211,14 +228,18 @@
 
 @media (max-width: 768px) {
   .bbb-subjects-layout {
-    grid-template-columns: 1fr;
-    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    width: 100%;
+    min-width: 0;
   }
 }
 
 /* Left sidebar navigation */
 .bbb-subjects-sidebar {
   width: 100%;
+  min-width: 0;
 }
 
 .bbb-subjects-nav {
@@ -234,9 +255,13 @@
     border-bottom: 2px solid #e2e8f0;
     flex-direction: row;
     overflow-x: auto;
-    padding-bottom: 4px;
-    gap: 6px;
+    padding-bottom: 0;
+    gap: 4px;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .bbb-subjects-nav::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -264,10 +289,11 @@
   .bbb-subject-nav-btn {
     width: auto;
     white-space: nowrap;
-    border-bottom: 3px solid transparent;
+    border-bottom: 2.5px solid transparent;
     border-left: none;
     margin-left: 0;
-    padding: 10px 16px;
+    margin-bottom: -2px;
+    padding: 10px 14px;
     font-size: 15px;
   }
 }
@@ -291,8 +317,10 @@
 @media (max-width: 768px) {
   .bbb-subject-nav-btn.active {
     border-left: none;
-    border-bottom: 3px solid #1e3a8a;
+    border-bottom: 2.5px solid #1e3a8a;
     background-color: transparent;
+    color: #1e3a8a;
+    font-weight: 600;
   }
 }
 
@@ -305,6 +333,8 @@
   display: flex;
   flex-direction: column;
   padding-top: 12px;
+  min-width: 0;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -323,6 +353,14 @@
   letter-spacing: -0.01em;
 }
 
+@media (max-width: 768px) {
+  .bbb-subject-title {
+    font-size: 28px;
+    line-height: 1.22;
+    margin: 0 0 12px 0;
+  }
+}
+
 .bbb-subject-lead-desc {
   font-family: var(--font-family-light);
   font-size: clamp(17px, 2vw, 20px);
@@ -330,6 +368,15 @@
   color: #475569;
   margin: 0 0 36px 0;
   max-width: 740px;
+}
+
+@media (max-width: 768px) {
+  .bbb-subject-lead-desc {
+    font-size: 15.5px;
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+    max-width: 100%;
+  }
 }
 
 /* Inquiry button matching reference */
