@@ -32,11 +32,24 @@
   background-color: #ffffff;
 }
 
+.logip-mobile-topbar,
+.logip-sidebar-backdrop,
+.logip-sidebar-close-btn {
+  display: none;
+}
+
+.logip-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
 .logip-brand {
   display: flex;
   align-items: center;
   padding: 0 10px;
-  margin-bottom: 30px;
+  margin-bottom: 0;
   text-decoration: none;
 }
 
@@ -163,7 +176,7 @@
 /* KPI STATS STRIP */
 .logip-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   border-top: 1px solid #eceef2;
   border-bottom: 1px solid #eceef2;
   padding: 12px 0;
@@ -1826,40 +1839,434 @@
 }
 
 @media (max-width: 1120px) {
+  .logip-main,
+  .logip-create-blog-main {
+    padding: 24px 28px 24px;
+  }
+
   .logip-overview-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
   .logip-charts-grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 860px) {
-  .logip-home-recent-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 960px) {
+  .logip-create-blog-main {
+    height: auto;
+    min-height: calc(100dvh - 58px);
+    overflow: visible;
   }
+
+  .logip-create-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    flex: none;
+    overflow: visible;
+  }
+
+  .logip-create-left,
+  .logip-create-right,
+  .logip-editor-group,
+  .logip-preview-group {
+    flex: none;
+    min-height: auto;
+  }
+
+  .logip-rich-editor {
+    flex: none;
+    min-height: 250px;
+  }
+
+  .logip-editor-textarea {
+    flex: none;
+    min-height: 210px;
+  }
+
+  .logip-live-card,
+  .logip-live-video-card {
+    flex: none;
+  }
+
+  .logip-live-card-img-wrap {
+    height: 160px;
+  }
+
+  .logip-live-video-wrap {
+    flex: none;
+    height: 220px;
+  }
+
+  .logip-video-url-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .logip-admin-viewport {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* Sticky Top Bar on Mobile/Tablet with Hamburger Menu */
+  .logip-mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 58px;
+    padding: 0 16px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eceef2;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+  }
+
+  .logip-mobile-menu-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background-color: #f3f5f8;
+    color: #111827;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logip-mobile-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .logip-mobile-brand-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .logip-mobile-brand-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .logip-mobile-active-tab {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #1E459F;
+    background-color: rgba(30, 69, 159, 0.1);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  /* Mobile Backdrop & Slide-Out Left Sidebar Drawer */
+  .logip-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 150;
+  }
+
   .logip-admin-shell {
     grid-template-columns: 1fr;
     height: auto;
-    max-height: calc(100vh - 24px);
+    min-height: calc(100dvh - 58px);
+    max-height: none;
+    overflow: visible;
   }
+
   .logip-sidebar {
-    flex-direction: row;
-    align-items: center;
-    padding: 12px 16px;
-    border-right: none;
-    border-bottom: 1px solid #eceef2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    max-width: 82vw;
+    height: 100dvh;
+    z-index: 160;
+    background-color: #ffffff;
+    border-right: 1px solid #eceef2;
+    padding: 22px 18px 24px;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+    overflow-y: auto;
   }
+
+  .logip-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .logip-sidebar-head {
+    margin-bottom: 24px;
+    padding: 0 4px;
+  }
+
   .logip-brand {
-    margin-bottom: 0;
+    padding: 0;
   }
+
+  .logip-brand-logo {
+    height: 38px;
+  }
+
+  .logip-sidebar-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background-color: #f3f5f8;
+    color: #374151;
+    font-size: 22px;
+    line-height: 1;
+  }
+
   .logip-nav {
-    flex-direction: row;
-    margin-left: 16px;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
   }
+
+  .logip-nav-item {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    gap: 11px;
+  }
+
   .logip-sidebar-bottom {
-    margin-top: 0;
-    margin-left: auto;
-    flex-direction: row;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #eceef2;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .logip-bottom-link {
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+
+  /* Main Content Area on Mobile/Tablet */
+  .logip-main,
+  .logip-create-blog-main {
+    padding: 20px 16px 36px;
+    height: auto;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  .logip-home-scroll,
+  .logip-table-section,
+  .logip-table {
+    min-width: 0;
+    width: 100%;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .logip-home-recent-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logip-table-body {
+    overflow: visible;
+    gap: 12px;
+  }
+
+  /* Responsive Card Layout for All Admin Tables (Blogs, Videos, Admission, Contact) */
+  .logip-table .logip-table-head {
+    display: none;
+  }
+
+  .logip-table .logip-table-row,
+  .logip-table-blogs .logip-table-row,
+  .logip-table-videos .logip-table-row,
+  .logip-table-admissions .logip-table-row,
+  .logip-table-contacts .logip-table-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    background-color: #f9fafb;
+    border: 1px solid #eceef2;
+    border-radius: 14px;
+  }
+
+  .logip-cell-main {
+    width: 100%;
+    padding-right: 0;
+  }
+
+  .logip-item-title {
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-word;
+  }
+
+  .logip-cell-person,
+  .logip-cell-text,
+  .logip-cell-date,
+  .logip-cell-url,
+  .logip-contact-line {
+    width: 100%;
+    padding-right: 0;
+  }
+
+  .logip-contact-email {
+    max-width: 100%;
+  }
+
+  .logip-message-preview {
+    padding-right: 0;
+  }
+
+  .logip-cell-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 1px solid #eceef2;
+  }
+
+  .logip-action-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (max-width: 640px) {
+  .logip-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .logip-greeting {
+    font-size: 20px;
+  }
+
+  .logip-stats-row {
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .logip-stat-card {
+    padding: 8px 10px;
+    border-right: none;
+    background-color: #f9fafb;
+    border-radius: 12px;
+  }
+
+  .logip-stat-card:first-child {
+    padding-left: 10px;
+  }
+
+  .logip-controls-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .logip-search-box {
+    grid-column: 1 / -1;
+  }
+
+  .logip-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .logip-overview-card {
+    padding: 14px;
+  }
+
+  .logip-overview-value {
+    font-size: 22px;
+  }
+
+  .logip-chart-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logip-donut-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logip-donut-legend {
+    width: 100%;
+  }
+
+  .logip-create-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .logip-create-title {
+    font-size: 22px;
+  }
+
+  .logip-create-actions {
+    width: 100%;
+  }
+
+  .logip-cancel-pill,
+  .logip-publish-pill {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .logip-image-thumbs-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .logip-modal {
+    width: calc(100% - 28px);
+    padding: 20px 18px;
+  }
+
+  .logip-modal-detail {
+    width: calc(100% - 24px);
+    max-height: 90dvh;
+    padding: 18px 16px;
+  }
+
+  .logip-detail-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .logip-overview-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -52,6 +52,17 @@
   overflow: hidden;
 }
 
+@media (max-width: 860px) {
+  .app-wrapper.admin-route,
+  .app-wrapper.admin-route .main-content {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
 .page-container {
   min-height: 100vh;
   background-color: #ffffff;

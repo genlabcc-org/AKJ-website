@@ -221,8 +221,10 @@ export default function AdminDashboard() {
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const handleLogout = () => {
+    setMobileSidebarOpen(false);
     setShowLogoutConfirm(true);
   };
 
@@ -243,6 +245,7 @@ export default function AdminDashboard() {
     setIsCreatingVideo(false);
     setSearchQuery('');
     setStatusFilter('All Status');
+    setMobileSidebarOpen(false);
   };
 
   const filteredBlogs = useMemo(() => {
@@ -1079,16 +1082,66 @@ export default function AdminDashboard() {
 
   return (
     <div className="logip-admin-viewport">
+      {/* MOBILE TOP BAR FOR SIDEBAR DRAWER */}
+      <div className="logip-mobile-topbar">
+        <button
+          type="button"
+          className="logip-mobile-menu-btn"
+          onClick={() => setMobileSidebarOpen(true)}
+          aria-label="Open menu sidebar"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
+        <Link to="/" className="logip-mobile-brand" aria-label="AKJ Home">
+          <img
+            src="/images/akj-logo.svg"
+            alt="AKJ Logo"
+            className="logip-mobile-brand-logo"
+          />
+          <span className="logip-mobile-brand-title">AKJ Admin</span>
+        </Link>
+
+        <span className="logip-mobile-active-tab">
+          {activeTab === 'home'
+            ? 'Overview'
+            : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+        </span>
+      </div>
+
+      {/* MOBILE SIDEBAR BACKDROP */}
+      {mobileSidebarOpen && (
+        <div
+          className="logip-sidebar-backdrop"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       <div className="logip-admin-shell">
         {/* LEFT SIDEBAR */}
-        <aside className="logip-sidebar">
-          <Link to="/" className="logip-brand" aria-label="AKJ Home">
-            <img
-              src="/images/akj-logo.svg"
-              alt="AKJ Logo"
-              className="logip-brand-logo"
-            />
-          </Link>
+        <aside className={`logip-sidebar ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
+          <div className="logip-sidebar-head">
+            <Link to="/" className="logip-brand" aria-label="AKJ Home">
+              <img
+                src="/images/akj-logo.svg"
+                alt="AKJ Logo"
+                className="logip-brand-logo"
+              />
+            </Link>
+            <button
+              type="button"
+              className="logip-sidebar-close-btn"
+              onClick={() => setMobileSidebarOpen(false)}
+              aria-label="Close sidebar"
+            >
+              &times;
+            </button>
+          </div>
 
           <nav className="logip-nav">
             <button
