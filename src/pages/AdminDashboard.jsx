@@ -219,9 +219,22 @@ export default function AdminDashboard() {
     };
   }, [fetchSupabaseData]);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/admin/login', { replace: true });
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      navigate('/admin/login', { replace: true });
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
   };
 
   const handleTabSwitch = (tab) => {
@@ -951,9 +964,6 @@ export default function AdminDashboard() {
 
   const publishedBlogsCount = blogs.filter((b) => b.status === 'Published').length;
   const draftBlogsCount = blogs.filter((b) => b.status !== 'Published').length;
-  const publishedBlogsRate = blogs.length
-    ? `${Math.round((publishedBlogsCount / blogs.length) * 100)}% rate`
-    : '0% rate';
 
   const publishedVideosCount = videos.filter((v) => v.status === 'Published').length;
   const draftVideosCount = videos.length - publishedVideosCount;
@@ -1153,15 +1163,6 @@ export default function AdminDashboard() {
               </svg>
               <span>Visit Website</span>
             </Link>
-
-            <button type="button" className="logip-bottom-link" onClick={fetchSupabaseData}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="16" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-              <span>{dbLoading ? 'Syncing Supabase...' : 'Help & Information'}</span>
-            </button>
 
             <button type="button" className="logip-bottom-link" onClick={handleLogout}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -2127,74 +2128,6 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
-
-                <div className="logip-recent-card">
-                  <div className="logip-recent-head">
-                    <h3>Latest Blogs</h3>
-                    <button type="button" onClick={() => handleTabSwitch('blogs')}>
-                      View all &rarr;
-                    </button>
-                  </div>
-                  <div className="logip-recent-list">
-                    {blogs.length === 0 ? (
-                      <p className="logip-recent-empty">No blog posts yet.</p>
-                    ) : (
-                      blogs.slice(0, 3).map((item) => (
-                        <button
-                          type="button"
-                          key={item.id}
-                          className="logip-recent-row"
-                          onClick={() => {
-                            setActiveTab('blogs');
-                            handleOpenEditBlog(item);
-                          }}
-                        >
-                          <div className="logip-recent-info">
-                            <strong>{item.title}</strong>
-                            <span>{item.publish_date || item.date || '—'} · {item.author}</span>
-                          </div>
-                          <span className={`logip-status-badge ${getStatusClass(item.status)}`}>
-                            {item.status}
-                          </span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="logip-recent-card">
-                  <div className="logip-recent-head">
-                    <h3>Latest Videos</h3>
-                    <button type="button" onClick={() => handleTabSwitch('videos')}>
-                      View all &rarr;
-                    </button>
-                  </div>
-                  <div className="logip-recent-list">
-                    {videos.length === 0 ? (
-                      <p className="logip-recent-empty">No video sessions yet.</p>
-                    ) : (
-                      videos.slice(0, 3).map((item) => (
-                        <button
-                          type="button"
-                          key={item.id}
-                          className="logip-recent-row"
-                          onClick={() => {
-                            setActiveTab('videos');
-                            handleOpenEditVideo(item);
-                          }}
-                        >
-                          <div className="logip-recent-info">
-                            <strong>{item.title}</strong>
-                            <span>{item.session_date || item.date || '—'}</span>
-                          </div>
-                          <span className={`logip-status-badge ${getStatusClass(item.status)}`}>
-                            {item.status}
-                          </span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
           </section>
@@ -2245,7 +2178,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Total Blogs</span>
                     <strong className="logip-stat-value">{blogs.length}</strong>
-                    <span className="logip-stat-trend text-green">Stored in database</span>
                   </div>
                 </div>
 
@@ -2259,7 +2191,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Published</span>
                     <strong className="logip-stat-value">{publishedBlogsCount}</strong>
-                    <span className="logip-stat-trend text-green">{publishedBlogsRate}</span>
                   </div>
                 </div>
               </div>
@@ -2275,7 +2206,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Total Videos</span>
                     <strong className="logip-stat-value">{videos.length}</strong>
-                    <span className="logip-stat-pill pill-green">Stored in database</span>
                   </div>
                 </div>
 
@@ -2289,7 +2219,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Published</span>
                     <strong className="logip-stat-value">{publishedVideosCount}</strong>
-                    <span className="logip-stat-pill pill-green">Live sessions</span>
                   </div>
                 </div>
               </div>
@@ -2307,7 +2236,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Total Applications</span>
                     <strong className="logip-stat-value">{admissions.length}</strong>
-                    <span className="logip-stat-pill pill-blue">Stored in database</span>
                   </div>
                 </div>
 
@@ -2321,7 +2249,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Pending / Review</span>
                     <strong className="logip-stat-value">{pendingAdmissionsCount}</strong>
-                    <span className="logip-stat-pill pill-amber">Awaiting decision</span>
                   </div>
                 </div>
 
@@ -2335,7 +2262,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Approved</span>
                     <strong className="logip-stat-value">{approvedAdmissionsCount}</strong>
-                    <span className="logip-stat-pill pill-green">Accepted students</span>
                   </div>
                 </div>
               </div>
@@ -2351,7 +2277,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Total Inquiries</span>
                     <strong className="logip-stat-value">{contacts.length}</strong>
-                    <span className="logip-stat-pill pill-blue">Stored in database</span>
                   </div>
                 </div>
 
@@ -2365,7 +2290,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">New / In Progress</span>
                     <strong className="logip-stat-value">{openContactsCount}</strong>
-                    <span className="logip-stat-pill pill-amber">Needs response</span>
                   </div>
                 </div>
 
@@ -2379,7 +2303,6 @@ export default function AdminDashboard() {
                   <div className="logip-stat-info">
                     <span className="logip-stat-label">Resolved</span>
                     <strong className="logip-stat-value">{resolvedContactsCount}</strong>
-                    <span className="logip-stat-pill pill-green">Handled</span>
                   </div>
                 </div>
               </div>
@@ -3283,6 +3206,39 @@ export default function AdminDashboard() {
                 disabled={isDeletingContact}
               >
                 {isDeletingContact ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {showLogoutConfirm && (
+        <div
+          className="logip-modal-backdrop"
+          onClick={() => !isLoggingOut && setShowLogoutConfirm(false)}
+        >
+          <div className="logip-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirm Logout</h3>
+            <p className="logip-delete-message">
+              Are you sure you want to log out of the AKJ International School Admin Panel?
+            </p>
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="logip-btn-cancel"
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmLogout}
+                className="logip-btn-delete"
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? 'Logging out...' : 'Log out'}
               </button>
             </div>
           </div>
