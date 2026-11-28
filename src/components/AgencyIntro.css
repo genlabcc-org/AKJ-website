@@ -123,7 +123,7 @@
   transform: translateY(-1px);
 }
 
-/* Dual Banner Images after A Unique Consultancy */
+/* Dual / Full-Width Banner Images after A Unique Consultancy */
 .agency-intro-dual-banners {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -131,6 +131,10 @@
   width: 100%;
   margin-top: 72px;
   overflow: hidden;
+}
+
+.agency-intro-dual-banners.single-banner {
+  grid-template-columns: 1fr;
 }
 
 @media (min-width: 1024px) {

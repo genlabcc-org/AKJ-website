@@ -129,19 +129,12 @@ export default function AgencyIntro() {
         </div>
       </div>
 
-      {/* DUAL BANNER IMAGES */}
-      <div className="agency-intro-dual-banners">
+      {/* DUAL / FULL-WIDTH BANNER IMAGE */}
+      <div className="agency-intro-dual-banners single-banner">
         <div className="agency-intro-dual-banner">
           <img
-            src="/images/akj-student-reading.jpg"
-            alt="AKJ student reading"
-            className="agency-intro-dual-img"
-          />
-        </div>
-        <div className="agency-intro-dual-banner">
-          <img
-            src="/images/akj-bookshelf.jpg"
-            alt="AKJ learning library"
+            src="/images/akj-cairo-reading-lounge.jpg"
+            alt="Cairo Stories Reading Lounge with learners and creative spaces - AKJ International School"
             className="agency-intro-dual-img"
           />
         </div>
@@ -193,7 +186,7 @@ export default function AgencyIntro() {
         <div className="agency-pillar-card">
           <div className="agency-pillar-img-wrap">
             <img
-              src="/images/s5.jpeg"
+              src="/images/AKJ P1.png"
               alt="Confident"
               className="agency-pillar-img"
               loading="lazy"

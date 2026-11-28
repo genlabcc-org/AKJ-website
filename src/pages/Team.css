@@ -423,7 +423,6 @@
   color: #000000;
   margin: 16px 0 20px;
 }
-
 .bbb-team-callout-lead {
   font-family: var(--font-family-light);
   font-size: 18px;
@@ -431,7 +430,7 @@
   color: #333333;
   margin: 0 0 32px;
 }
-
+ 
 .bbb-team-pill-btn {
   display: inline-flex;
   align-items: center;
@@ -467,8 +466,7 @@
     gap: 24px;
     padding: 36px 0 54px;
   }
-
-  .bbb-team-group-row {
+  .mbb-team-group-row {
     grid-template-columns: 1fr;
     gap: 28px;
   }
@@ -480,7 +478,7 @@
 
 @media (max-width: 768px) {
   .bbb-team-page {
-    padding: 24px 20px 72px;
+    padding: 24px 20px 72px; 
   }
 
   .bbb-team-dual-banners {
