@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { supabase } from '../supabase';
+import {
+  normalizeAchievementCategoryId,
+  getAchievementGradeStage,
+} from '../utils/achievementConfig';
 import './LearnersAchievement.css';
 
 const LEARNER_CATEGORIES = [
@@ -232,6 +237,49 @@ const GRADE_FILTER_OPTIONS = [
 export default function LearnersAchievement() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeGradeFilter, setActiveGradeFilter] = useState('all');
+  const [liveAchievements, setLiveAchievements] = useState([]);
+  const [loadingAchievements, setLoadingAchievements] = useState(Boolean(supabase));
+  const [selectedAchievement, setSelectedAchievement] = useState(null);
+
+  useEffect(() => {
+    if (!supabase) return;
+    let active = true;
+
+    const loadAchievements = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('achievements')
+          .select('*')
+          .eq('status', 'Published')
+          .order('id', { ascending: false });
+
+        if (active && !error && data) {
+          setLiveAchievements(data);
+        }
+      } finally {
+        if (active) setLoadingAchievements(false);
+      }
+    };
+
+    loadAchievements();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const achievementsByCategory = useMemo(() => {
+    const grouped = {};
+    liveAchievements.forEach((item) => {
+      const catId = normalizeAchievementCategoryId(item.category);
+      const stageId = getAchievementGradeStage(item.grade);
+      if (activeGradeFilter !== 'all' && stageId !== activeGradeFilter) {
+        return;
+      }
+      if (!grouped[catId]) grouped[catId] = [];
+      grouped[catId].push(item);
+    });
+    return grouped;
+  }, [liveAchievements, activeGradeFilter]);
 
   const filteredCategories = LEARNER_CATEGORIES.map((cat) => {
     const matchingStages = cat.stages.filter((stg) => {
@@ -246,11 +294,12 @@ export default function LearnersAchievement() {
     return {
       ...cat,
       stages: matchingStages,
+      uploadedAchievements: achievementsByCategory[cat.id] || [],
     };
   }).filter((cat) => {
     const matchCategory =
       activeCategory === 'all' || cat.id === activeCategory;
-    return matchCategory && cat.stages.length > 0;
+    return matchCategory && (cat.stages.length > 0 || cat.uploadedAchievements.length > 0);
   });
 
   return (
@@ -289,7 +338,11 @@ export default function LearnersAchievement() {
           <div className="bbb-learners-filter-header">
             <span className="bbb-learners-filter-label">BROWSE BY CATEGORY:</span>
             <span className="bbb-learners-total-count">
-              6 CAMBRIDGE CATEGORIES
+              {loadingAchievements
+                ? 'LOADING ACHIEVEMENTS...'
+                : liveAchievements.length > 0
+                  ? `6 CAMBRIDGE CATEGORIES · ${liveAchievements.length} UPLOADED`
+                  : '6 CAMBRIDGE CATEGORIES'}
             </span>
           </div>
 
@@ -362,8 +415,44 @@ export default function LearnersAchievement() {
                   <p className="bbb-learners-group-desc">{cat.desc}</p>
                 </div>
 
-                {/* RIGHT: BORDERLESS CARDS GRID (MATCHING TEAM CARDS) */}
+                {/* RIGHT: UPLOADED ACHIEVEMENTS + PATHWAY CARDS GRID */}
                 <div className="bbb-learners-group-right">
+                  {cat.uploadedAchievements.length > 0 && (
+                    <div className="bbb-achievement-photos-grid">
+                      {cat.uploadedAchievements.map((ach) => (
+                        <article
+                          key={ach.id}
+                          className="bbb-achievement-photo-card"
+                          onClick={() => setSelectedAchievement(ach)}
+                        >
+                          {ach.photo && (
+                            <div className="bbb-achievement-photo-wrap">
+                              <img
+                                src={ach.photo}
+                                alt={`${ach.category} - ${ach.grade}`}
+                                className="bbb-achievement-photo-img"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                          <div className="bbb-achievement-photo-body">
+                            <div className="bbb-learner-card-header">
+                              <span className="bbb-learner-stage-pill">
+                                {ach.category}
+                              </span>
+                              <span className="bbb-learner-grades-tag">
+                                {ach.grade}
+                              </span>
+                            </div>
+                            <p className="bbb-learner-card-desc bbb-achievement-photo-desc">
+                              {ach.description}
+                            </p>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="bbb-learners-cards-grid">
                     {cat.stages.map((stg) => (
                       <article key={stg.id} className={`bbb-learner-card ${stg.image ? 'has-image' : ''}`}>
@@ -405,6 +494,49 @@ export default function LearnersAchievement() {
           ))}
         </div>
       </div>
+
+      {/* LIGHTBOX MODAL FOR ACHIEVEMENT PHOTO */}
+      {selectedAchievement && (
+        <div
+          className="bbb-achievement-modal-backdrop"
+          onClick={() => setSelectedAchievement(null)}
+        >
+          <div
+            className="bbb-achievement-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="bbb-achievement-modal-close"
+              onClick={() => setSelectedAchievement(null)}
+              aria-label="Close achievement detail"
+            >
+              &times;
+            </button>
+            {selectedAchievement.photo && (
+              <div className="bbb-achievement-modal-media">
+                <img
+                  src={selectedAchievement.photo}
+                  alt={`${selectedAchievement.category} - ${selectedAchievement.grade}`}
+                />
+              </div>
+            )}
+            <div className="bbb-achievement-modal-body">
+              <div className="bbb-learner-card-header">
+                <span className="bbb-learner-stage-pill">
+                  {selectedAchievement.category}
+                </span>
+                <span className="bbb-learner-grades-tag">
+                  {selectedAchievement.grade}
+                </span>
+              </div>
+              <p className="bbb-achievement-modal-desc">
+                {selectedAchievement.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

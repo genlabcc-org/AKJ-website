@@ -2,6 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase, BLOG_IMAGES_BUCKET, normalizeBlogRow, packLegacyBlogPayload, getVideoEmbedInfo } from '../supabase';
+import { ACHIEVEMENT_CATEGORIES, ACHIEVEMENT_GRADE_GROUPS } from '../utils/achievementConfig';
+import {
+  uploadAchievementPhotoToR2,
+  deleteAchievementPhotoFromR2,
+} from '../utils/r2Upload';
 import './AdminDashboard.css';
 
 function formatNowShort() {
@@ -42,13 +47,15 @@ export default function AdminDashboard() {
   const { adminUser, logout } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const achievementPhotoInputRef = useRef(null);
   const contentAreaRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'blogs' | 'videos' | 'admission' | 'contact'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'blogs' | 'videos' | 'admission' | 'contact' | 'achievements'
   const [admissionChartMode, setAdmissionChartMode] = useState('stages'); // 'stages' | 'timeline'
   const [currentMonthAnchor] = useState(() => new Date());
   const [isCreatingBlog, setIsCreatingBlog] = useState(false);
   const [isCreatingVideo, setIsCreatingVideo] = useState(false);
+  const [isCreatingAchievement, setIsCreatingAchievement] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');
@@ -56,6 +63,7 @@ export default function AdminDashboard() {
   const [videos, setVideos] = useState([]);
   const [admissions, setAdmissions] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [achievements, setAchievements] = useState([]);
   const [dbLoading, setDbLoading] = useState(false);
   const [dbNotice, setDbNotice] = useState('');
 
@@ -105,6 +113,23 @@ export default function AdminDashboard() {
   // Delete Video confirmation modal state
   const [videoToDelete, setVideoToDelete] = useState(null);
   const [isDeletingVideo, setIsDeletingVideo] = useState(false);
+
+  // Create / Edit Achievement full-page state
+  const [editingAchievementId, setEditingAchievementId] = useState(null);
+  const [achievementCategory, setAchievementCategory] = useState(ACHIEVEMENT_CATEGORIES[0]);
+  const [achievementGrade, setAchievementGrade] = useState('');
+  const [achievementPhoto, setAchievementPhoto] = useState('');
+  const [achievementDescription, setAchievementDescription] = useState('');
+  const [achievementStatus, setAchievementStatus] = useState('Published');
+  const [isUploadingAchievementPhoto, setIsUploadingAchievementPhoto] = useState(false);
+  const [achievementPhotoError, setAchievementPhotoError] = useState('');
+  const [achievementUploadNote, setAchievementUploadNote] = useState('');
+  const [achievementError, setAchievementError] = useState('');
+  const [isSavingAchievement, setIsSavingAchievement] = useState(false);
+
+  // Delete Achievement confirmation modal state
+  const [achievementToDelete, setAchievementToDelete] = useState(null);
+  const [isDeletingAchievement, setIsDeletingAchievement] = useState(false);
 
   const displayName = useMemo(() => {
     if (!adminUser?.name || adminUser.name === 'Administrator') {
@@ -200,6 +225,15 @@ export default function AdminDashboard() {
           // ignore
         }
       }
+
+      const { data: achievementsData, error: achievementsError } = await supabase
+        .from('achievements')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (!achievementsError && achievementsData) {
+        setAchievements(achievementsData);
+      }
     } catch {
       setDbNotice('Unable to load data from Supabase.');
     } finally {
@@ -243,6 +277,7 @@ export default function AdminDashboard() {
     setActiveTab(tab);
     setIsCreatingBlog(false);
     setIsCreatingVideo(false);
+    setIsCreatingAchievement(false);
     setSearchQuery('');
     setStatusFilter('All Status');
     setMobileSidebarOpen(false);
@@ -919,7 +954,10 @@ export default function AdminDashboard() {
   };
 
   const handleCycleStatus = async (item, table) => {
-    const order = table === 'videos' ? ['Published', 'Draft'] : ['Published', 'Scheduled', 'Draft'];
+    const order =
+      table === 'videos' || table === 'achievements'
+        ? ['Published', 'Draft']
+        : ['Published', 'Scheduled', 'Draft'];
     const currentIndex = order.indexOf(item.status);
     const nextStatus = order[(currentIndex + 1) % order.length];
 
@@ -927,15 +965,186 @@ export default function AdminDashboard() {
       setBlogs((prev) =>
         prev.map((b) => (b.id === item.id ? { ...b, status: nextStatus } : b))
       );
-    } else {
+    } else if (table === 'videos') {
       setVideos((prev) =>
         prev.map((v) => (v.id === item.id ? { ...v, status: nextStatus } : v))
+      );
+    } else if (table === 'achievements') {
+      setAchievements((prev) =>
+        prev.map((a) => (a.id === item.id ? { ...a, status: nextStatus } : a))
       );
     }
 
     if (supabase) {
       await supabase.from(table).update({ status: nextStatus }).eq('id', item.id);
     }
+  };
+
+  const filteredAchievements = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return achievements.filter((item) => {
+      const cat = item.category || '';
+      const grade = item.grade || '';
+      const desc = item.description || '';
+      const matchesSearch =
+        cat.toLowerCase().includes(query) ||
+        grade.toLowerCase().includes(query) ||
+        desc.toLowerCase().includes(query);
+      const itemStatus = item.status || 'Published';
+      const matchesStatus = statusFilter === 'All Status' || itemStatus === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [achievements, searchQuery, statusFilter]);
+
+  const publishedAchievementsCount = achievements.filter(
+    (a) => (a.status || 'Published') === 'Published'
+  ).length;
+  const draftAchievementsCount = achievements.length - publishedAchievementsCount;
+  const achievementCategoriesCount = new Set(
+    achievements.map((a) => a.category).filter(Boolean)
+  ).size;
+
+  const handleAchievementPhotoSelected = async (files) => {
+    const file = files?.[0];
+    if (!file) return;
+
+    setAchievementPhotoError('');
+    setAchievementUploadNote('');
+    setIsUploadingAchievementPhoto(true);
+
+    try {
+      const result = await uploadAchievementPhotoToR2(file);
+      setAchievementPhoto(result.url);
+      if (result.uploadedSize < result.originalSize) {
+        const origKb = Math.round(result.originalSize / 1024);
+        const optKb = Math.round(result.uploadedSize / 1024);
+        setAchievementUploadNote(
+          `Uploaded to Cloudflare R2 (optimized from ${origKb} KB to ${optKb} KB).`
+        );
+      } else {
+        setAchievementUploadNote('Uploaded to Cloudflare R2.');
+      }
+    } catch (err) {
+      setAchievementPhotoError(
+        err?.message || 'Failed to upload photo to Cloudflare R2.'
+      );
+    } finally {
+      setIsUploadingAchievementPhoto(false);
+    }
+  };
+
+  const handleOpenCreateAchievement = () => {
+    setEditingAchievementId(null);
+    setAchievementCategory(ACHIEVEMENT_CATEGORIES[0]);
+    setAchievementGrade('');
+    setAchievementPhoto('');
+    setAchievementDescription('');
+    setAchievementStatus('Published');
+    setAchievementPhotoError('');
+    setAchievementUploadNote('');
+    setAchievementError('');
+    setIsCreatingAchievement(true);
+  };
+
+  const handleOpenEditAchievement = (item) => {
+    setEditingAchievementId(item.id);
+    setAchievementCategory(item.category || ACHIEVEMENT_CATEGORIES[0]);
+    setAchievementGrade(item.grade || '');
+    setAchievementPhoto(item.photo || '');
+    setAchievementDescription(item.description || '');
+    setAchievementStatus(item.status || 'Published');
+    setAchievementPhotoError('');
+    setAchievementUploadNote('');
+    setAchievementError('');
+    setIsCreatingAchievement(true);
+  };
+
+  const handleSaveAchievement = async () => {
+    if (!achievementCategory.trim()) {
+      setAchievementError('Please select a category.');
+      return;
+    }
+    if (!achievementGrade.trim()) {
+      setAchievementError('Please select a grade.');
+      return;
+    }
+    if (!achievementPhoto.trim()) {
+      setAchievementError('Please upload an achievement photo.');
+      return;
+    }
+    if (!achievementDescription.trim()) {
+      setAchievementError('Please enter a description for this achievement.');
+      return;
+    }
+
+    setAchievementError('');
+    setIsSavingAchievement(true);
+
+    const payload = {
+      category: achievementCategory.trim(),
+      grade: achievementGrade.trim(),
+      photo: achievementPhoto.trim(),
+      description: achievementDescription.trim(),
+      status: achievementStatus,
+    };
+
+    if (editingAchievementId !== null) {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('achievements')
+          .update(payload)
+          .eq('id', editingAchievementId)
+          .select()
+          .single();
+
+        const updatedItem =
+          !error && data ? data : { id: editingAchievementId, ...payload };
+        setAchievements((prev) =>
+          prev.map((a) => (a.id === editingAchievementId ? updatedItem : a))
+        );
+      } else {
+        setAchievements((prev) =>
+          prev.map((a) =>
+            a.id === editingAchievementId ? { ...a, ...payload } : a
+          )
+        );
+      }
+    } else if (supabase) {
+      const { data, error } = await supabase
+        .from('achievements')
+        .insert([payload])
+        .select()
+        .single();
+
+      if (!error && data) {
+        setAchievements((prev) => [data, ...prev]);
+      } else {
+        setAchievements((prev) => [{ id: Date.now(), ...payload }, ...prev]);
+      }
+    } else {
+      setAchievements((prev) => [{ id: Date.now(), ...payload }, ...prev]);
+    }
+
+    setIsSavingAchievement(false);
+    setEditingAchievementId(null);
+    setIsCreatingAchievement(false);
+  };
+
+  const handleConfirmDeleteAchievement = async () => {
+    if (!achievementToDelete) return;
+    setIsDeletingAchievement(true);
+
+    if (achievementToDelete.photo) {
+      await deleteAchievementPhotoFromR2(achievementToDelete.photo);
+    }
+
+    if (supabase) {
+      await supabase.from('achievements').delete().eq('id', achievementToDelete.id);
+    }
+
+    setAchievements((prev) => prev.filter((a) => a.id !== achievementToDelete.id));
+    setIsDeletingAchievement(false);
+    setAchievementToDelete(null);
   };
 
   const getStatusClass = (status) => {
@@ -1184,14 +1393,18 @@ export default function AdminDashboard() {
 
             <button
               type="button"
-              className={`logip-nav-item ${activeTab === 'admission' ? 'active' : ''}`}
-              onClick={() => handleTabSwitch('admission')}
+              className={`logip-nav-item ${activeTab === 'achievements' ? 'active' : ''}`}
+              onClick={() => handleTabSwitch('achievements')}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5" />
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
               </svg>
-              <span>Admission</span>
+              <span>Achievements</span>
             </button>
 
             <button
@@ -1204,6 +1417,18 @@ export default function AdminDashboard() {
                 <polyline points="22,6 12,13 2,6" />
               </svg>
               <span>Contact</span>
+            </button>
+
+            <button
+              type="button"
+              className={`logip-nav-item ${activeTab === 'admission' ? 'active' : ''}`}
+              onClick={() => handleTabSwitch('admission')}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5" />
+              </svg>
+              <span>Admissions</span>
             </button>
           </nav>
 
@@ -1821,6 +2046,31 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                 </button>
+
+                <button
+                  type="button"
+                  className="logip-overview-card card-blue"
+                  onClick={() => handleTabSwitch('achievements')}
+                >
+                  <div className="logip-overview-top">
+                    <span className="logip-overview-icon icon-blue">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                        <path d="M4 22h16" />
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                      </svg>
+                    </span>
+                    <span className="logip-overview-arrow">&rarr;</span>
+                  </div>
+                  <div className="logip-overview-body">
+                    <span className="logip-overview-label">Achievements</span>
+                    <strong className="logip-overview-value">{achievements.length}</strong>
+                    <span className="logip-overview-meta">
+                      {publishedAchievementsCount} Published · {draftAchievementsCount} Draft
+                    </span>
+                  </div>
+                </button>
               </div>
 
               {/* ADMISSION GRAPHS */}
@@ -2181,11 +2431,271 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
+
+                <div className="logip-recent-card">
+                  <div className="logip-recent-head">
+                    <h3>Recent Achievements</h3>
+                    <button type="button" onClick={() => handleTabSwitch('achievements')}>
+                      View all &rarr;
+                    </button>
+                  </div>
+                  <div className="logip-recent-list">
+                    {achievements.length === 0 ? (
+                      <p className="logip-recent-empty">No achievements uploaded yet.</p>
+                    ) : (
+                      achievements.slice(0, 3).map((item) => {
+                        const status = item.status || 'Published';
+                        return (
+                          <button
+                            type="button"
+                            key={item.id}
+                            className="logip-recent-row"
+                            onClick={() => {
+                              setActiveTab('achievements');
+                              handleOpenEditAchievement(item);
+                            }}
+                          >
+                            <div className="logip-recent-info">
+                              <strong>{item.category} · {item.grade}</strong>
+                              <span>{item.description}</span>
+                            </div>
+                            <span className={`logip-status-badge ${getStatusClass(status)}`}>
+                              {status}
+                            </span>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : activeTab === 'achievements' && isCreatingAchievement ? (
+          /* CREATE / EDIT ACHIEVEMENT FULL-PAGE VIEW */
+          <section className="logip-main logip-create-blog-main">
+            <button
+              type="button"
+              className="logip-back-to-blogs"
+              onClick={() => {
+                setEditingAchievementId(null);
+                setIsCreatingAchievement(false);
+              }}
+            >
+              <span>&larr;</span>
+              <span>Back to Achievements</span>
+            </button>
+
+            <div className="logip-create-header">
+              <div>
+                <h1 className="logip-create-title">
+                  {editingAchievementId !== null ? 'Edit Achievement' : 'Add New Achievement'}
+                </h1>
+                <p className="logip-create-subtitle">
+                  Upload photo to Cloudflare R2 and publish to Learners&apos; Achievement Corner.
+                </p>
+              </div>
+
+              <div className="logip-create-actions">
+                <button
+                  type="button"
+                  className="logip-cancel-pill"
+                  onClick={() => {
+                    setEditingAchievementId(null);
+                    setIsCreatingAchievement(false);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="logip-publish-pill"
+                  onClick={handleSaveAchievement}
+                  disabled={isSavingAchievement || isUploadingAchievementPhoto}
+                >
+                  {isSavingAchievement
+                    ? editingAchievementId !== null
+                      ? 'Saving...'
+                      : 'Publishing...'
+                    : editingAchievementId !== null
+                      ? 'Save Changes'
+                      : 'Publish Achievement'}
+                </button>
+              </div>
+            </div>
+
+            <div className="logip-create-grid">
+              {/* LEFT COLUMN: Category, Grade, Description */}
+              <div className="logip-create-left">
+                <div className="logip-field-group">
+                  <label htmlFor="achievement-category-select">Category</label>
+                  <select
+                    id="achievement-category-select"
+                    className="logip-pill-input"
+                    value={achievementCategory}
+                    onChange={(e) => {
+                      setAchievementCategory(e.target.value);
+                      if (achievementError) setAchievementError('');
+                    }}
+                  >
+                    {ACHIEVEMENT_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="logip-field-group">
+                  <label htmlFor="achievement-grade-select">Grade</label>
+                  <select
+                    id="achievement-grade-select"
+                    className="logip-pill-input"
+                    value={achievementGrade}
+                    onChange={(e) => {
+                      setAchievementGrade(e.target.value);
+                      if (achievementError) setAchievementError('');
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select Grade / Stage
+                    </option>
+                    {ACHIEVEMENT_GRADE_GROUPS.map((grp) => (
+                      <optgroup key={grp.group} label={grp.group}>
+                        {grp.options.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="logip-field-group logip-editor-group">
+                  <label htmlFor="achievement-desc-area">Description</label>
+                  <textarea
+                    id="achievement-desc-area"
+                    className="logip-achievement-textarea"
+                    value={achievementDescription}
+                    onChange={(e) => {
+                      setAchievementDescription(e.target.value);
+                      if (achievementError) setAchievementError('');
+                    }}
+                    placeholder="Describe the learner achievement, award, event, or project highlight..."
+                  />
+                  {achievementError && <p className="logip-field-error">{achievementError}</p>}
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN: Status, R2 Photo Upload, Live Card Preview */}
+              <div className="logip-create-right">
+                <div className="logip-field-group">
+                  <label htmlFor="achievement-status-select">Status</label>
+                  <select
+                    id="achievement-status-select"
+                    className="logip-pill-input"
+                    value={achievementStatus}
+                    onChange={(e) => setAchievementStatus(e.target.value)}
+                  >
+                    <option value="Published">Published</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </div>
+
+                <div className="logip-field-group">
+                  <label>Photo</label>
+                  <input
+                    ref={achievementPhotoInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      handleAchievementPhotoSelected(e.target.files);
+                      e.target.value = '';
+                    }}
+                  />
+                  <div
+                    className="logip-upload-dropzone"
+                    onClick={() =>
+                      !isUploadingAchievementPhoto && achievementPhotoInputRef.current?.click()
+                    }
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (!isUploadingAchievementPhoto) {
+                        handleAchievementPhotoSelected(e.dataTransfer.files);
+                      }
+                    }}
+                  >
+                    {isUploadingAchievementPhoto
+                      ? 'Uploading photo...'
+                      : 'Click or Drag photo'}
+                  </div>
+
+                  {achievementUploadNote && (
+                    <p className="logip-achievement-upload-note">{achievementUploadNote}</p>
+                  )}
+                  {achievementPhotoError && (
+                    <p className="logip-field-error">{achievementPhotoError}</p>
+                  )}
+                  {achievementPhoto && (
+                    <div className="logip-image-thumbs-row">
+                      <div className="logip-upload-thumb-box">
+                        <img src={achievementPhoto} alt={achievementCategory} />
+                        <button
+                          type="button"
+                          className="logip-thumb-remove"
+                          onClick={() => {
+                            setAchievementPhoto('');
+                            setAchievementUploadNote('');
+                          }}
+                          aria-label="Remove photo"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="logip-field-group logip-preview-group">
+                  <label>Live Card Preview</label>
+                  <div className="logip-live-card">
+                    <div className="logip-live-card-img-wrap">
+                      {achievementPhoto.trim() ? (
+                        <img
+                          src={achievementPhoto.trim()}
+                          alt={achievementCategory}
+                          className="logip-live-card-img"
+                        />
+                      ) : (
+                        <div className="logip-live-card-placeholder">
+                          No R2 photo uploaded yet
+                        </div>
+                      )}
+                    </div>
+                    <div className="logip-live-card-body">
+                      <div className="logip-live-card-meta">
+                        <span className="logip-live-tag">{achievementCategory}</span>
+                        <span className="logip-live-date">
+                          {achievementGrade || 'Select Grade'}
+                        </span>
+                      </div>
+                      <p className="logip-live-card-desc">
+                        {achievementDescription.trim().length > 110
+                          ? `${achievementDescription.trim().slice(0, 110)}...`
+                          : achievementDescription.trim() ||
+                          'Achievement description preview will appear here...'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
         ) : (
-          /* BLOGS, VIDEOS, ADMISSION & CONTACT LIST VIEW */
+          /* BLOGS, VIDEOS, ADMISSION, CONTACT & ACHIEVEMENTS LIST VIEW */
           <section className="logip-main">
             {/* Top Greeting & Date */}
             <header className="logip-header">
@@ -2198,7 +2708,9 @@ export default function AdminDashboard() {
                       ? 'Manage your video sessions below.'
                       : activeTab === 'admission'
                         ? 'Review and manage student admission applications below.'
-                        : 'Review and respond to contact form inquiries below.'}
+                        : activeTab === 'contact'
+                          ? 'Review and respond to contact form inquiries below.'
+                          : 'Upload learner achievement photos to Cloudflare R2 and manage records in Supabase.'}
                   {dbNotice && <span className="logip-db-hint"> ({dbNotice})</span>}
                 </p>
               </div>
@@ -2318,7 +2830,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : activeTab === 'contact' ? (
               <div className="logip-stats-row">
                 <div className="logip-stat-card">
                   <div className="logip-stat-icon">
@@ -2359,6 +2871,51 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="logip-stats-row">
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                      <path d="M4 22h16" />
+                      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Total Achievements</span>
+                    <strong className="logip-stat-value">{achievements.length}</strong>
+                  </div>
+                </div>
+
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Published</span>
+                    <strong className="logip-stat-value">{publishedAchievementsCount}</strong>
+                  </div>
+                </div>
+
+                <div className="logip-stat-card">
+                  <div className="logip-stat-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <rect x="3" y="3" width="7" height="7" />
+                      <rect x="14" y="3" width="7" height="7" />
+                      <rect x="14" y="14" width="7" height="7" />
+                      <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                  </div>
+                  <div className="logip-stat-info">
+                    <span className="logip-stat-label">Categories Active</span>
+                    <strong className="logip-stat-value">{achievementCategoriesCount}</strong>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* SEARCH & FILTER CONTROLS */}
@@ -2379,7 +2936,9 @@ export default function AdminDashboard() {
                         ? 'Search video sessions...'
                         : activeTab === 'admission'
                           ? 'Search student, email, grade, ref ID...'
-                          : 'Search name, email, purpose, message...'
+                          : activeTab === 'contact'
+                            ? 'Search name, email, purpose, message...'
+                            : 'Search category, grade, description...'
                   }
                 />
               </div>
@@ -2404,7 +2963,7 @@ export default function AdminDashboard() {
                       <option value="In Progress">In Progress</option>
                       <option value="Resolved">Resolved</option>
                     </>
-                  ) : activeTab === 'videos' ? (
+                  ) : activeTab === 'videos' || activeTab === 'achievements' ? (
                     <>
                       <option value="Published">Published</option>
                       <option value="Draft">Draft</option>
@@ -2451,13 +3010,21 @@ export default function AdminDashboard() {
                   onClick={() => {
                     if (activeTab === 'blogs') {
                       handleOpenCreateBlog();
-                    } else {
+                    } else if (activeTab === 'videos') {
                       handleOpenCreateVideo();
+                    } else {
+                      handleOpenCreateAchievement();
                     }
                   }}
                 >
                   <span>+</span>
-                  <span>{activeTab === 'blogs' ? 'New Blog' : 'New Video'}</span>
+                  <span>
+                    {activeTab === 'blogs'
+                      ? 'New Blog'
+                      : activeTab === 'videos'
+                        ? 'New Video'
+                        : 'Add'}
+                  </span>
                 </button>
               )}
             </div>
@@ -2471,7 +3038,9 @@ export default function AdminDashboard() {
                     ? 'Videos Sessions'
                     : activeTab === 'admission'
                       ? 'Admission Applications'
-                      : 'Contact Responses'}
+                      : activeTab === 'contact'
+                        ? 'Contact Responses'
+                        : 'Learner Achievements'}
               </h2>
 
               {activeTab === 'blogs' ? (
@@ -2775,7 +3344,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
-              ) : (
+              ) : activeTab === 'contact' ? (
                 <div className="logip-table logip-table-contacts">
                   <div className="logip-table-head">
                     <span>Sender</span>
@@ -2878,10 +3447,108 @@ export default function AdminDashboard() {
                     )}
                   </div>
                 </div>
+              ) : (
+                <div className="logip-table logip-table-achievements">
+                  <div className="logip-table-head">
+                    <span>Photo &amp; Description</span>
+                    <span>Category</span>
+                    <span>Grade</span>
+                    <span>Status</span>
+                    <span>Actions</span>
+                  </div>
+
+                  <div className="logip-table-body">
+                    {filteredAchievements.length === 0 ? (
+                      <div className="logip-empty-row">
+                        {dbLoading
+                          ? 'Loading achievements...'
+                          : 'No achievements yet. Click "+ New Achievements" to add one.'}
+                      </div>
+                    ) : (
+                      filteredAchievements.map((item) => {
+                        const itemStatus = item.status || 'Published';
+                        return (
+                          <div className="logip-table-row" key={item.id}>
+                            <div className="logip-cell-main">
+                              {item.photo ? (
+                                <img
+                                  src={item.photo}
+                                  alt={`${item.category} - ${item.grade}`}
+                                  className="logip-thumb"
+                                />
+                              ) : (
+                                <div className="logip-thumb-placeholder" aria-hidden="true">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                  </svg>
+                                </div>
+                              )}
+                              <span
+                                className="logip-achievement-desc-cell"
+                                title={item.description}
+                              >
+                                {item.description}
+                              </span>
+                            </div>
+
+                            <div className="logip-cell-text">
+                              <span className="logip-grade-badge">{item.category}</span>
+                            </div>
+
+                            <div className="logip-cell-text">{item.grade}</div>
+
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => handleCycleStatus(item, 'achievements')}
+                                className={`logip-status-badge ${getStatusClass(itemStatus)}`}
+                                title="Click to change status in Supabase"
+                              >
+                                {itemStatus}
+                              </button>
+                            </div>
+
+                            <div className="logip-cell-actions">
+                              <button
+                                type="button"
+                                className="logip-action-btn"
+                                onClick={() => handleOpenEditAchievement(item)}
+                                title="Edit achievement"
+                                aria-label={`Edit achievement ${item.id}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M12 20h9" />
+                                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                className="logip-action-btn logip-action-delete"
+                                onClick={() => setAchievementToDelete(item)}
+                                title="Delete achievement"
+                                aria-label={`Delete achievement ${item.id}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               )}
 
               {/* PAGINATION FOOTER */}
-              
+
             </div>
           </section>
         )}
@@ -3259,6 +3926,43 @@ export default function AdminDashboard() {
                 disabled={isDeletingContact}
               >
                 {isDeletingContact ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE ACHIEVEMENT CONFIRMATION MODAL */}
+      {achievementToDelete && (
+        <div
+          className="logip-modal-backdrop"
+          onClick={() => !isDeletingAchievement && setAchievementToDelete(null)}
+        >
+          <div className="logip-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Achievement</h3>
+            <p className="logip-delete-message">
+              Are you sure you want to delete this{' '}
+              <strong>
+                {achievementToDelete.category} ({achievementToDelete.grade})
+              </strong>{' '}
+              achievement? This action cannot be undone.
+            </p>
+            <div className="logip-modal-actions">
+              <button
+                type="button"
+                onClick={() => setAchievementToDelete(null)}
+                className="logip-btn-cancel"
+                disabled={isDeletingAchievement}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteAchievement}
+                className="logip-btn-delete"
+                disabled={isDeletingAchievement}
+              >
+                {isDeletingAchievement ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
